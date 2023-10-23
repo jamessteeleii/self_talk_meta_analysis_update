@@ -17,6 +17,7 @@ tar_option_set(
     "janitor",
     "tidyverse",
     "base",
+    # "purrr",
     # "scales",
     # "ggtext",
     # "zoo",
@@ -42,17 +43,23 @@ list(
   tar_target(data_effect_sizes, calculate_effect_sizes(data)),
 
   # Fit, check, and plot main model
-  tar_target(rstan_setup, rstan_setup()), # to run chains in parallel
-  tar_target(intercept_prior, intercept_prior()),
-  tar_target(prior_plot, prior_plot()),
-  tar_target(main_model, fit_main_model(data_effect_sizes, intercept_prior)),
+  # tar_target(rstan_setup, rstan_setup()), # to run chains in parallel
+  tar_target(main_model_prior, set_main_model_prior()),
+  tar_target(main_model, fit_main_model(data_effect_sizes, main_model_prior)),
   tar_target(rhat_main_model, make_rhat_plot(main_model)),
   tar_target(trace_plot_main_model, make_trace_plot(main_model)),
   tar_target(pp_check_main_model, make_pp_check(main_model)),
   tar_target(main_model_plot, plot_main_model(data_effect_sizes, main_model)),
 
+  # Fit, check, and plot motor demands model
+  tar_target(motor_demands_prior, set_motor_demands_prior()),
+  tar_target(motor_demands_model, fit_motor_demands_model(data_effect_sizes, motor_demands_prior)),
+  tar_target(rhat_motor_demands_model, make_rhat_plot(motor_demands_model)),
+  tar_target(trace_plot_motor_demands_model, make_trace_plot(motor_demands_model)),
+  tar_target(pp_check_motor_demands_model, make_pp_check(motor_demands_model)),
+  # tar_target(main_model_plot, plot_main_model(data_effect_sizes, main_model)),
+
   # Make plots tiffs
-  tar_target(prior_plot_tiff, make_plot_tiff(prior_plot, 7.5, 3.75, "plots/prior_plot.tiff")),
   tar_target(main_model_plot_tiff, make_plot_tiff(main_model_plot, 7.5, 10, "plots/main_model_plot.tiff"))
 
 

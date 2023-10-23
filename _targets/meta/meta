@@ -3,21 +3,30 @@ calculate_effect_sizes|function|77a438848a3e400b|||||||||||||||
 data|stem|7a4cee144943247b|9ca0a6f10b807a74|483ddb59de3586db|1588979285||t19650.5350045422s|0c7faaa14b981821|7423|rds|local|vector|||0.53||
 data_effect_sizes|stem|34a5097e4ec4e75b|debfbfb5650806b6|1566302378fb9614|1970377303||t19650.5350053201s|44d8c4df393e7826|8755|rds|local|vector|||0.05||
 file|stem|0382984172808e56|2477334d6597c220|ef46db3751d8e999|-1301001980|C:/Users/james/Dropbox/Research/Dissy students/Hannah Corcoran/self_talk_meta_analysis_update/data/Final data.csv|t19650.5188547967s|8ed9da19a5e28550|36621|file|local|vector|||3.08|package ggplot2 was built under R version 4.2.3. package tibble was built under R version 4.2.3. package tidyr was built under R version 4.2.3. package readr was built under R version 4.2.3. package purrr was built under R version 4.2.3. package stringr was built under R version 4.2.3. package forcats was built under R version 4.2.3. package lubridate was built under R version 4.2.3|
-fit_main_model|function|553be6e750b0d180|||||||||||||||
+fit_main_model|function|5ef0faaab0295d70|||||||||||||||
+fit_motor_demands_model|function|5edcefa74b04eb27|||||||||||||||
 get_tidy_model|function|90abdc3bf63838c4|||||||||||||||
 intercept_prior|stem|2a3bfed4b04d383e|f0668d1e56e014d3|ef46db3751d8e999|-900241001||t19650.5421134642s|3b7c77e89f1a6100|221|rds|local|vector|||0||
-main_model|stem|4116bdf56cbc1346|d191e94c0f7db73e|e9eea87362e15ee3|1187893240||t19650.5441701231s|85ef9fe6b8603414|84610952|rds|local|vector|||174.09|Rows containing NAs were excluded from the model.|
-main_model_plot|stem|f61a7a2c9702396b|c36182cbd2a6d3b4|8774689ad2130bc9|742340498||t19653.5183754355s|58ab79783fa9e45b|136444279|rds|local|vector|||13.81|gather_ was deprecated in tidyr 1.2.0.ℹ Please use gather instead.ℹ The deprecated feature was likely used in the tidybayes package.  Please report the issue at httpsgithub.commjskaytidybayesissuesnew.. Ignoring unknown parameters rel_min_height and scale|
-main_model_plot_tiff|stem|b5cbf3e5a387e8fd|d7aabca0a6615367|6923fdb719eaa357|1963413705||t19653.5184494466s|dff9495c51b724c1|77|rds|local|vector|||6.22|Removed 1126 rows containing nonfinite values stat_density.. Calling structureNULL,  is deprecated, as NULL cannot have attributes.  Consider structurelist,  instead.|
+main_model|stem|9ffaa160019389f5|8ca37ff8d4cc7385|ca731fe6b6954544|1187893240||t19653.6126001759s|fb003274d38ecd53|84607188|rds|local|vector|||138.74|Rows containing NAs were excluded from the model.|
+main_model_plot|stem|b040cfc174cdf71e|c36182cbd2a6d3b4|a3b1a5a064f680e3|742340498||t19653.6152882707s|9447327e478b8003|136487588|rds|local|vector|||12.56|1m22mgather_ was deprecated in tidyr 1.2.0.36mℹ39m Please use gather instead.36mℹ39m The deprecated feature was likely used in the 34mtidybayes39m package.  Please report the issue at 3m34m8httpsgithub.commjskaytidybayesissuesnewhttpsgithub.commjskaytidybayesissuesnew839m23m.. 1m22mIgnoring unknown parameters rel_min_height and scale|
+main_model_plot_tiff|stem|b5cbf3e5a387e8fd|d7aabca0a6615367|27367865026d9c72|1963413705||t19653.6155957164s|dff9495c51b724c1|77|rds|local|vector|||6.58|1m22mRemoved 1126 rows containing nonfinite values stat_density.. Calling structureNULL,  is deprecated, as NULL cannot have attributes.  Consider structurelist,  instead.|
+main_model_prior|stem|2a3bfed4b04d383e|28ce2554db55b9c2|98826dd27d362f13|-1276940391||t19653.6109544453s|3b7c77e89f1a6100|221|rds|local|vector|||0||
 make_plot_tiff|function|6b43f6a7107c8204|||||||||||||||
 make_pp_check|function|4e9a019b6b971b97|||||||||||||||
 make_rhat_plot|function|19026c58652eb3b2|||||||||||||||
 make_trace_plot|function|075cfc5cd8fead27|||||||||||||||
+motor_demands_model|stem|01d5662a2fcf9aed|878b3e2c466000d3|ea1150e6644a4d65|-610542631||t19653.6953267358s|591985e24f985205|85112573|rds|local|vector|||211.46|Rows containing NAs were excluded from the model.. There were 6032 transitions after warmup that exceeded the maximum treedepth. Increase max_treedepth above 10. Seehttpsmcstan.orgmiscwarnings.htmlmaximumtreedepthexceeded. Examine the pairs plot to diagnose sampling problems|
+motor_demands_prior|stem|99d3e900d76aedb8|74a2ded60812956a|87b60d89a5dc77f6|-1791190386||t19653.6928382945s|476aaeddbf8d904d|261|rds|local|vector|||3.17|package ggplot2 was built under R version 4.2.3. package tibble was built under R version 4.2.3. package tidyr was built under R version 4.2.3. package readr was built under R version 4.2.3. package purrr was built under R version 4.2.3. package stringr was built under R version 4.2.3. package forcats was built under R version 4.2.3. package lubridate was built under R version 4.2.3|
 plot_main_model|function|c0d73763199b7760|||||||||||||||
-pp_check_main_model|stem|c7607b707dc1a2d4|86318324d4c1f571|844b722092039a69|2070646323||t19653.4791754315s|f3bfe39e74494707|87352|rds|local|vector|||0.84||
+pp_check_main_model|stem|c7607b707dc1a2d4|86318324d4c1f571|044e56fe4e1cc1d4|2070646323||t19653.6153377197s|f3bfe39e74494707|87352|rds|local|vector|||0.57||
+pp_check_motor_demands_model|stem|1cd4f622ec56854f|c14f5f0466abc60b|807017b944e799f6|1996779215||t19653.6953986473s|4a8eb2ed2a808ee9|83579|rds|local|vector|||0.62||
 prior_plot|stem|d3307da6b6c2ddee|8fc20e606026b335|ef46db3751d8e999|343421018||t19653.4704532893s|42bc872cfd5d3d3c|112971|rds|local|vector|||3.08|package ggplot2 was built under R version 4.2.3. package tibble was built under R version 4.2.3. package tidyr was built under R version 4.2.3. package readr was built under R version 4.2.3. package purrr was built under R version 4.2.3. package stringr was built under R version 4.2.3. package forcats was built under R version 4.2.3. package lubridate was built under R version 4.2.3|
 prior_plot_tiff|stem|3e3a7ba1fec53027|37d8023fc9123c4a|836dc349a85acdd3|848812830||t19653.4734785323s|c6fbfb9abe15abfd|72|rds|local|vector|||0.24||
 read_prepare_data|function|a119e136c7c1d8ae|||||||||||||||
-rhat_main_model|stem|fc77f4ab1a2bde47|d75ec2690f5271a3|fac90330ca3dc74f|-36262118||t19653.479237836s|cd593181d497d85a|84847016|rds|local|vector|||1.86|Dropped 1 NAs from new_rhatrhat.|
-rstan_setup|stem|b9a6088fb031d21c|3253c467dc197a5f|ef46db3751d8e999|2092037602||t19650.5421132093s|6281f79619f6778a|80|rds|local|vector|||3.04|package ggplot2 was built under R version 4.2.3. package tibble was built under R version 4.2.3. package tidyr was built under R version 4.2.3. package readr was built under R version 4.2.3. package purrr was built under R version 4.2.3. package stringr was built under R version 4.2.3. package forcats was built under R version 4.2.3. package lubridate was built under R version 4.2.3|
-trace_plot_main_model|stem|bf6781071ab1dc93|f5d3869431cdf48e|b5bad86a17a6848a|-1078993693||t19653.4791651028s|26dd2764cc78a123|11662856|rds|local|vector|||3.24||
+rhat_main_model|stem|6105ceecb9522b53|d75ec2690f5271a3|3116c89c348dedf4|-36262118||t19653.6153997031s|29d6dd9526381ce2|84883672|rds|local|vector|||1.81|Dropped 1 NAs from new_rhatrhat.|
+rhat_motor_demands_model|stem|f716d7ddc95bd0e7|80cb66d431e4d52f|1c6ea6ba9ac80537|-1766974641||t19653.6953898897s|103a16379eefd277|85352950|rds|local|vector|||1.75|Dropped 1 NAs from new_rhatrhat.|
+rstan_setup|function|1fffbcde88401688|||||||||||||||
+set_main_model_prior|function|5ea566013faac64e|||||||||||||||
+set_motor_demands_prior|function|9f117679aad86717|||||||||||||||
+trace_plot_main_model|stem|bf6781071ab1dc93|f5d3869431cdf48e|8f60ffbe0a82bebc|-1078993693||t19653.615330603s|26dd2764cc78a123|11662856|rds|local|vector|||2.66||
+trace_plot_motor_demands_model|stem|facf670085b3d943|27fa77876c62bb49|a0aaf7f47ed800ad|-1667765712||t19653.6954444453s|e10ade519f2fe8b8|13760277|rds|local|vector|||2.99||

@@ -526,24 +526,115 @@ ggsave(
 
 ##### subgroup and moderators models
 
-get_prior(yi | se(1 / vi) ~ 1 + motor_demands + (1 | study / experiment / group / effect), data=data_effect_sizes)
+get_prior(yi | se(1 / vi) ~ 0 + motor_demands + (1 | study / experiment / group / effect), data=data_effect_sizes)
+
+motor_demands_prior <-
+  c(
+    prior("student_t(3, 0.67, 0.07)", class = "b", coef = "motor_demandsFine"),
+    prior("student_t(3, 0.26, 0.04)", class = "b", coef = "motor_demandsGross")
+  )
 
 
 
-
-
-motor_demands_model <-
+prior_motor_demands_model <-
   brm(
-    yi | se(sqrt(vi)) ~ 1 + motor_demands + (1 | study / experiment / group / effect),
+    yi | se(sqrt(vi)) ~ 0 + motor_demands + (1 | study / experiment / group / effect),
     data = data_effect_sizes,
-    prior = prior_meta,
+    prior = motor_demands_prior,
     chains = 4,
     cores = 4,
     seed = 1988,
     warmup = 2000,
     iter = 8000,
-    control = list(adapt_delta = 0.99)
+    control = list(adapt_delta = 0.99),
+    sample_prior = "only"
   )
 
 
+
 plot(motor_demands_model)
+pp_check(motor_demands_model)
+
+
+
+# Prior distribution samples
+nd <- datagrid(model = motor_demands_model,
+         motor_demands = c("Fine", "Gross")
+         )
+
+prior_preds <- predictions(prior_motor_demands_model, type = "response",
+            newdata = nd,
+            re_formula = NA) %>%
+  posterior_draws() %>%
+  transform(type = "Response") %>%
+  mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
+
+# Posterior distribution samples
+posterior_preds <- predictions(motor_demands_model, type = "response",
+                           newdata = nd,
+                           re_formula = NA) %>%
+  posterior_draws() %>%
+  transform(type = "Response") %>%
+  mutate(label = "Posterior Pooled Estimate")
+
+posterior_summary <- group_by(posterior_preds, motor_demands, label) %>%
+  mean_qi(draw) %>%
+  mutate(draw = draw,
+         .lower = .lower,
+         .upper = .upper)
+
+# Combine prior and posterior samples for plot
+prior_posterior <- rbind(prior_preds, posterior_preds) %>%
+  mutate(label = factor(label, levels = c("Prior (Hatzigeorgiadis et al., 2011)",
+                                          "Posterior Pooled Estimate")))
+
+posterior_update <- ggplot(data = prior_posterior,
+                           aes(x = draw, y = motor_demands,
+                               color = label, fill = label)) +
+  # Add reference line at zero
+  geom_vline(xintercept = 0, linetype = 2) +
+
+  # Add densities
+  stat_slab(alpha=0.8, linewidth = 0) +
+
+  # Add individual study data
+  geom_point(
+    data = data_effect_sizes %>%
+      filter(!is.na(yi)) %>%
+      mutate(label = NA),
+    aes(x = yi, y = motor_demands),
+    # position = position_nudge(y = -0.1),
+    shape = "|"
+  ) +
+
+  # Add text and labels
+  geom_text(
+    data = mutate_if(posterior_summary,
+                     is.numeric, round, 2),
+    aes(
+      label = glue::glue("{draw} [{.lower}, {.upper}]"),
+      y = motor_demands,
+      x = 1.5
+    ),
+    hjust = "inward",
+    size = 3,
+    color = "black"
+  ) +
+
+  scale_color_manual(values = c("#009E73", "#E69F00")) +
+  scale_fill_manual(values = c("#009E73", "#E69F00")) +
+
+  labs(x = "Standardised Mean Difference", # summary measure
+       y = element_blank(),
+       fill = "",
+       title = "Motor Demands (Fine versus Gross)",
+       subtitle = "Prior and posterior distributions for pooled estimates, individual effects (ticks), and mean and 95% quantile interval for posterior (text label)"
+  ) +
+  scale_x_continuous(limits = c(-1, 1.5), breaks = c(-1,-0.5, 0, 0.5, 1)) +
+  guides(color = "none",
+         shape = "none") +
+  theme_classic() +
+  theme(legend.position = "bottom",
+        panel.border = element_rect(fill = NA),
+        title = element_text(size=8),
+        plot.subtitle = element_text(size=6))

@@ -185,38 +185,40 @@ rstan_setup <- function() {
 }
 
 # Priors
-intercept_prior <- function() {
-  intercept_prior <-
+set_main_model_prior <- function() {
+
+  # Taken form Hatsigeorgiadis et al. (2011) overall estimate
+  main_model_prior <-
     prior("student_t(3, 0.48, 0.05)", class = "Intercept")
 }
 
-prior_plot <- function() {
-  ggplot() +
-    stat_function(
-      data = data.frame(x = c(-2, 2)),
-      aes(x),
-      fun = dstudent_t,
-      n = 101,
-      args = list(
-        df = 3,
-        mu = 0.48,
-        sigma = 0.05,
-        log = FALSE
-      ),
-      color = "black"
-    ) +
-    geom_point(aes(y = 0, x = 0.48)) +
-    geom_errorbarh(aes(y = 0, xmin = 0.38, xmax = 0.58)) +
-    labs(
-      x = "Prior for model intercept (Standardised Mean Difference)" ,
-      y = "PDF",
-      title = "Visualisation of prior distribution",
-      subtitle = "Taken from main model intercept estimate from Hatzigeorgiadis et al., (2011)"
-    ) +
-    scale_x_continuous(limits = c(-2, 2), breaks = c(-2,-1, 0, 1, 2)) +
-    theme_classic() +
-    theme(panel.border = element_rect(fill = NA))
+set_motor_demands_prior <- function() {
+
+  # Note, this model omits the intercept in order to include the priors on the groups directly
+  motor_demands_prior <-
+    c(
+      prior("student_t(3, 0.67, 0.07)", class = "b", coef = "motor_demandsFine"),
+      prior("student_t(3, 0.26, 0.04)", class = "b", coef = "motor_demandsGross")
+    )
 }
+
+prior_motor_demands_model <- function(data, prior) {
+  prior_motor_demands_model <-
+    brm(
+      yi | se(sqrt(vi)) ~ 0 + motor_demands + (1 | study / experiment / group / effect),
+      data = data_effect_sizes,
+      prior = motor_demands_prior,
+      chains = 4,
+      cores = 4,
+      seed = 1988,
+      warmup = 2000,
+      iter = 8000,
+      control = list(adapt_delta = 0.99),
+      sample_prior = "only"
+    )
+}
+
+
 
 # Models
 fit_main_model <- function(data, prior) {
@@ -420,7 +422,7 @@ plot_main_model <- function(data, model) {
 fit_motor_demands_model <- function(data, prior) {
   motor_demands_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 1 + motor_demands + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + motor_demands + (1 | study / experiment / group / effect),
       data = data,
       prior = prior,
       chains = 4,
@@ -432,7 +434,9 @@ fit_motor_demands_model <- function(data, prior) {
     )
 }
 
+plot_motor_demands_model <- function(data, prior, prior_model, model) {
 
+}
 
 
 # Model checks
