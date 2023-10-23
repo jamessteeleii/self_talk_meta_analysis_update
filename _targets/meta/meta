@@ -1,0 +1,23 @@
+name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
+calculate_effect_sizes|function|77a438848a3e400b|||||||||||||||
+data|stem|7a4cee144943247b|9ca0a6f10b807a74|483ddb59de3586db|1588979285||t19650.5350045422s|0c7faaa14b981821|7423|rds|local|vector|||0.53||
+data_effect_sizes|stem|34a5097e4ec4e75b|debfbfb5650806b6|1566302378fb9614|1970377303||t19650.5350053201s|44d8c4df393e7826|8755|rds|local|vector|||0.05||
+file|stem|0382984172808e56|2477334d6597c220|ef46db3751d8e999|-1301001980|C:/Users/james/Dropbox/Research/Dissy students/Hannah Corcoran/self_talk_meta_analysis_update/data/Final data.csv|t19650.5188547967s|8ed9da19a5e28550|36621|file|local|vector|||3.08|package ggplot2 was built under R version 4.2.3. package tibble was built under R version 4.2.3. package tidyr was built under R version 4.2.3. package readr was built under R version 4.2.3. package purrr was built under R version 4.2.3. package stringr was built under R version 4.2.3. package forcats was built under R version 4.2.3. package lubridate was built under R version 4.2.3|
+fit_main_model|function|553be6e750b0d180|||||||||||||||
+get_tidy_model|function|90abdc3bf63838c4|||||||||||||||
+intercept_prior|stem|2a3bfed4b04d383e|f0668d1e56e014d3|ef46db3751d8e999|-900241001||t19650.5421134642s|3b7c77e89f1a6100|221|rds|local|vector|||0||
+main_model|stem|4116bdf56cbc1346|d191e94c0f7db73e|e9eea87362e15ee3|1187893240||t19650.5441701231s|85ef9fe6b8603414|84610952|rds|local|vector|||174.09|Rows containing NAs were excluded from the model.|
+main_model_plot|stem|f61a7a2c9702396b|c36182cbd2a6d3b4|8774689ad2130bc9|742340498||t19653.5183754355s|58ab79783fa9e45b|136444279|rds|local|vector|||13.81|gather_ was deprecated in tidyr 1.2.0.ℹ Please use gather instead.ℹ The deprecated feature was likely used in the tidybayes package.  Please report the issue at httpsgithub.commjskaytidybayesissuesnew.. Ignoring unknown parameters rel_min_height and scale|
+main_model_plot_tiff|stem|b5cbf3e5a387e8fd|d7aabca0a6615367|6923fdb719eaa357|1963413705||t19653.5184494466s|dff9495c51b724c1|77|rds|local|vector|||6.22|Removed 1126 rows containing nonfinite values stat_density.. Calling structureNULL,  is deprecated, as NULL cannot have attributes.  Consider structurelist,  instead.|
+make_plot_tiff|function|6b43f6a7107c8204|||||||||||||||
+make_pp_check|function|4e9a019b6b971b97|||||||||||||||
+make_rhat_plot|function|19026c58652eb3b2|||||||||||||||
+make_trace_plot|function|075cfc5cd8fead27|||||||||||||||
+plot_main_model|function|c0d73763199b7760|||||||||||||||
+pp_check_main_model|stem|c7607b707dc1a2d4|86318324d4c1f571|844b722092039a69|2070646323||t19653.4791754315s|f3bfe39e74494707|87352|rds|local|vector|||0.84||
+prior_plot|stem|d3307da6b6c2ddee|8fc20e606026b335|ef46db3751d8e999|343421018||t19653.4704532893s|42bc872cfd5d3d3c|112971|rds|local|vector|||3.08|package ggplot2 was built under R version 4.2.3. package tibble was built under R version 4.2.3. package tidyr was built under R version 4.2.3. package readr was built under R version 4.2.3. package purrr was built under R version 4.2.3. package stringr was built under R version 4.2.3. package forcats was built under R version 4.2.3. package lubridate was built under R version 4.2.3|
+prior_plot_tiff|stem|3e3a7ba1fec53027|37d8023fc9123c4a|836dc349a85acdd3|848812830||t19653.4734785323s|c6fbfb9abe15abfd|72|rds|local|vector|||0.24||
+read_prepare_data|function|a119e136c7c1d8ae|||||||||||||||
+rhat_main_model|stem|fc77f4ab1a2bde47|d75ec2690f5271a3|fac90330ca3dc74f|-36262118||t19653.479237836s|cd593181d497d85a|84847016|rds|local|vector|||1.86|Dropped 1 NAs from new_rhatrhat.|
+rstan_setup|stem|b9a6088fb031d21c|3253c467dc197a5f|ef46db3751d8e999|2092037602||t19650.5421132093s|6281f79619f6778a|80|rds|local|vector|||3.04|package ggplot2 was built under R version 4.2.3. package tibble was built under R version 4.2.3. package tidyr was built under R version 4.2.3. package readr was built under R version 4.2.3. package purrr was built under R version 4.2.3. package stringr was built under R version 4.2.3. package forcats was built under R version 4.2.3. package lubridate was built under R version 4.2.3|
+trace_plot_main_model|stem|bf6781071ab1dc93|f5d3869431cdf48e|b5bad86a17a6848a|-1078993693||t19653.4791651028s|26dd2764cc78a123|11662856|rds|local|vector|||3.24||
