@@ -329,6 +329,21 @@ ggplot() +
   theme(panel.border = element_rect(fill = NA))
 
 
+prior_main_model <-
+  brm(
+    yi | se(sqrt(vi)) ~ 1 + (1 | study / experiment / group / effect),
+    data = data_effect_sizes,
+    prior = prior_meta,
+    chains = 4,
+    cores = 4,
+    seed = 1988,
+    warmup = 2000,
+    iter = 8000,
+    control = list(adapt_delta = 0.99),
+    sample_prior = "only",
+  )
+
+
 main_model <-
   brm(
     yi | se(sqrt(vi)) ~ 1 + (1 | study / experiment / group / effect),
@@ -348,6 +363,47 @@ plot(main_model)
 
 pp_check(main_model)
 
+
+
+prior_preds <- predictions(prior_main_model, type = "response",
+                           # newdata = nd,
+                           re_formula = NA) %>%
+  posterior_draws() %>%
+  transform(type = "Response") %>%
+  mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
+
+
+# Posterior distribution samples
+posterior_preds <- predictions(main_model, type = "response",
+                               # newdata = nd,
+                               re_formula = NA) %>%
+  posterior_draws() %>%
+  transform(type = "Response") %>%
+  mutate(label = "Posterior Pooled Estimate")
+
+posterior_summary <- group_by(posterior_preds, label) %>%
+  mean_qi(draw) %>%
+  mutate(draw = draw,
+         .lower = .lower,
+         .upper = .upper)
+
+# Combine prior and posterior samples for plot
+prior_posterior <- rbind(prior_preds, posterior_preds) %>%
+  mutate(label = factor(label, levels = c("Prior (Hatzigeorgiadis et al., 2011)",
+                                          "Posterior Pooled Estimate")))
+
+
+#
+#
+#
+#
+prior_draws <-
+  prior_main_model %>%
+  spread_draws(b_Intercept) %>%
+    mutate(study = "Prior (Hatzigeorgiadis et al., 2011)",
+           label = "Prior (Hatzigeorgiadis et al., 2011)")
+
+
 study_draws <- main_model %>%
   spread_draws(b_Intercept, r_study[study, ]) %>%
   mutate(b_Intercept = b_Intercept + r_study,
@@ -361,12 +417,12 @@ study_summary <- group_by(study_draws, label) %>%
          .lower = .lower,
          .upper = .upper)
 
-pooled_draws <- main_model %>%
+posterior_draws <- main_model %>%
   spread_draws(b_Intercept) %>%
   mutate(study = "Posterior Pooled Estimate",
          label = "Posterior Pooled Estimate")
 
-pooled_summary <- group_by(pooled_draws, label) %>%
+posterior_summary <- group_by(pooled_draws, label) %>%
   mean_qi(b_Intercept) %>%
   mutate(b_Intercept = b_Intercept,
          .lower = .lower,
@@ -385,14 +441,7 @@ pred_int_data <- posterior_predict(
 pred_int_data <- median_qi(pred_int_data) %>%
   mutate(label = as.character("Posterior Pooled Estimate"))
 
-prior_plot <-
-  data.frame(b_Intercept = rstudent_t(
-    n = 1e6,
-    df = 3,
-    mu = 0.48,
-    sigma = 0.05
-  ),
-  label = "Prior (Hatzigeorgiadis et al., 2011)")
+
 
 
 forest_study <- ggplot(aes(x = b_Intercept,
@@ -467,29 +516,26 @@ forest_study <- ggplot(aes(x = b_Intercept,
   theme(panel.border = element_rect(fill = NA),
         plot.subtitle = element_text(size=6))
 
-prior_posterior <- rbind(pooled_draws[, c(4, 6)], prior_plot) %>%
-  mutate(label = factor(label, levels = c("Prior (Hatzigeorgiadis et al., 2011)",
-                                          "Posterior Pooled Estimate")))
+prior_posterior <- rbind(posterior_draws[, c(4, 6)], prior_draws[, c(4, 6)]) %>%
+  mutate(label = factor(label, levels = c("Posterior Pooled Estimate",
+                                          "Prior (Hatzigeorgiadis et al., 2011)"
+                                          )))
 
 posterior_update <- ggplot(data = prior_posterior,
                            aes(x = b_Intercept,
                                color = label, fill = label)) +
 
   geom_vline(xintercept = 0, linetype = 2) +
-  geom_density(
-    rel_min_height = 0.01,
-    col = NA,
-    scale = 1,
-    alpha = 0.5
-  ) +
+
+  stat_slab(alpha=0.6, linewidth=0) +
 
   # Add text and labels
   geom_text(
-    data = mutate_if(pooled_summary,
+    data = mutate_if(posterior_summary,
                      is.numeric, round, 2),
     aes(
-      label = glue::glue("{b_Intercept} [{.lower}, {.upper}]"),
-      y = label,
+      label = glue::glue("Posterior Pooled Estimate\n{b_Intercept} [{.lower}, {.upper}]"),
+      y = 0.1,
       x = 1
     ),
     hjust = "inward",
@@ -497,8 +543,9 @@ posterior_update <- ggplot(data = prior_posterior,
     color = "black"
   ) +
 
-  scale_color_manual(values = c("#009E73", "#E69F00"), limits = rev) +
-  scale_fill_manual(values = c("#009E73", "#E69F00"), limits = rev) +
+  scale_y_discrete(expand = c(0, 0)) +
+  scale_color_manual(values = c("#009E73", "#E69F00")) +
+  scale_fill_manual(values = c("#009E73", "#E69F00")) +
 
   labs(x = "Standardised Mean Difference (Positive Values Favour Self-Talk)", # summary measure
        y = element_blank(),
@@ -507,6 +554,7 @@ posterior_update <- ggplot(data = prior_posterior,
        subtitle = "Note: x-axis rescaled from panel (A) for easier comparison of prior and posterior distributions") +
   scale_x_continuous(limits = c(-0.5, 1), breaks = c(-0.5, 0, 0.5, 1)) +
   theme_classic() +
+  guides(color = "none") +
   theme(legend.position = "bottom",
         panel.border = element_rect(fill = NA),
         plot.subtitle = element_text(size=6))
@@ -585,17 +633,18 @@ posterior_summary <- group_by(posterior_preds, motor_demands, label) %>%
 
 # Combine prior and posterior samples for plot
 prior_posterior <- rbind(prior_preds, posterior_preds) %>%
-  mutate(label = factor(label, levels = c("Prior (Hatzigeorgiadis et al., 2011)",
-                                          "Posterior Pooled Estimate")))
+  mutate(label = factor(label, levels = c("Posterior Pooled Estimate",
+                                          "Prior (Hatzigeorgiadis et al., 2011)"
+                                          )))
 
 posterior_update <- ggplot(data = prior_posterior,
                            aes(x = draw, y = motor_demands,
-                               color = label, fill = label)) +
+                               color = label, fill = label)
+                           ) +
   # Add reference line at zero
   geom_vline(xintercept = 0, linetype = 2) +
 
-  # Add densities
-  stat_slab(alpha=0.8, linewidth = 0) +
+  stat_slab(alpha = 0.6, linewidth = 0) +
 
   # Add individual study data
   geom_point(
@@ -603,7 +652,7 @@ posterior_update <- ggplot(data = prior_posterior,
       filter(!is.na(yi)) %>%
       mutate(label = NA),
     aes(x = yi, y = motor_demands),
-    # position = position_nudge(y = -0.1),
+    position = position_nudge(y = -0.05),
     shape = "|"
   ) +
 
@@ -618,7 +667,8 @@ posterior_update <- ggplot(data = prior_posterior,
     ),
     hjust = "inward",
     size = 3,
-    color = "black"
+    color = "black",
+    position = position_nudge(y=0.1)
   ) +
 
   scale_color_manual(values = c("#009E73", "#E69F00")) +
@@ -638,3 +688,161 @@ posterior_update <- ggplot(data = prior_posterior,
         panel.border = element_rect(fill = NA),
         title = element_text(size=8),
         plot.subtitle = element_text(size=6))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+data_effect_sizes_study_design <- data_effect_sizes %>%
+  mutate(study_design = if_else(study_design == "between", "Pre/post - experimental/control",
+                                if_else(study_design == "between-post", "Post - experimental/control", "Pre/post - experimental" )))
+
+
+get_prior(yi | se(1 / vi) ~ 0 + study_design + (1 | study / experiment / group / effect), data=data_effect_sizes_study_design)
+
+study_design_prior <-
+  c(
+    prior("student_t(3, 0.37, 0.09)", class = "b", coef = "study_designPostMexperimentalDcontrol"),
+    prior("student_t(3, 0.36, 0.1)", class = "b", coef = "study_designPreDpostMexperimental"),
+    prior("student_t(3, 0.53, 0.06)", class = "b", coef = "study_designPreDpostMexperimentalDcontrol")
+
+  )
+
+
+
+prior_study_design_model <-
+  brm(
+    yi | se(sqrt(vi)) ~ 0 + study_design + (1 | study / experiment / group / effect),
+    data = data_effect_sizes_study_design,
+    prior = study_design_prior,
+    chains = 4,
+    cores = 4,
+    seed = 1988,
+    warmup = 2000,
+    iter = 8000,
+    control = list(adapt_delta = 0.99),
+    sample_prior = "only"
+  )
+
+study_design_model <-
+  brm(
+    yi | se(sqrt(vi)) ~ 0 + study_design + (1 | study / experiment / group / effect),
+    data = data_effect_sizes_study_design,
+    prior = study_design_prior,
+    chains = 4,
+    cores = 4,
+    seed = 1988,
+    warmup = 2000,
+    iter = 8000,
+    control = list(adapt_delta = 0.99),
+  )
+
+
+
+plot(study_design_model)
+pp_check(study_design_model)
+
+
+# Prior distribution samples
+nd <- datagrid(model = study_design_model,
+               study_design = c("Pre/post - experimental/control", "Post - experimental/control", "Pre/post - experimental")
+)
+
+prior_preds <- predictions(prior_study_design_model, type = "response",
+                           newdata = nd,
+                           re_formula = NA) %>%
+  posterior_draws() %>%
+  transform(type = "Response") %>%
+  mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
+
+# Posterior distribution samples
+posterior_preds <- predictions(study_design_model, type = "response",
+                               newdata = nd,
+                               re_formula = NA) %>%
+  posterior_draws() %>%
+  transform(type = "Response") %>%
+  mutate(label = "Posterior Pooled Estimate")
+
+posterior_summary <- group_by(posterior_preds, study_design, label) %>%
+  mean_qi(draw) %>%
+  mutate(draw = draw,
+         .lower = .lower,
+         .upper = .upper)
+
+# Combine prior and posterior samples for plot
+prior_posterior <- rbind(prior_preds, posterior_preds) %>%
+  mutate(label = factor(label, levels = c("Posterior Pooled Estimate",
+                                          "Prior (Hatzigeorgiadis et al., 2011)"
+  )))
+
+posterior_update <- ggplot(data = prior_posterior,
+                           aes(x = draw, y = study_design,
+                               color = label, fill = label)
+) +
+  # Add reference line at zero
+  geom_vline(xintercept = 0, linetype = 2) +
+
+  stat_slab(alpha = 0.6, linewidth = 0) +
+
+  # Add individual study data
+  geom_point(
+    data = data_effect_sizes_study_design %>%
+      filter(!is.na(yi)) %>%
+      mutate(label = NA),
+    aes(x = yi, y = study_design),
+    position = position_nudge(y = -0.05),
+    shape = "|"
+  ) +
+
+  # Add text and labels
+  geom_text(
+    data = mutate_if(posterior_summary,
+                     is.numeric, round, 2),
+    aes(
+      label = glue::glue("{draw} [{.lower}, {.upper}]"),
+      y = study_design,
+      x = 1.5
+    ),
+    hjust = "inward",
+    size = 3,
+    color = "black",
+    position = position_nudge(y=0.1)
+  ) +
+
+  # scale_y_discrete(limits = c("Instructional",
+  #                             "Motivational",
+  #                             "Combined Instructional/Motivational",
+  #                             "Rational")) +
+  scale_color_manual(values = c("#009E73", "#E69F00")) +
+  scale_fill_manual(values = c("#009E73", "#E69F00")) +
+
+  labs(x = "Standardised Mean Difference", # summary measure
+       y = element_blank(),
+       fill = "",
+       title = "Study Design (Pre/Post or Post Only With Experimental Only or Control)",
+       subtitle = "Prior and posterior distributions for pooled estimates, individual effects (ticks), and mean and 95% quantile interval for posterior (text label)"
+  ) +
+  scale_x_continuous(limits = c(-1, 1.5), breaks = c(-1,-0.5, 0, 0.5, 1)) +
+  guides(color = "none",
+         shape = "none") +
+  theme_classic() +
+  theme(legend.position = "bottom",
+        panel.border = element_rect(fill = NA),
+        title = element_text(size=8),
+        plot.subtitle = element_text(size=6))
+

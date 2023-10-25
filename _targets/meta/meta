@@ -1,32 +1,120 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-calculate_effect_sizes|function|77a438848a3e400b|||||||||||||||
-data|stem|7a4cee144943247b|9ca0a6f10b807a74|483ddb59de3586db|1588979285||t19650.5350045422s|0c7faaa14b981821|7423|rds|local|vector|||0.53||
-data_effect_sizes|stem|34a5097e4ec4e75b|debfbfb5650806b6|1566302378fb9614|1970377303||t19650.5350053201s|44d8c4df393e7826|8755|rds|local|vector|||0.05||
-file|stem|0382984172808e56|2477334d6597c220|ef46db3751d8e999|-1301001980|C:/Users/james/Dropbox/Research/Dissy students/Hannah Corcoran/self_talk_meta_analysis_update/data/Final data.csv|t19650.5188547967s|8ed9da19a5e28550|36621|file|local|vector|||3.08|package ggplot2 was built under R version 4.2.3. package tibble was built under R version 4.2.3. package tidyr was built under R version 4.2.3. package readr was built under R version 4.2.3. package purrr was built under R version 4.2.3. package stringr was built under R version 4.2.3. package forcats was built under R version 4.2.3. package lubridate was built under R version 4.2.3|
+calculate_effect_sizes|function|45cde3b621c87df8|||||||||||||||
+cue_selection_model|stem|6e3f904a27757b9f|671de310fd3fc5dc|c3f50fe82801b2d8|1000951864||t19655.6738926572s|555f2b05a2c962c2|85396102|rds|local|vector|||198.62|Rows containing NAs were excluded from the model.. There were 5981 transitions after warmup that exceeded the maximum treedepth. Increase max_treedepth above 10. Seehttpsmcstan.orgmiscwarnings.htmlmaximumtreedepthexceeded. Examine the pairs plot to diagnose sampling problems|
+cue_selection_model_plot|stem|9628b6c395d23df1|75b100b8e1678846|915f350d31bd2560|1951870630||t19655.7702434219s|24b6249e37793568|175845231|rds|local|vector|||80.02||
+cue_selection_prior|stem|1914b012a5de14de|ff8546ca25d3d216|3e849735a1dad4f9|-1973296062||t19655.6502333935s|f4cbf14e0e2f6191|267|rds|local|vector|||3.33|package ggplot2 was built under R version 4.2.3. package tibble was built under R version 4.2.3. package tidyr was built under R version 4.2.3. package readr was built under R version 4.2.3. package purrr was built under R version 4.2.3. package stringr was built under R version 4.2.3. package forcats was built under R version 4.2.3. package lubridate was built under R version 4.2.3|
+data|stem|019c7adc986b18a9|9ca0a6f10b807a74|c0f7a3a508b07a90|1588979285||t19655.6550649388s|70f12b4d547dc532|7487|rds|local|vector|||0.4|Expected 2 pieces. Missing pieces filled with NA in 53 rows 1, 2, 3, 4, 5,6, 7, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, ..... Expected 2 pieces. Missing pieces filled with NA in 17 rows 8, 9, 10, 11,49, 50, 51, 52, 53, 56, 57, 58, 59, 67, 68, 69, 70.|
+data_effect_sizes|stem|e99dd32fcc8e2c26|debfbfb5650806b6|1cfc7d27f5c99d37|1970377303||t19655.6550658192s|2128f018c1397b18|8813|rds|local|vector|||0.06||
+file|stem|f6b263fa92caea93|2477334d6597c220|ef46db3751d8e999|-1301001980|C:/Users/james/Dropbox/Research/Dissy students/Hannah Corcoran/self_talk_meta_analysis_update/data/Final data.csv|t19655.4838520582s|b397732bc6d5308d|35981|file|local|vector|||0||
+fit_cue_selection_model|function|a7fc71996b87a65b|||||||||||||||
 fit_main_model|function|5ef0faaab0295d70|||||||||||||||
+fit_matching_model|function|671c9f881e21486f|||||||||||||||
 fit_motor_demands_model|function|5edcefa74b04eb27|||||||||||||||
+fit_participant_group_model|function|83399b235c200c5d|||||||||||||||
+fit_selftalk_content_model|function|578068e217f832c3|||||||||||||||
+fit_study_design_model|function|6ec3317eb5b4e963|||||||||||||||
+fit_task_novelty_model|function|db8fbbcf08f1b715|||||||||||||||
+fit_training_model|function|056f0568a23af0d2|||||||||||||||
 get_tidy_model|function|90abdc3bf63838c4|||||||||||||||
 intercept_prior|stem|2a3bfed4b04d383e|f0668d1e56e014d3|ef46db3751d8e999|-900241001||t19650.5421134642s|3b7c77e89f1a6100|221|rds|local|vector|||0||
-main_model|stem|9ffaa160019389f5|8ca37ff8d4cc7385|ca731fe6b6954544|1187893240||t19653.6126001759s|fb003274d38ecd53|84607188|rds|local|vector|||138.74|Rows containing NAs were excluded from the model.|
-main_model_plot|stem|b040cfc174cdf71e|c36182cbd2a6d3b4|a3b1a5a064f680e3|742340498||t19653.6152882707s|9447327e478b8003|136487588|rds|local|vector|||12.56|1m22mgather_ was deprecated in tidyr 1.2.0.36mℹ39m Please use gather instead.36mℹ39m The deprecated feature was likely used in the 34mtidybayes39m package.  Please report the issue at 3m34m8httpsgithub.commjskaytidybayesissuesnewhttpsgithub.commjskaytidybayesissuesnew839m23m.. 1m22mIgnoring unknown parameters rel_min_height and scale|
-main_model_plot_tiff|stem|b5cbf3e5a387e8fd|d7aabca0a6615367|27367865026d9c72|1963413705||t19653.6155957164s|dff9495c51b724c1|77|rds|local|vector|||6.58|1m22mRemoved 1126 rows containing nonfinite values stat_density.. Calling structureNULL,  is deprecated, as NULL cannot have attributes.  Consider structurelist,  instead.|
+main_model|stem|623fdb6f86ecf302|db604304251796f5|2665c7552ff5cde0|1187893240||t19655.6664203773s|6f291b42098437ea|84765350|rds|local|vector|||137.81|Rows containing NAs were excluded from the model.|
+main_model_plot|stem|73e4e0a8cf1b6a26|f1867540802affc6|8f470f0a8a252a43|742340498||t19655.6904871421s|68dde51856e136f8|193242756|rds|local|vector|||12.48|gather_ was deprecated in tidyr 1.2.0.ℹ Please use gather instead.ℹ The deprecated feature was likely used in the tidybayes package.  Please report the issue at httpsgithub.commjskaytidybayesissuesnew.|
+main_model_plot_tiff|stem|b5cbf3e5a387e8fd|d7aabca0a6615367|3fb618f87d730c8a|1963413705||t19655.7338967915s|dff9495c51b724c1|77|rds|local|vector|||4.89|Removed 24 rows containing missing values stat_slabinterval.|
 main_model_prior|stem|2a3bfed4b04d383e|28ce2554db55b9c2|98826dd27d362f13|-1276940391||t19653.6109544453s|3b7c77e89f1a6100|221|rds|local|vector|||0||
+main_prior|stem|2a3bfed4b04d383e|772197e424ba2205|7840a6ac0b305e6e|121776332||t19655.3755175746s|3b7c77e89f1a6100|221|rds|local|vector|||3.03|package ggplot2 was built under R version 4.2.3. package tibble was built under R version 4.2.3. package tidyr was built under R version 4.2.3. package readr was built under R version 4.2.3. package purrr was built under R version 4.2.3. package stringr was built under R version 4.2.3. package forcats was built under R version 4.2.3. package lubridate was built under R version 4.2.3|
 make_plot_tiff|function|6b43f6a7107c8204|||||||||||||||
 make_pp_check|function|4e9a019b6b971b97|||||||||||||||
 make_rhat_plot|function|19026c58652eb3b2|||||||||||||||
 make_trace_plot|function|075cfc5cd8fead27|||||||||||||||
-motor_demands_model|stem|01d5662a2fcf9aed|878b3e2c466000d3|ea1150e6644a4d65|-610542631||t19653.6953267358s|591985e24f985205|85112573|rds|local|vector|||211.46|Rows containing NAs were excluded from the model.. There were 6032 transitions after warmup that exceeded the maximum treedepth. Increase max_treedepth above 10. Seehttpsmcstan.orgmiscwarnings.htmlmaximumtreedepthexceeded. Examine the pairs plot to diagnose sampling problems|
+matching_model|stem|63000d46da2dc342|46ae4f93ba5e7137|854cdadfaf37f9b9|1324981851||t19655.762711406s|f4408eedbe486e3c|78275773|rds|local|vector|||206.51|Rows containing NAs were excluded from the model.. There were 1 divergent transitions after warmup. Seehttpsmcstan.orgmiscwarnings.htmldivergenttransitionsafterwarmupto find out why this is a problem and how to eliminate them.. There were 6000 transitions after warmup that exceeded the maximum treedepth. Increase max_treedepth above 10. Seehttpsmcstan.orgmiscwarnings.htmlmaximumtreedepthexceeded. Examine the pairs plot to diagnose sampling problems|
+matching_model_plot|stem|33b8d2b0854b7f74|697734bebcd6c58a|e7eb30b6daba18ff|1847956836||t19655.7653601933s|5f591946cd3cb2ea|164393070|rds|local|vector|||168.51||
+matching_prior|stem|6bf467e6295889d3|2255ad8143bcf031|4d63fe4f737d13d7|-1174902061||t19655.5495059171s|63c2d5d6ce2d0be6|307|rds|local|vector|||3.28|package ggplot2 was built under R version 4.2.3. package tibble was built under R version 4.2.3. package tidyr was built under R version 4.2.3. package readr was built under R version 4.2.3. package purrr was built under R version 4.2.3. package stringr was built under R version 4.2.3. package forcats was built under R version 4.2.3. package lubridate was built under R version 4.2.3|
+moderators_panel_plot|stem|dd4ab65bde037175|a747ed03aafa2659|341a2761a8a3df1b|-40666149||t19655.771973671s|6d965789a962ae2c|1393731633|rds|local|vector|||0.03||
+moderators_panel_plot_tiff|stem|a3156731000155ea|6a08be6aa01853bc|c05ee955d6447da7|371139193||t19655.7747601066s|40b3a10246f0095b|83|rds|local|vector|||5.89|Removed 4 rows containing missing values stat_slabinterval.. Removed 2 rows containing missing values geom_point.. Removed 113 rows containing missing values stat_slabinterval.. Removed 5 rows containing missing values geom_point.. Removed 7 rows containing missing values stat_slabinterval.. Removed 2 rows containing missing values geom_point.. Removed 84 rows containing missing values stat_slabinterval.. Removed 2 rows containing missing values geom_point.. Removed 111 rows containing missing values stat_slabinterval.. Removed 2 rows containing missing values geom_point.. Removed 11 rows containing missing values stat_slabinterval.. Removed 2 rows containing missing values geom_point.. Removed 142 rows containing missing values stat_slabinterval.. Removed 2 rows containing missing values geom_point.. Removed 45 rows containing missing values stat_slabinterval.. Removed 2 rows containing missing values geom_point.|
+motor_demands_model|stem|7c923bd393efc350|878b3e2c466000d3|3976cc8e6263f28d|-610542631||t19655.6630724987s|2440420b925c8b3c|85214615|rds|local|vector|||162.49|Rows containing NAs were excluded from the model.. There were 1 transitions after warmup that exceeded the maximum treedepth. Increase max_treedepth above 10. Seehttpsmcstan.orgmiscwarnings.htmlmaximumtreedepthexceeded. Examine the pairs plot to diagnose sampling problems|
+motor_demands_model_plot|stem|4561dbb37cf0e4e7|5a391c1dcb337ee9|ba726d1f007c0606|1758399125||t19655.7633052704s|9378f2c1cebcecfb|175393463|rds|local|vector|||3.04||
 motor_demands_prior|stem|99d3e900d76aedb8|74a2ded60812956a|87b60d89a5dc77f6|-1791190386||t19653.6928382945s|476aaeddbf8d904d|261|rds|local|vector|||3.17|package ggplot2 was built under R version 4.2.3. package tibble was built under R version 4.2.3. package tidyr was built under R version 4.2.3. package readr was built under R version 4.2.3. package purrr was built under R version 4.2.3. package stringr was built under R version 4.2.3. package forcats was built under R version 4.2.3. package lubridate was built under R version 4.2.3|
-plot_main_model|function|c0d73763199b7760|||||||||||||||
-pp_check_main_model|stem|c7607b707dc1a2d4|86318324d4c1f571|044e56fe4e1cc1d4|2070646323||t19653.6153377197s|f3bfe39e74494707|87352|rds|local|vector|||0.57||
-pp_check_motor_demands_model|stem|1cd4f622ec56854f|c14f5f0466abc60b|807017b944e799f6|1996779215||t19653.6953986473s|4a8eb2ed2a808ee9|83579|rds|local|vector|||0.62||
+participant_group_model|stem|a7ba1c73adf155d6|08aeb2d7aaaf3100|e24d8d2f5a24832a|704948598||t19655.6647828197s|f1d8176484794802|80813104|rds|local|vector|||144.24|Rows containing NAs were excluded from the model.|
+participant_group_model_plot|stem|1c98e40cd398f55b|8aa85b67dcfc89d3|f72157c92ea31185|1878188876||t19655.7663514657s|72df213b8973b47e|168193335|rds|local|vector|||2.36||
+participant_group_prior|stem|c4acadb5a94eebee|abfb8148f8c02efb|8c18e393218c00ce|1827936401||t19655.4329978072s|b118d73574f00f7d|299|rds|local|vector|||4.75|package ggplot2 was built under R version 4.2.3. package tibble was built under R version 4.2.3. package tidyr was built under R version 4.2.3. package readr was built under R version 4.2.3. package purrr was built under R version 4.2.3. package stringr was built under R version 4.2.3. package forcats was built under R version 4.2.3. package lubridate was built under R version 4.2.3|
+plot_cue_selection_model|function|0d385e5ccb8e58cb|||||||||||||||
+plot_main_model|function|f11aee9bbb7b09c7|||||||||||||||
+plot_matching_model|function|caf07065aad02338|||||||||||||||
+plot_motor_demands_model|function|5d1a2a39ccfe7e01|||||||||||||||
+plot_panel_moderators|function|c07f61e8fb22c299|||||||||||||||
+plot_participant_group_model|function|98890fbd2f0254f6|||||||||||||||
+plot_selftalk_content_model|function|4dc73b8ab513e227|||||||||||||||
+plot_study_design_model|function|396bd2ae51ed4cee|||||||||||||||
+plot_task_novelty_model|function|f4b1716c1cd282a9|||||||||||||||
+plot_training_model|function|8096dea342f01dca|||||||||||||||
+pp_check_cue_selection_model|stem|11370b730dd7805b|e75eab3fb6cff10f|9d49ba39301315df|2007306750||t19655.6872401735s|e3162d5f9736d21d|87342|rds|local|vector|||0.8||
+pp_check_main_model|stem|4d2f9a23ded4bdf6|86318324d4c1f571|1ed3698118b27f0e|2070646323||t19655.6812815149s|c75d463b13614f6d|87355|rds|local|vector|||0.56||
+pp_check_matching_model|stem|f38a3d2fd2327199|baa4a9fa69c0bce2|d9845c21ff2de18b|976545066||t19655.7627209836s|e5ab8c21aa974cfa|82991|rds|local|vector|||0.66||
+pp_check_motor_demands_model|stem|3742b3281b9c33eb|c14f5f0466abc60b|c00242b44e699af1|1996779215||t19655.6811517596s|d53070f203bc6313|87346|rds|local|vector|||0.7||
+pp_check_participant_group_model|stem|0414ff0c10fb1903|3bba11f4031a4657|06b64664d1da1602|136267742||t19655.6812746267s|840afa4d6f56074b|86994|rds|local|vector|||0.59||
+pp_check_selftalk_content_model|stem|9f4f9d36468b3424|3ec71c2c99a08f87|aaef5158b551f147|751257245||t19655.6808457983s|629518dde0e2ce18|87347|rds|local|vector|||0.62||
+pp_check_study_design_model|stem|06a8b7d2b0962acb|4a810153b4fa9107|aa2f4058d67961b1|-1863956279||t19655.6807677533s|55872cd17e283fb9|87348|rds|local|vector|||0.63||
+pp_check_task_novelty_model|stem|4e85f641ae2e01f6|0a5c29a984d60c57|778c6b9ff54375ca|-273492103||t19655.6810315905s|f76aa76465b13f38|87356|rds|local|vector|||1.04||
+pp_check_training_model|stem|3996264aa6f63bd6|75bdffadb8e6bfba|5f7e76cc7c741643|-1982376404||t19655.6873890095s|ee0237345ec4f75b|87331|rds|local|vector|||0.75||
+prior_cue_selection_model|stem|7506ceff9f14f9ba|94ae378e07fbe501|f10d1f93999cbdd7|588782314||t19655.6797624953s|6dc7d006ddaa8149|86651457|rds|local|vector|||70.25|Rows containing NAs were excluded from the model.|
+prior_main_model|stem|42b7636cdd3cea70|f845fb321eb5f34f|6100d7a0a4c4884e|1666217637||t19655.6789057196s|90dc4f576bf56bf2|86129523|rds|local|vector|||68.39|Rows containing NAs were excluded from the model.|
+prior_matching_model|stem|8944cc0f23b65a56|83847e37921397dc|e4f9496553c9a590|278765608||t19655.7602818376s|31d0e00a81ce8474|79229380|rds|local|vector|||71.94|Rows containing NAs were excluded from the model.|
+prior_motor_demands_model|stem|d4bf867b3f8eb492|41ac21d101a1a38f|b08cadb1957ec574|-1329103054||t19655.6672725374s|863f6b35840ef362|86386910|rds|local|vector|||70.01|Rows containing NAs were excluded from the model.|
+prior_participant_group_model|stem|1c4d9d68561d908c|2cf671271d319221|31b694f306e371f1|1197886549||t19655.6763812471s|c24e797d008a7974|82065566|rds|local|vector|||69.11|Rows containing NAs were excluded from the model.|
 prior_plot|stem|d3307da6b6c2ddee|8fc20e606026b335|ef46db3751d8e999|343421018||t19653.4704532893s|42bc872cfd5d3d3c|112971|rds|local|vector|||3.08|package ggplot2 was built under R version 4.2.3. package tibble was built under R version 4.2.3. package tidyr was built under R version 4.2.3. package readr was built under R version 4.2.3. package purrr was built under R version 4.2.3. package stringr was built under R version 4.2.3. package forcats was built under R version 4.2.3. package lubridate was built under R version 4.2.3|
 prior_plot_tiff|stem|3e3a7ba1fec53027|37d8023fc9123c4a|836dc349a85acdd3|848812830||t19653.4734785323s|c6fbfb9abe15abfd|72|rds|local|vector|||0.24||
-read_prepare_data|function|a119e136c7c1d8ae|||||||||||||||
-rhat_main_model|stem|6105ceecb9522b53|d75ec2690f5271a3|3116c89c348dedf4|-36262118||t19653.6153997031s|29d6dd9526381ce2|84883672|rds|local|vector|||1.81|Dropped 1 NAs from new_rhatrhat.|
-rhat_motor_demands_model|stem|f716d7ddc95bd0e7|80cb66d431e4d52f|1c6ea6ba9ac80537|-1766974641||t19653.6953898897s|103a16379eefd277|85352950|rds|local|vector|||1.75|Dropped 1 NAs from new_rhatrhat.|
-rstan_setup|function|1fffbcde88401688|||||||||||||||
+prior_selftalk_content_model|stem|cbaa0fdf5a750b37|89eae6ff46fbc53a|32f3514c5300e1be|1947907474||t19655.6806352364s|66d0d2adc2ab764c|87652794|rds|local|vector|||71.61|Rows containing NAs were excluded from the model.|
+prior_study_design_model|stem|a51b7e1aed612c0d|2b96fc3fb7af3780|3d3ab017e5658ba2|-682466697||t19655.6780706266s|3f81099c32cfc982|87088459|rds|local|vector|||68.73|Rows containing NAs were excluded from the model.|
+prior_task_novelty_model|stem|51b9b26a6be05035|99cd8818a7f5e034|f7d2d922a4025fce|561671228||t19655.6715501377s|e57926d3a529c6be|86485757|rds|local|vector|||71.12|Rows containing NAs were excluded from the model.|
+prior_training_model|stem|f68679c9486817cb|615f3f2fd3a75235|c00c901c2f7ab1dd|-1724730598||t19655.677232077s|a00d62405786d84d|86568462|rds|local|vector|||69.82|Rows containing NAs were excluded from the model.|
+read_prepare_data|function|1540d95ec4966429|||||||||||||||
+rhat_cue_selection_model|stem|8cb427e838618a26|4e0137619242e257|0baa9fd7b1914ffa|-200413165||t19655.6873122356s|523422f9ffad09ef|85812149|rds|local|vector|||2.25|Dropped 1 NAs from new_rhatrhat.|
+rhat_main_model|stem|3d53b1628ea2a3eb|d75ec2690f5271a3|859b0e2870dd2bf1|-36262118||t19655.6813498346s|92037fb09504fa3a|85320417|rds|local|vector|||2|Dropped 1 NAs from new_rhatrhat.|
+rhat_matching_model|stem|e1d9b604e9ea806e|aaea3bd418a564d4|8590a5befe36659f|95867479||t19655.7628369837s|d3ffe4a5e5a3a10e|78514699|rds|local|vector|||1.67|Dropped 1 NAs from new_rhatrhat.|
+rhat_motor_demands_model|stem|414c2b9b04d77bc6|80cb66d431e4d52f|ca6afe4475d325fc|-1766974641||t19655.6811417571s|a5e46ea4fa46ec38|85826938|rds|local|vector|||1.83|Dropped 1 NAs from new_rhatrhat.|
+rhat_participant_group_model|stem|324537ecae4802e1|3de4aba80bf98d2e|dbe16f65e8c49e8b|-1371000940||t19655.6812173608s|4a982a8537bb6bb7|81390571|rds|local|vector|||1.76|Dropped 1 NAs from new_rhatrhat.|
+rhat_selftalk_content_model|stem|d1fc2d01076eaed1|ff1a43292a480d65|0adb0383e5b8085b|-17655538||t19655.6808369204s|86a8151e212c0c51|86793441|rds|local|vector|||2.01|Dropped 1 NAs from new_rhatrhat.|
+rhat_study_design_model|stem|cf155dcb909c16f5|00a781c937a1680c|f08c9fab0b9874e9|175569012||t19655.6807064476s|3caf65275c22dda4|86308028|rds|local|vector|||2.1|Dropped 1 NAs from new_rhatrhat.|
+rhat_task_novelty_model|stem|e1fb51f9a3cf6390|21ae0d0c67223b39|3d29c97e35f7db2c|-515011869||t19655.6809722252s|62b231ceb5489321|85804142|rds|local|vector|||1.86|Dropped 1 NAs from new_rhatrhat.|
+rhat_training_model|stem|b12d35f9f5516da1|3063b193c999b91f|aa917a7d239eb9bc|-2007622040||t19655.6874770937s|5b7e191dfaad6fad|85809688|rds|local|vector|||3.68|Dropped 1 NAs from new_rhatrhat.|
+rstan_setup|stem|b9a6088fb031d21c|3253c467dc197a5f|ef46db3751d8e999|2092037602||t19655.3840334161s|6281f79619f6778a|80|rds|local|vector|||2.98|package ggplot2 was built under R version 4.2.3. package tibble was built under R version 4.2.3. package tidyr was built under R version 4.2.3. package readr was built under R version 4.2.3. package purrr was built under R version 4.2.3. package stringr was built under R version 4.2.3. package forcats was built under R version 4.2.3. package lubridate was built under R version 4.2.3|
+sample_prior_cue_selection_model|function|bac156288ba6f3d6|||||||||||||||
+sample_prior_main_model|function|683e99adc990e58f|||||||||||||||
+sample_prior_matching_model|function|39c25e69f190b7e6|||||||||||||||
+sample_prior_motor_demands_model|function|a4f999b5c0adf009|||||||||||||||
+sample_prior_participant_group_model|function|689ce10e43e80057|||||||||||||||
+sample_prior_selftalk_content_model|function|b5e045f17da748b1|||||||||||||||
+sample_prior_study_design_model|function|9423bc9461a3b5cf|||||||||||||||
+sample_prior_task_novelty_model|function|bc50a4fff60371ef|||||||||||||||
+sample_prior_training_model|function|2e46850073011049|||||||||||||||
+selftalk_content_model|stem|52fae552d2169e4d|c17fe0f747deb6c1|2f7793229b939c69|-638293193||t19655.6587142479s|9c25475f3dbb30d5|86117048|rds|local|vector|||166.25|Rows containing NAs were excluded from the model.|
+selftalk_content_model_plot|stem|cefd24da224b16bb|5e42d4a3079d56f1|c2082d20762dbe89|-2010008144||t19655.7703983495s|e3cfec3bd6c45c72|180538989|rds|local|vector|||2.88||
+selftalk_content_prior|stem|a1a4795c250bad70|d34775385ab001ca|202a91d4e544555a|-1524824573||t19655.499667363s|0592d33550c0bb62|308|rds|local|vector|||3.3|package ggplot2 was built under R version 4.2.3. package tibble was built under R version 4.2.3. package tidyr was built under R version 4.2.3. package readr was built under R version 4.2.3. package purrr was built under R version 4.2.3. package stringr was built under R version 4.2.3. package forcats was built under R version 4.2.3. package lubridate was built under R version 4.2.3|
+set_cue_selection_prior|function|14cac1c23d3abcd0|||||||||||||||
 set_main_model_prior|function|5ea566013faac64e|||||||||||||||
+set_main_prior|function|5ea566013faac64e|||||||||||||||
+set_matching_prior|function|ee64f71bf6e82710|||||||||||||||
 set_motor_demands_prior|function|9f117679aad86717|||||||||||||||
-trace_plot_main_model|stem|bf6781071ab1dc93|f5d3869431cdf48e|8f60ffbe0a82bebc|-1078993693||t19653.615330603s|26dd2764cc78a123|11662856|rds|local|vector|||2.66||
-trace_plot_motor_demands_model|stem|facf670085b3d943|27fa77876c62bb49|a0aaf7f47ed800ad|-1667765712||t19653.6954444453s|e10ade519f2fe8b8|13760277|rds|local|vector|||2.99||
+set_participant_group_prior|function|0031336e12abe4a1|||||||||||||||
+set_selftalk_content_prior|function|0b8a4afd279750a4|||||||||||||||
+set_study_design_prior|function|05a6c49333fd8a8d|||||||||||||||
+set_task_novelty_prior|function|19492fa6044371ab|||||||||||||||
+set_training_prior|function|98db3e2ff2a73088|||||||||||||||
+study_design_model|stem|581270b6a1db3305|f32fba1f68650af0|8d549fe778ee562c|-1924792620||t19655.656746919s|e3c4e0102c0b3104|85594668|rds|local|vector|||141.7|Rows containing NAs were excluded from the model.|
+study_design_model_plot|stem|84f8c7b817f3702e|83ac239f72b109e7|34fa7b0d43611f4f|-588659937||t19655.7691970638s|082c45c24ed154c0|178067943|rds|local|vector|||154.04||
+study_design_prior|stem|7e7aae96719d4618|925ddeb789e79f3d|dd4beef4278a7962|-119327759||t19655.650233687s|efcd02b2c80eadaa|298|rds|local|vector|||0||
+task_novelty_model|stem|465496d8b809ca00|9e0ed9cf09404d71|22a2e104f5fc0081|-691945142||t19655.6611491381s|4fd748a6188b068b|85162546|rds|local|vector|||206.67|Rows containing NAs were excluded from the model.. There were 12004 transitions after warmup that exceeded the maximum treedepth. Increase max_treedepth above 10. Seehttpsmcstan.orgmiscwarnings.htmlmaximumtreedepthexceeded. Examine the pairs plot to diagnose sampling problems|
+task_novelty_model_plot|stem|20f621b75e29e234|059cb7e10ff23ede|9361e7713de840a1|-534343327||t19655.7662147956s|258ded3d0a343ece|175457920|rds|local|vector|||64.66||
+task_novelty_prior|stem|4eb1451bc6e7f47d|b087a42e50d89e0d|8c87dbca73f80fff|1328455367||t19655.6502338723s|76d5158c9904ac60|264|rds|local|vector|||0||
+trace_plot_cue_selection_model|stem|d44b73bab97de672|7e1829b70e794cf7|95a2351400f10be0|1876006704||t19655.6873797889s|6b7b975c291e5b53|13758402|rds|local|vector|||4.73||
+trace_plot_main_model|stem|d950e831a056b71d|f5d3869431cdf48e|244ee11908df403d|-1078993693||t19655.6813893458s|cc2c275570452f95|11665749|rds|local|vector|||2.45||
+trace_plot_matching_model|stem|4cca9b263fc649e3|61b8dca9b3287c01|92bc7cca56de2b10|2081657821||t19655.7627783462s|a7e6d320154808e0|18093372|rds|local|vector|||3.67||
+trace_plot_motor_demands_model|stem|8c00bd9aa8ef4745|27fa77876c62bb49|1e29c4d117853169|-1667765712||t19655.6810750865s|d6954d1caf91b623|13760339|rds|local|vector|||2.76||
+trace_plot_participant_group_model|stem|4afb315ac4e38ef8|fef75e467f7fe3dc|8ed27c1f7b9b49ec|-679728920||t19655.6812670463s|36777bbc5575fa91|15930150|rds|local|vector|||3.06||
+trace_plot_selftalk_content_model|stem|f1c3281f905b5521|836d28b27c8ec8d6|0c9be9d5b8b6301b|-1025397636||t19655.6809033919s|4324f473334439e8|18060915|rds|local|vector|||3.7||
+trace_plot_study_design_model|stem|c9cd4fd5a91d7954|fceae9a53f6cdd55|7f4078c752faf3be|-1821804570||t19655.6807599257s|f18ea7e062c9ded7|15924175|rds|local|vector|||3.4||
+trace_plot_task_novelty_model|stem|25a1ef65709ee2dc|5a8a702a6208bb96|0cb2ecf78729bccc|382951385||t19655.6810186329s|18802e9c31d9adfc|13770386|rds|local|vector|||2.94||
+trace_plot_training_model|stem|9ed6c66e4bdcbb71|a1262fe426262d2b|bc808545749f6581|-1532029311||t19655.6875268238s|69c1099352c67f58|13766950|rds|local|vector|||3.2||
+training_model|stem|d76d39859770cdd2|34a0e3a7e3558a80|ea38d614fc33ad19|-755880526||t19655.6755401567s|695bc4d49b0c3630|85422149|rds|local|vector|||138.57|Rows containing NAs were excluded from the model.. There were 1 divergent transitions after warmup. Seehttpsmcstan.orgmiscwarnings.htmldivergenttransitionsafterwarmupto find out why this is a problem and how to eliminate them.. Examine the pairs plot to diagnose sampling problems|
+training_model_plot|stem|a5182396cce4f77d|162e67724ed71185|39f37ff73314abc0|-1695512707||t19655.7672998831s|86d535d08c858e42|175799332|rds|local|vector|||72.02||
+training_prior|stem|19b613e6ec449128|42bdb3be656adef4|cc5282fa9644ce48|313801589||t19655.6502340229s|5419e37049f19aa2|258|rds|local|vector|||0||

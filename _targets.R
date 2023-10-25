@@ -24,7 +24,7 @@ tar_option_set(
     # "performance",
     # "see",
     # "lme4",
-    # "marginaleffects",
+    "marginaleffects",
     # "broom.mixed",
     "patchwork"
     # "kableExtra",
@@ -42,25 +42,100 @@ list(
   tar_target(data, read_prepare_data(file)),
   tar_target(data_effect_sizes, calculate_effect_sizes(data)),
 
+  # Setup rstan to run chains in parallel
+  tar_target(rstan_setup, rstan_setup()),
+
   # Fit, check, and plot main model
-  # tar_target(rstan_setup, rstan_setup()), # to run chains in parallel
-  tar_target(main_model_prior, set_main_model_prior()),
-  tar_target(main_model, fit_main_model(data_effect_sizes, main_model_prior)),
+  tar_target(main_prior, set_main_prior()),
+  tar_target(prior_main_model, sample_prior_main_model(data_effect_sizes, main_prior)),
+  tar_target(main_model, fit_main_model(data_effect_sizes, main_prior)),
   tar_target(rhat_main_model, make_rhat_plot(main_model)),
   tar_target(trace_plot_main_model, make_trace_plot(main_model)),
   tar_target(pp_check_main_model, make_pp_check(main_model)),
-  tar_target(main_model_plot, plot_main_model(data_effect_sizes, main_model)),
+  tar_target(main_model_plot, plot_main_model(data_effect_sizes, prior_main_model, main_model)),
 
   # Fit, check, and plot motor demands model
   tar_target(motor_demands_prior, set_motor_demands_prior()),
+  tar_target(prior_motor_demands_model, sample_prior_motor_demands_model(data_effect_sizes, motor_demands_prior)),
   tar_target(motor_demands_model, fit_motor_demands_model(data_effect_sizes, motor_demands_prior)),
   tar_target(rhat_motor_demands_model, make_rhat_plot(motor_demands_model)),
   tar_target(trace_plot_motor_demands_model, make_trace_plot(motor_demands_model)),
   tar_target(pp_check_motor_demands_model, make_pp_check(motor_demands_model)),
-  # tar_target(main_model_plot, plot_main_model(data_effect_sizes, main_model)),
+  tar_target(motor_demands_model_plot, plot_motor_demands_model(data_effect_sizes, prior_motor_demands_model, motor_demands_model)),
+
+  # Fit, check, and plot participant group model
+  tar_target(participant_group_prior, set_participant_group_prior()),
+  tar_target(prior_participant_group_model, sample_prior_participant_group_model(data_effect_sizes, participant_group_prior)),
+  tar_target(participant_group_model, fit_participant_group_model(data_effect_sizes, participant_group_prior)),
+  tar_target(rhat_participant_group_model, make_rhat_plot(participant_group_model)),
+  tar_target(trace_plot_participant_group_model, make_trace_plot(participant_group_model)),
+  tar_target(pp_check_participant_group_model, make_pp_check(participant_group_model)),
+  tar_target(participant_group_model_plot, plot_participant_group_model(data_effect_sizes, prior_participant_group_model, participant_group_model)),
+
+  # Fit, check, and plot self-talk content model
+  tar_target(selftalk_content_prior, set_selftalk_content_prior()),
+  tar_target(prior_selftalk_content_model, sample_prior_selftalk_content_model(data_effect_sizes, selftalk_content_prior)),
+  tar_target(selftalk_content_model, fit_selftalk_content_model(data_effect_sizes, selftalk_content_prior)),
+  tar_target(rhat_selftalk_content_model, make_rhat_plot(selftalk_content_model)),
+  tar_target(trace_plot_selftalk_content_model, make_trace_plot(selftalk_content_model)),
+  tar_target(pp_check_selftalk_content_model, make_pp_check(selftalk_content_model)),
+  tar_target(selftalk_content_model_plot, plot_selftalk_content_model(data_effect_sizes, prior_selftalk_content_model, selftalk_content_model)),
+
+  # Fit, check, and plot matching hypothesis model
+  tar_target(matching_prior, set_matching_prior()),
+  tar_target(prior_matching_model, sample_prior_matching_model(data_effect_sizes, matching_prior)),
+  tar_target(matching_model, fit_matching_model(data_effect_sizes, matching_prior)),
+  tar_target(rhat_matching_model, make_rhat_plot(matching_model)),
+  tar_target(trace_plot_matching_model, make_trace_plot(matching_model)),
+  tar_target(pp_check_matching_model, make_pp_check(matching_model)),
+  tar_target(matching_model_plot, plot_matching_model(data_effect_sizes, prior_matching_model, matching_model)),
+
+  # Fit, check, and plot task_novelty model
+  tar_target(task_novelty_prior, set_task_novelty_prior()),
+  tar_target(prior_task_novelty_model, sample_prior_task_novelty_model(data_effect_sizes, task_novelty_prior)),
+  tar_target(task_novelty_model, fit_task_novelty_model(data_effect_sizes, task_novelty_prior)),
+  tar_target(rhat_task_novelty_model, make_rhat_plot(task_novelty_model)),
+  tar_target(trace_plot_task_novelty_model, make_trace_plot(task_novelty_model)),
+  tar_target(pp_check_task_novelty_model, make_pp_check(task_novelty_model)),
+  tar_target(task_novelty_model_plot, plot_task_novelty_model(data_effect_sizes, prior_task_novelty_model, task_novelty_model)),
+
+  # Fit, check, and plot cue_selection model
+  tar_target(cue_selection_prior, set_cue_selection_prior()),
+  tar_target(prior_cue_selection_model, sample_prior_cue_selection_model(data_effect_sizes, cue_selection_prior)),
+  tar_target(cue_selection_model, fit_cue_selection_model(data_effect_sizes, cue_selection_prior)),
+  tar_target(rhat_cue_selection_model, make_rhat_plot(cue_selection_model)),
+  tar_target(trace_plot_cue_selection_model, make_trace_plot(cue_selection_model)),
+  tar_target(pp_check_cue_selection_model, make_pp_check(cue_selection_model)),
+  tar_target(cue_selection_model_plot, plot_cue_selection_model(data_effect_sizes, prior_cue_selection_model, cue_selection_model)),
+
+  # Fit, check, and plot training model
+  tar_target(training_prior, set_training_prior()),
+  tar_target(prior_training_model, sample_prior_training_model(data_effect_sizes, training_prior)),
+  tar_target(training_model, fit_training_model(data_effect_sizes, training_prior)),
+  tar_target(rhat_training_model, make_rhat_plot(training_model)),
+  tar_target(trace_plot_training_model, make_trace_plot(training_model)),
+  tar_target(pp_check_training_model, make_pp_check(training_model)),
+  tar_target(training_model_plot, plot_training_model(data_effect_sizes, prior_training_model, training_model)),
+
+  # Fit, check, and plot study_design model
+  tar_target(study_design_prior, set_study_design_prior()),
+  tar_target(prior_study_design_model, sample_prior_study_design_model(data_effect_sizes, study_design_prior)),
+  tar_target(study_design_model, fit_study_design_model(data_effect_sizes, study_design_prior)),
+  tar_target(rhat_study_design_model, make_rhat_plot(study_design_model)),
+  tar_target(trace_plot_study_design_model, make_trace_plot(study_design_model)),
+  tar_target(pp_check_study_design_model, make_pp_check(study_design_model)),
+  tar_target(study_design_model_plot, plot_study_design_model(data_effect_sizes, prior_study_design_model, study_design_model)),
+
+  # Make panel plot of moderators
+  tar_target(moderators_panel_plot, plot_panel_moderators(
+    motor_demands_model_plot, participant_group_model_plot, selftalk_content_model_plot,
+      matching_model_plot, task_novelty_model_plot, cue_selection_model_plot,
+      training_model_plot, study_design_model_plot, plot_spacer()
+  )),
 
   # Make plots tiffs
-  tar_target(main_model_plot_tiff, make_plot_tiff(main_model_plot, 7.5, 10, "plots/main_model_plot.tiff"))
+  tar_target(main_model_plot_tiff, make_plot_tiff(main_model_plot, 7.5, 10, "plots/main_model_plot.tiff")),
+  tar_target(moderators_panel_plot_tiff, make_plot_tiff(moderators_panel_plot, 21, 9, "plots/moderators_panel_plot.tiff"))
 
 
 #
