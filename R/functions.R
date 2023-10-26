@@ -1396,7 +1396,7 @@ plot_training_model <- function(data, prior_model, model) {
     labs(x = "Standardised Mean Difference", # summary measure
          y = element_blank(),
          fill = "",
-         title = "Cue Selection (Assigned versus Self-selected)",
+         title = "Training Intervention? (No-training versus Training)",
     ) +
     scale_x_continuous(limits = c(-1, 1.5), breaks = c(-1,-0.5, 0, 0.5, 1)) +
     guides(color = "none",
