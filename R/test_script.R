@@ -846,3 +846,34 @@ posterior_update <- ggplot(data = prior_posterior,
         title = element_text(size=8),
         plot.subtitle = element_text(size=6))
 
+
+
+
+
+
+
+targets::tar_load(
+  # motor_demands_model_plot,
+  # participant_group_model_plot
+  # selftalk_content_model_plot
+  # matching_model_plot
+  # task_novelty_model_plot
+  # cue_selection_model_plot
+  # training_model_plot
+  study_design_model_plot
+)
+
+
+library(patchwork)
+
+( (motor_demands_model_plot / participant_group_model_plot / selftalk_content_model_plot) |
+  (matching_model_plot / task_novelty_model_plot / cue_selection_model_plot) |
+  (training_model_plot / study_design_model_plot / plot_spacer()) ) +
+  plot_annotation(tag_levels = "A",
+                  title = "Updated Posterior Moderators Estimates",
+                  subtitle = "Prior and posterior distributions for pooled estimates, individual effects (ticks), and mean and 95% quantile interval for posterior (text label)") +
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+
+patchwork::plot_spacer()
+
+
