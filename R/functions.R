@@ -1,11 +1,46 @@
 # Read in and prepare data for effect size calculations and models
 read_prepare_data <- function(file) {
   data <- read_csv(here("data", "Final data.csv")) %>%
-    mutate_at(c(2:8, 30:32, 34:37), as.factor) %>%
+    mutate_at(c(2:9, 41:43, 45:48), as.factor) %>%
     clean_names() %>%
 
-    # add in pre-post correlation assumption
-    mutate(ri = 0.7) %>%
+    # Add in pre-post correlations
+    mutate(
+      # Convert p to t (Change scores)
+      delta_t_value_st = replace_na(qt(delta_p_value_st/2, df=n_st-1, lower.tail=FALSE)),
+      delta_t_value_con = replace_na(qt(delta_p_value_con/2, df=n_con-1, lower.tail=FALSE)),
+
+      # Convert t to SE (Change scores)
+      delta_se_st = replace_na(if_else(is.na(delta_m_st),
+                                       (post_m_st - pre_m_st)/delta_t_value_st, delta_m_st/delta_t_value_st)),
+      delta_se_con = replace_na(if_else(is.na(delta_m_con),
+                                        (post_m_con - pre_m_con)/delta_t_value_con, delta_m_con/delta_t_value_con)),
+
+      # Make positive
+      delta_se_st = if_else(delta_se_st < 0, delta_se_st * -1, delta_se_st),
+      delta_se_con = if_else(delta_se_con < 0, delta_se_con * -1, delta_se_con),
+
+      # Convert SE to SD (Change scores)
+      delta_sd_st = replace_na(delta_se_st * sqrt(n_st)),
+      delta_sd_con = replace_na(delta_se_con * sqrt(n_con)),
+
+      # Add missing deltas
+      delta_m_st = replace_na(post_m_st - pre_m_st),
+      delta_m_con = replace_na(post_m_con - pre_m_con),
+
+      # Calculate pre-post correlation coefficient for those with pre, post, and delta SDs
+      ri_st = replace_na((pre_sd_st^2 + post_sd_st^2 - delta_sd_st^2)/(2 * pre_sd_st * post_sd_st)),
+      ri_con = replace_na((pre_sd_con^2 + post_sd_con^2 - delta_sd_con^2)/(2 * pre_sd_con * post_sd_con)),
+
+      # Remove values outside the range of -1 to +1 as they are likely due to misreporting or miscalculations in original studies
+      ri_st = if_else(between(ri_st,-1,1) == FALSE, NA, ri_st),
+      ri_con = if_else(between(ri_con,-1,1) == FALSE, NA, ri_con),
+
+      # Add 0.7 assumed correlation where missing
+      ri_st = replace_na(ri_st, 0.7),
+      ri_con = replace_na(ri_con, 0.7)
+
+    )  %>%
 
     # add calculation of pooled baseline standard deviations
     mutate(pre_sd_pool = sqrt(((n_st - 1) * pre_sd_st ^ 2 +
@@ -30,6 +65,8 @@ read_prepare_data <- function(file) {
     select(-selftalk_novelty1, -selftalk_novelty2, -task_novelty1, -task_novelty2) %>%
 
     mutate(cue_selection = if_else(cue_selection == "No", "Assigned", "Self-selected"),
+           overtness_selection = if_else(overtness_selection == "No", "Assigned",
+                                         if_else(overtness_selection == "Yes", "Self-selected", NA)),
            training = if_else(acute_chronic == "acute", "No training", "Training"),
            study_design = if_else(study_design == "between", "Pre/post - experimental/control",
                                   if_else(study_design == "between-post", "Post - experimental/control", "Pre/post - experimental" )))
@@ -51,7 +88,7 @@ calculate_effect_sizes <- function(data) {
     m2i = pre_m_st,
     sd1i = pre_sd_pool,
     ni = n_st,
-    ri = ri,
+    ri = ri_st,
     data = data_increase_ppc
   )
   data_increase_ppc_con <- escalc(
@@ -60,7 +97,7 @@ calculate_effect_sizes <- function(data) {
     m2i = pre_m_con,
     sd1i = pre_sd_pool,
     ni = n_con,
-    ri = ri,
+    ri = ri_con,
     data = data_increase_ppc
   )
 
@@ -98,7 +135,7 @@ calculate_effect_sizes <- function(data) {
     m2i = pre_m_st,
     sd1i = pre_sd_st,
     ni = n_st,
-    ri = ri,
+    ri = ri_st,
     data = data_increase_pp
   )
 
@@ -115,7 +152,7 @@ calculate_effect_sizes <- function(data) {
     m2i = post_m_st,
     sd1i = pre_sd_pool,
     ni = n_st,
-    ri = ri,
+    ri = ri_st,
     data = data_decrease_ppc
   )
   data_decrease_ppc_con <- escalc(
@@ -124,7 +161,7 @@ calculate_effect_sizes <- function(data) {
     m2i = post_m_con,
     sd1i = pre_sd_pool,
     ni = n_con,
-    ri = ri,
+    ri = ri_con,
     data = data_decrease_ppc
   )
 
@@ -162,7 +199,7 @@ calculate_effect_sizes <- function(data) {
     m2i = post_m_st,
     sd1i = pre_sd_st,
     ni = n_st,
-    ri = ri,
+    ri = ri_st,
     data = data_decrease_pp
   )
 
@@ -192,8 +229,18 @@ make_plot_tiff <- function(plot, width, height, path) {
 
 }
 
-get_tidy_model <- function(model) {
-  tidy(model)
+get_logBF_curve <- function(model) {
+
+  plan(cluster, workers = 10)
+
+  BF_curve <- future_map_dfr(.x = seq(0,1,length=100), .f = function(.x) {
+    return(data.frame(effect = .x,
+                      BF = bayesfactor_parameters(model, null = .x)))
+  })
+
+  plan(sequential)
+
+  return(BF_curve)
 }
 
 # Setup rstan to run quicker
@@ -401,6 +448,34 @@ sample_prior_cue_selection_model <- function(data, prior) {
     )
 }
 
+set_overtness_selection_prior <- function() {
+
+  # Note, this model omits the intercept in order to include the priors on the groups directly
+  overtness_selection_prior <-
+    c(
+      prior("student_t(3, 0.49, 0.08)", class = "b", coef = "overtness_selectionAssigned"),
+      prior("student_t(3, 0.48, 0.08)", class = "b", coef = "overtness_selectionSelfMselected")
+
+    )
+}
+
+sample_prior_overtness_selection_model <- function(data, prior) {
+
+  prior_overtness_selection_model <-
+    brm(
+      yi | se(sqrt(vi)) ~ 0 + overtness_selection + (1 | study / experiment / group / effect),
+      data = data,
+      prior = prior,
+      chains = 4,
+      cores = 4,
+      seed = 1988,
+      warmup = 2000,
+      iter = 8000,
+      control = list(adapt_delta = 0.99),
+      sample_prior = "only"
+    )
+}
+
 set_training_prior <- function() {
 
   # Note, this model omits the intercept in order to include the priors on the groups directly
@@ -468,8 +543,8 @@ fit_main_model <- function(data, prior) {
       chains = 4,
       cores = 4,
       seed = 1988,
-      warmup = 2000,
-      iter = 8000,
+      warmup = 4000,
+      iter = 40000,
       control = list(adapt_delta = 0.99)
     )
 }
@@ -483,8 +558,8 @@ fit_motor_demands_model <- function(data, prior) {
       chains = 4,
       cores = 4,
       seed = 1988,
-      warmup = 2000,
-      iter = 8000,
+      warmup = 4000,
+      iter = 40000,
       control = list(adapt_delta = 0.99)
     )
 }
@@ -498,8 +573,8 @@ fit_participant_group_model <- function(data, prior) {
       chains = 4,
       cores = 4,
       seed = 1988,
-      warmup = 2000,
-      iter = 8000,
+      warmup = 4000,
+      iter = 40000,
       control = list(adapt_delta = 0.99)
     )
 }
@@ -513,8 +588,8 @@ fit_selftalk_content_model <- function(data, prior) {
       chains = 4,
       cores = 4,
       seed = 1988,
-      warmup = 2000,
-      iter = 8000,
+      warmup = 4000,
+      iter = 40000,
       control = list(adapt_delta = 0.99)
     )
 }
@@ -535,8 +610,8 @@ fit_matching_model <- function(data, prior) {
       chains = 4,
       cores = 4,
       seed = 1988,
-      warmup = 2000,
-      iter = 8000,
+      warmup = 4000,
+      iter = 40000,
       control = list(adapt_delta = 0.99)
     )
 }
@@ -551,8 +626,8 @@ fit_task_novelty_model <- function(data, prior) {
       chains = 4,
       cores = 4,
       seed = 1988,
-      warmup = 2000,
-      iter = 8000,
+      warmup = 4000,
+      iter = 40000,
       control = list(adapt_delta = 0.99)
     )
 }
@@ -567,8 +642,28 @@ fit_cue_selection_model <- function(data, prior) {
       chains = 4,
       cores = 4,
       seed = 1988,
-      warmup = 2000,
-      iter = 8000,
+      warmup = 4000,
+      iter = 40000,
+      control = list(adapt_delta = 0.99)
+    )
+}
+
+fit_overtness_selection_model <- function(data, prior) {
+
+  data <- data %>%
+    filter(overtness_selection == "Assigned" |
+             overtness_selection == "Self-selected")
+
+  overtness_selection_model <-
+    brm(
+      yi | se(sqrt(vi)) ~ 0 + overtness_selection + (1 | study / experiment / group / effect),
+      data = data,
+      prior = prior,
+      chains = 4,
+      cores = 4,
+      seed = 1988,
+      warmup = 4000,
+      iter = 40000,
       control = list(adapt_delta = 0.99)
     )
 }
@@ -583,8 +678,8 @@ fit_training_model <- function(data, prior) {
       chains = 4,
       cores = 4,
       seed = 1988,
-      warmup = 2000,
-      iter = 8000,
+      warmup = 4000,
+      iter = 40000,
       control = list(adapt_delta = 0.99)
     )
 }
@@ -599,14 +694,14 @@ fit_study_design_model <- function(data, prior) {
       chains = 4,
       cores = 4,
       seed = 1988,
-      warmup = 2000,
-      iter = 8000,
+      warmup = 4000,
+      iter = 40000,
       control = list(adapt_delta = 0.99)
     )
 }
 
 # Plots
-plot_main_model <- function(data, prior_model, model) {
+plot_main_model <- function(data, prior_model, model, BF_curve) {
 
   # Sample draws from the prior distribution
   prior_draws <-
@@ -621,7 +716,7 @@ plot_main_model <- function(data, prior_model, model) {
     mutate(b_Intercept = b_Intercept + r_study,
            study = as.factor(study)) %>%
     select(.chain, .iteration, .draw, b_Intercept, study) %>%
-    merge(data[, 1:2], by = "study")
+    merge(data[, c(1,3)], by = "study")
 
   study_summary <- group_by(study_draws, label) %>%
     mean_qi(b_Intercept) %>%
@@ -773,9 +868,42 @@ plot_main_model <- function(data, prior_model, model) {
       plot.subtitle = element_text(size = 6)
     )
 
+  # Bayes Factor curve plot
+  BF_curve_plot <- BF_curve %>% ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
+
+    # Add reference line at zero
+    geom_vline(xintercept = 0, linetype = 2) +
+
+    # Add bands for Jeffreys thresholds for log10BF
+    geom_hline(yintercept = c(0,0.5,1,1.5,2), linetype = "dashed") +
+    annotate("text", label = stringr::str_wrap("Negative", width = 15),
+             x = 1, y=-0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Weak", width = 15),
+             x = 1, y=0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Substantial", width = 15),
+             x = 1, y=0.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Strong", width = 15),
+             x = 1, y=1.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Very Strong", width = 15),
+             x = 1, y=1.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Decisive", width = 15),
+             x = 1, y=2.25, size = 1.75) +
+    geom_smooth(se=FALSE, color="black") +
+    labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
+         y = "log10(BF)",
+         title = "Change in Evidence",
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+    ) +
+    scale_x_continuous(limits = c(-0.55, 1.1),
+                       breaks = c(-0.5, 0, 0.5, 1)) +
+    theme_classic() +
+    theme(panel.border = element_rect(fill = NA),
+          axis.title.y = element_text(vjust = -40),
+          plot.subtitle = element_text(size = 6))
+
   # Combine plots
-  (forest_study / posterior_update) +
-    plot_layout(heights = c(2, 1)) +
+  (forest_study / posterior_update / BF_curve_plot) +
+    plot_layout(heights = c(2, 1,1)) +
     plot_annotation(tag_levels = "A")
 
 }
@@ -1321,6 +1449,97 @@ plot_cue_selection_model <- function(data, prior_model, model) {
           plot.subtitle = element_text(size=6))
 }
 
+plot_overtness_selection_model <- function(data, prior_model, model) {
+
+  data <- data %>%
+    filter(overtness_selection == "Assigned" |
+             overtness_selection == "Self-selected")
+
+  # Prior distribution samples
+  nd <- datagrid(model = model,
+                 overtness_selection = c("Assigned",
+                                   "Self-selected")
+  )
+
+  prior_preds <- predictions(prior_model, type = "response",
+                             newdata = nd,
+                             re_formula = NA) %>%
+    posterior_draws() %>%
+    transform(type = "Response") %>%
+    mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
+
+  # Posterior distribution samples
+  posterior_preds <- predictions(model, type = "response",
+                                 newdata = nd,
+                                 re_formula = NA) %>%
+    posterior_draws() %>%
+    transform(type = "Response") %>%
+    mutate(label = "Posterior Pooled Estimate")
+
+  posterior_summary <- group_by(posterior_preds, overtness_selection, label) %>%
+    mean_qi(draw) %>%
+    mutate(draw = draw,
+           .lower = .lower,
+           .upper = .upper)
+
+  # Combine prior and posterior samples for plot
+  prior_posterior <- rbind(prior_preds, posterior_preds) %>%
+    mutate(label = factor(label, levels = c("Posterior Pooled Estimate",
+                                            "Prior (Hatzigeorgiadis et al., 2011)"
+    )))
+
+  posterior_update <- ggplot(data = prior_posterior,
+                             aes(x = draw, y = overtness_selection,
+                                 color = label, fill = label)
+  ) +
+    # Add reference line at zero
+    geom_vline(xintercept = 0, linetype = 2) +
+
+    stat_slab(alpha = 0.6, linewidth = 0) +
+
+    # Add individual study data
+    geom_point(
+      data = data %>%
+        filter(!is.na(yi)) %>%
+        mutate(label = NA),
+      aes(x = yi, y = overtness_selection),
+      position = position_nudge(y = -0.05),
+      shape = "|"
+    ) +
+
+    # Add text and labels
+    geom_text(
+      data = mutate_if(posterior_summary,
+                       is.numeric, round, 2),
+      aes(
+        label = glue::glue("{draw} [{.lower}, {.upper}]"),
+        y = overtness_selection,
+        x = 1.5
+      ),
+      hjust = "inward",
+      size = 3,
+      color = "black",
+      position = position_nudge(y=0.1)
+    ) +
+
+    scale_color_manual(values = c("#009E73", "#E69F00")) +
+    scale_fill_manual(values = c("#009E73", "#E69F00")) +
+
+    labs(x = "Standardised Mean Difference", # summary measure
+         y = element_blank(),
+         fill = "",
+         title = "Overtness Selection (Assigned versus Self-selected)",
+    ) +
+    scale_x_continuous(limits = c(-1, 1.5), breaks = c(-1,-0.5, 0, 0.5, 1)) +
+    guides(color = "none",
+           shape = "none") +
+    theme_classic() +
+    theme(legend.position = "bottom",
+          panel.border = element_rect(fill = NA),
+          title = element_text(size=8),
+          plot.subtitle = element_text(size=6))
+}
+
 plot_training_model <- function(data, prior_model, model) {
 
   # Prior distribution samples
@@ -1508,6 +1727,399 @@ plot_panel_moderators <- function(plot1, plot2, plot3,
 
 }
 
+# Supplemental plots (moderator change in evidence)
+plot_BF_curve_motor_demands <- function(BF_curve) {
+
+  BF_curve %>%
+
+    # Recode levels
+    mutate(BF.Parameter=recode(BF.Parameter,
+                               'b_motor_demandsFine'='Fine',
+                               'b_motor_demandsGross'='Gross')) %>%
+
+    ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
+
+    # Add reference line at zero
+    geom_vline(xintercept = 0, linetype = 2) +
+
+    # Add bands for Jeffreys thresholds for log10BF
+    geom_hline(yintercept = c(0,0.5,1,1.5,2), linetype = "dashed") +
+    annotate("text", label = stringr::str_wrap("Negative", width = 15),
+             x = 1, y=-0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Weak", width = 15),
+             x = 1, y=0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Substantial", width = 15),
+             x = 1, y=0.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Strong", width = 15),
+             x = 1, y=1.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Very Strong", width = 15),
+             x = 1, y=1.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Decisive", width = 15),
+             x = 1, y=2.25, size = 1.75) +
+    geom_smooth(se=FALSE, color="black") +
+    labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
+         y = "log10(BF)",
+         title = "Change in Evidence (Motor Demands)",
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+    ) +
+    scale_x_continuous(limits = c(-0.55, 1.1),
+                       breaks = c(-0.5, 0, 0.5, 1)) +
+    facet_wrap(~BF.Parameter) +
+    theme_classic() +
+    theme(panel.border = element_rect(fill = NA),
+          plot.subtitle = element_text(size = 6))
+
+}
+
+plot_BF_curve_participant_group <- function(BF_curve) {
+
+  BF_curve %>%
+
+    # Recode levels
+    mutate(BF.Parameter=recode(BF.Parameter,
+                               'b_participant_groupNonMathletes'='Non-athletes',
+                               'b_participant_groupBeginnerathletes'='Beginner athletes',
+                               'b_participant_groupExperiencedathletes'='Experienced athletes')) %>%
+
+    ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
+
+    # Add reference line at zero
+    geom_vline(xintercept = 0, linetype = 2) +
+
+    # Add bands for Jeffreys thresholds for log10BF
+    geom_hline(yintercept = c(0,0.5,1,1.5,2), linetype = "dashed") +
+    annotate("text", label = stringr::str_wrap("Negative", width = 15),
+             x = 1, y=-0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Weak", width = 15),
+             x = 1, y=0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Substantial", width = 15),
+             x = 1, y=0.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Strong", width = 15),
+             x = 1, y=1.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Very Strong", width = 15),
+             x = 1, y=1.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Decisive", width = 15),
+             x = 1, y=2.25, size = 1.75) +
+    geom_smooth(se=FALSE, color="black") +
+    labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
+         y = "log10(BF)",
+         title = "Change in Evidence (Participants)",
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+    ) +
+    scale_x_continuous(limits = c(-0.55, 1.1),
+                       breaks = c(-0.5, 0, 0.5, 1)) +
+    facet_wrap(~BF.Parameter) +
+    theme_classic() +
+    theme(panel.border = element_rect(fill = NA),
+          plot.subtitle = element_text(size = 6))
+
+}
+
+plot_BF_curve_selftalk_content <- function(BF_curve) {
+
+  BF_curve %>%
+
+    # Recode levels
+    mutate(BF.Parameter=recode(BF.Parameter,
+                               'b_selftalk_contentInstructional'='Instructional',
+                               'b_selftalk_contentMotivational'='Motivational',
+                               'b_selftalk_contentCombinedInstructionalDMotivational'='Combined Instructional/Motivational',
+                               'b_selftalk_contentRational'='Rational')) %>%
+
+    ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
+
+    # Add reference line at zero
+    geom_vline(xintercept = 0, linetype = 2) +
+
+    # Add bands for Jeffreys thresholds for log10BF
+    geom_hline(yintercept = c(0,0.5,1,1.5,2), linetype = "dashed") +
+    annotate("text", label = stringr::str_wrap("Negative", width = 15),
+             x = 1, y=-0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Weak", width = 15),
+             x = 1, y=0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Substantial", width = 15),
+             x = 1, y=0.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Strong", width = 15),
+             x = 1, y=1.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Very Strong", width = 15),
+             x = 1, y=1.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Decisive", width = 15),
+             x = 1, y=2.25, size = 1.75) +
+    geom_smooth(se=FALSE, color="black") +
+    labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
+         y = "log10(BF)",
+         title = "Change in Evidence (Self-Talk Content)",
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+    ) +
+    scale_x_continuous(limits = c(-0.55, 1.1),
+                       breaks = c(-0.5, 0, 0.5, 1)) +
+    facet_wrap(~BF.Parameter) +
+    theme_classic() +
+    theme(panel.border = element_rect(fill = NA),
+          plot.subtitle = element_text(size = 6))
+
+}
+
+plot_BF_curve_matching <- function(BF_curve) {
+
+  BF_curve %>%
+
+    # Recode levels
+    mutate(BF.Parameter=recode(BF.Parameter,
+                               'b_matchingInstructionalDFine'='Instructional/Fine',
+                               'b_matchingInstructionalDGross'='Instructional/Gross',
+                               'b_matchingMotivationalDFine'='Motivational/Fine',
+                               'b_matchingMotivationalDGross'='Motivational/Gross')) %>%
+
+    ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
+
+    # Add reference line at zero
+    geom_vline(xintercept = 0, linetype = 2) +
+
+    # Add bands for Jeffreys thresholds for log10BF
+    geom_hline(yintercept = c(0,0.5,1,1.5,2), linetype = "dashed") +
+    annotate("text", label = stringr::str_wrap("Negative", width = 15),
+             x = 1, y=-0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Weak", width = 15),
+             x = 1, y=0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Substantial", width = 15),
+             x = 1, y=0.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Strong", width = 15),
+             x = 1, y=1.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Very Strong", width = 15),
+             x = 1, y=1.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Decisive", width = 15),
+             x = 1, y=2.25, size = 1.75) +
+    geom_smooth(se=FALSE, color="black") +
+    labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
+         y = "log10(BF)",
+         title = "Change in Evidence (Matching Hypothesis)",
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+    ) +
+    scale_x_continuous(limits = c(-0.55, 1.1),
+                       breaks = c(-0.5, 0, 0.5, 1)) +
+    facet_wrap(~BF.Parameter) +
+    theme_classic() +
+    theme(panel.border = element_rect(fill = NA),
+          plot.subtitle = element_text(size = 6))
+
+}
+
+plot_BF_curve_task_novelty <- function(BF_curve) {
+
+  BF_curve %>%
+
+    # Recode levels
+    mutate(BF.Parameter=recode(BF.Parameter,
+                               'b_task_noveltyLearned'='Learned',
+                               'b_task_noveltyNovel'='Novel')) %>%
+
+    ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
+
+    # Add reference line at zero
+    geom_vline(xintercept = 0, linetype = 2) +
+
+    # Add bands for Jeffreys thresholds for log10BF
+    geom_hline(yintercept = c(0,0.5,1,1.5,2), linetype = "dashed") +
+    annotate("text", label = stringr::str_wrap("Negative", width = 15),
+             x = 1, y=-0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Weak", width = 15),
+             x = 1, y=0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Substantial", width = 15),
+             x = 1, y=0.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Strong", width = 15),
+             x = 1, y=1.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Very Strong", width = 15),
+             x = 1, y=1.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Decisive", width = 15),
+             x = 1, y=2.25, size = 1.75) +
+    geom_smooth(se=FALSE, color="black") +
+    labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
+         y = "log10(BF)",
+         title = "Change in Evidence (Task Novelty)",
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+    ) +
+    scale_x_continuous(limits = c(-0.55, 1.1),
+                       breaks = c(-0.5, 0, 0.5, 1)) +
+    facet_wrap(~BF.Parameter) +
+    theme_classic() +
+    theme(panel.border = element_rect(fill = NA),
+          plot.subtitle = element_text(size = 6))
+
+}
+
+plot_BF_curve_cue_selection <- function(BF_curve) {
+
+  BF_curve %>%
+
+    # Recode levels
+    mutate(BF.Parameter=recode(BF.Parameter,
+                               'b_cue_selectionAssigned'='Assigned',
+                               'b_cue_selectionSelfMselected'='Self-selected')) %>%
+
+    ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
+
+    # Add reference line at zero
+    geom_vline(xintercept = 0, linetype = 2) +
+
+    # Add bands for Jeffreys thresholds for log10BF
+    geom_hline(yintercept = c(0,0.5,1,1.5,2), linetype = "dashed") +
+    annotate("text", label = stringr::str_wrap("Negative", width = 15),
+             x = 1, y=-0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Weak", width = 15),
+             x = 1, y=0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Substantial", width = 15),
+             x = 1, y=0.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Strong", width = 15),
+             x = 1, y=1.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Very Strong", width = 15),
+             x = 1, y=1.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Decisive", width = 15),
+             x = 1, y=2.25, size = 1.75) +
+    geom_smooth(se=FALSE, color="black") +
+    labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
+         y = "log10(BF)",
+         title = "Change in Evidence (Cue Selection)",
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+    ) +
+    scale_x_continuous(limits = c(-0.55, 1.1),
+                       breaks = c(-0.5, 0, 0.5, 1)) +
+    facet_wrap(~BF.Parameter) +
+    theme_classic() +
+    theme(panel.border = element_rect(fill = NA),
+          plot.subtitle = element_text(size = 6))
+
+}
+
+plot_BF_curve_overtness_selection <- function(BF_curve) {
+
+  BF_curve %>%
+
+    # Recode levels
+    mutate(BF.Parameter=recode(BF.Parameter,
+                               'b_overtness_selectionAssigned'='Assigned',
+                               'b_overtness_selectionSelfMselected'='Self-selected')) %>%
+
+    ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
+
+    # Add reference line at zero
+    geom_vline(xintercept = 0, linetype = 2) +
+
+    # Add bands for Jeffreys thresholds for log10BF
+    geom_hline(yintercept = c(0,0.5,1,1.5,2), linetype = "dashed") +
+    annotate("text", label = stringr::str_wrap("Negative", width = 15),
+             x = 1, y=-0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Weak", width = 15),
+             x = 1, y=0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Substantial", width = 15),
+             x = 1, y=0.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Strong", width = 15),
+             x = 1, y=1.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Very Strong", width = 15),
+             x = 1, y=1.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Decisive", width = 15),
+             x = 1, y=2.25, size = 1.75) +
+    geom_smooth(se=FALSE, color="black") +
+    labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
+         y = "log10(BF)",
+         title = "Change in Evidence (Overtness Selection)",
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+    ) +
+    scale_x_continuous(limits = c(-0.55, 1.1),
+                       breaks = c(-0.5, 0, 0.5, 1)) +
+    facet_wrap(~BF.Parameter) +
+    theme_classic() +
+    theme(panel.border = element_rect(fill = NA),
+          plot.subtitle = element_text(size = 6))
+
+}
+
+plot_BF_curve_training <- function(BF_curve) {
+
+  BF_curve %>%
+
+    # Recode levels
+    mutate(BF.Parameter=recode(BF.Parameter,
+                               'b_trainingNotraining'='No-training',
+                               'b_trainingTraining'='Training')) %>%
+
+    ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
+
+    # Add reference line at zero
+    geom_vline(xintercept = 0, linetype = 2) +
+
+    # Add bands for Jeffreys thresholds for log10BF
+    geom_hline(yintercept = c(0,0.5,1,1.5,2), linetype = "dashed") +
+    annotate("text", label = stringr::str_wrap("Negative", width = 15),
+             x = 1, y=-0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Weak", width = 15),
+             x = 1, y=0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Substantial", width = 15),
+             x = 1, y=0.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Strong", width = 15),
+             x = 1, y=1.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Very Strong", width = 15),
+             x = 1, y=1.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Decisive", width = 15),
+             x = 1, y=2.25, size = 1.75) +
+    geom_smooth(se=FALSE, color="black") +
+    labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
+         y = "log10(BF)",
+         title = "Change in Evidence (Motor Demands)",
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+    ) +
+    scale_x_continuous(limits = c(-0.55, 1.1),
+                       breaks = c(-0.5, 0, 0.5, 1)) +
+    facet_wrap(~BF.Parameter) +
+    theme_classic() +
+    theme(panel.border = element_rect(fill = NA),
+          plot.subtitle = element_text(size = 6))
+
+}
+
+plot_BF_curve_study_design <- function(BF_curve) {
+
+  BF_curve %>%
+
+    # Recode levels
+    mutate(BF.Parameter=recode(BF.Parameter,
+                               'b_study_designPostMexperimentalDcontrol'='Post - experimental/control',
+                               'b_study_designPreDpostMexperimental'='Pre/post - experimental',
+                               'b_study_designPreDpostMexperimentalDcontrol'='Pre/post - experimental/control')) %>%
+
+    ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
+
+    # Add reference line at zero
+    geom_vline(xintercept = 0, linetype = 2) +
+
+    # Add bands for Jeffreys thresholds for log10BF
+    geom_hline(yintercept = c(0,0.5,1,1.5,2), linetype = "dashed") +
+    annotate("text", label = stringr::str_wrap("Negative", width = 15),
+             x = 1, y=-0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Weak", width = 15),
+             x = 1, y=0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Substantial", width = 15),
+             x = 1, y=0.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Strong", width = 15),
+             x = 1, y=1.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Very Strong", width = 15),
+             x = 1, y=1.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Decisive", width = 15),
+             x = 1, y=2.25, size = 1.75) +
+    geom_smooth(se=FALSE, color="black") +
+    labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
+         y = "log10(BF)",
+         title = "Change in Evidence (Motor Demands)",
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+    ) +
+    scale_x_continuous(limits = c(-0.55, 1.1),
+                       breaks = c(-0.5, 0, 0.5, 1)) +
+    facet_wrap(~BF.Parameter) +
+    theme_classic() +
+    theme(panel.border = element_rect(fill = NA),
+          plot.subtitle = element_text(size = 6))
+
+}
 
 # Model checks
 make_rhat_plot <- function(model) {

@@ -11,7 +11,43 @@ library(patchwork)
 
 data <- read.csv("data/Final data.csv")
 
-data$ri <- 0.7
+data <- data %>%
+  mutate(
+    # Convert p to t (Change scores)
+    delta_t_value_st = replace_na(qt(delta_p_value_st/2, df=n_st-1, lower.tail=FALSE)),
+    delta_t_value_con = replace_na(qt(delta_p_value_con/2, df=n_con-1, lower.tail=FALSE)),
+
+    # Convert t to SE (Change scores)
+    delta_se_st = replace_na(if_else(is.na(delta_m_st),
+                                    (post_m_st - pre_m_st)/delta_t_value_st, delta_m_st/delta_t_value_st)),
+    delta_se_con = replace_na(if_else(is.na(delta_m_con),
+                                    (post_m_con - pre_m_con)/delta_t_value_con, delta_m_con/delta_t_value_con)),
+
+    # Make positive
+    delta_se_st = if_else(delta_se_st < 0, delta_se_st * -1, delta_se_st),
+    delta_se_con = if_else(delta_se_con < 0, delta_se_con * -1, delta_se_con),
+
+    # Convert SE to SD (Change scores)
+    delta_sd_st = replace_na(delta_se_st * sqrt(n_st)),
+    delta_sd_con = replace_na(delta_se_con * sqrt(n_con)),
+
+    # Add missing deltas
+    delta_m_st = replace_na(post_m_st - pre_m_st),
+    delta_m_con = replace_na(post_m_con - pre_m_con),
+
+    # Calculate pre-post correlation coefficient for those with pre, post, and delta SDs
+    ri_st = replace_na((pre_sd_st^2 + post_sd_st^2 - delta_sd_st^2)/(2 * pre_sd_st * post_sd_st)),
+    ri_con = replace_na((pre_sd_con^2 + post_sd_con^2 - delta_sd_con^2)/(2 * pre_sd_con * post_sd_con)),
+
+    # Remove values outside the range of -1 to +1 as they are likely due to misreporting or miscalculations in original studies
+    ri_st = if_else(between(ri_st,-1,1) == FALSE, NA, ri_st),
+    ri_con = if_else(between(ri_con,-1,1) == FALSE, NA, ri_con),
+
+    # Add 0.7 assumed correlation where missing
+    ri_st = replace_na(ri_st, 0.7),
+    ri_con = replace_na(ri_con, 0.7)
+  )
+
 
 data$pre_sd_pool <-
   sqrt(((data$n_st - 1) * data$pre_sd_st ^ 2 + (data$n_con - 1) * data$pre_sd_con ^
@@ -875,5 +911,125 @@ library(patchwork)
   plot_layout(guides = "collect") & theme(legend.position = 'bottom')
 
 patchwork::plot_spacer()
+
+
+
+# BF <- bayestestR::bayesfactor_parameters(main_model, null = 0)
+#
+# BF$
+#
+# si <- bayestestR::si(
+#   posterior = main_model,
+#   prior = NULL,
+#   BF = ,
+#   verbose = FALSE
+# )
+#
+# plot(si)
+#
+# BF_gradient <- function(model, effects) {
+#   bayestestR::bayesfactor_parameters(model, null = effects)
+#
+#   BF$log_BF
+# }
+#
+#
+#
+
+
+install.packages("doSNOW")
+
+install.packages("doParallel")
+
+install.packages("doMPI")
+
+install.packages("foreach")
+
+#
+library(foreach)
+library(doParallel)
+
+n.cores <- parallel::detectCores() - 1
+
+#create the cluster
+my.cluster <- parallel::makeCluster(
+  n.cores,
+  type = "PSOCK"
+)
+
+#register it to be used by %dopar%
+doParallel::registerDoParallel(cl = my.cluster)
+
+#ensure stopped on exit
+on.exit(stopCluster(my.cluster))
+
+
+
+system.time(
+
+logBF_curve <- foreach (i = seq(0,1,length=100), .packages = c("bayestestR"), .combine = "rbind") %dopar% {
+  data.frame(
+    effect = i,
+    BF = exp(bayesfactor_parameters(main_model, null = i)$log_BF)
+  )
+}
+
+)
+
+
+BF_curve_plot <- logBF_curve %>% ggplot(aes(x=effect, y=log10(BF))) +
+  geom_hline(yintercept = c(0,0.5,1,1.5,2), linetype = "dashed") +
+  annotate("text", label = stringr::str_wrap("Negative", width = 10),
+           x = 1, y=-0.25, size = 3) +
+  annotate("text", label = stringr::str_wrap("Weak", width = 10),
+           x = 1, y=0.25, size = 3) +
+  annotate("text", label = stringr::str_wrap("Substantial", width = 10),
+           x = 1, y=0.75, size = 3) +
+  annotate("text", label = stringr::str_wrap("Strong", width = 10),
+           x = 1, y=1.25, size = 3) +
+  annotate("text", label = stringr::str_wrap("Very Strong", width = 10),
+           x = 1, y=1.75, size = 3) +
+  annotate("text", label = stringr::str_wrap("Decisive", width = 10),
+           x = 1, y=2.25, size = 3) +
+  geom_smooth(se=FALSE) +
+  labs(x = "Point Effect Size BF Calculated Against",
+       y = "log10(BF)",
+       title = "Change in Evidence") +
+  scale_y_continuous(limits = c(-0.5,5)) +
+  theme_classic() +
+  theme(panel.border = element_rect(fill = NA))
+
+
+
+  targets::tar_load(main_model_plot)
+
+  library(patchwork)
+
+
+  main_model_plot | BF_curve_plot
+
+
+
+
+
+
+
+  plan(cluster, workers = 10)
+
+  BF_curve <- future_map_dfr(.x = seq(0,1,length=10), .f = function(.x) {
+    return(data.frame(effect = .x,
+                      BF = bayesfactor_parameters(motor_demands_model, null = .x)))
+  })
+
+  plan(sequential)
+
+
+
+
+
+
+
+
+
 
 
