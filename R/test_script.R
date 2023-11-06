@@ -1028,7 +1028,46 @@ BF_curve_plot <- logBF_curve %>% ggplot(aes(x=effect, y=log10(BF))) +
 
 
 
+  matching_model_logBF_curve %>%
 
+    # Recode levels
+    mutate(BF.Parameter=recode(BF.Parameter,
+                               'b_matchingInstructionalDFine'='Instructional/Fine',
+                               'b_matchingInstructionalDGross'='Instructional/Gross',
+                               'b_matchingMotivationalDFine'='Motivational/Fine',
+                               'b_matchingMotivationalDGross'='Motivational/Gross')) %>%
+
+    ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
+
+    # Add reference line at zero
+    geom_vline(xintercept = 0, linetype = 2) +
+
+    # Add bands for Jeffreys thresholds for log10BF
+    geom_hline(yintercept = c(0,0.5,1,1.5,2), linetype = "dashed") +
+    annotate("text", label = stringr::str_wrap("Negative", width = 15),
+             x = 1, y=-0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Weak", width = 15),
+             x = 1, y=0.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Substantial", width = 15),
+             x = 1, y=0.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Strong", width = 15),
+             x = 1, y=1.25, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Very Strong", width = 15),
+             x = 1, y=1.75, size = 1.75) +
+    annotate("text", label = stringr::str_wrap("Decisive", width = 15),
+             x = 1, y=2.25, size = 1.75) +
+    geom_smooth(se=FALSE, color="black") +
+    labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
+         y = "log10(BF)",
+         title = "Change in Evidence",
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+    ) +
+    scale_x_continuous(limits = c(-0.55, 1.1),
+                       breaks = c(-0.5, 0, 0.5, 1)) +
+    facet_wrap(~BF.Parameter) +
+    theme_classic() +
+    theme(panel.border = element_rect(fill = NA),
+          plot.subtitle = element_text(size = 6))
 
 
 

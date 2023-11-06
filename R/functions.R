@@ -700,6 +700,57 @@ fit_study_design_model <- function(data, prior) {
     )
 }
 
+fit_cumulative_main_model <- function(data) {
+
+  data <- data %>%
+    mutate(year = as.numeric(as.character(year)))
+
+  # Create empty data frame for draws
+  cumulative_draws <- data.frame(year = as.numeric(),
+                                  b_Intercept = as.numeric,
+                                 prior = as.character())
+
+  # Loop through each model using previous years posterior as prior
+  for (i in unique(data$year)){
+
+    data_year <- data %>%
+      filter(year == i)
+
+    posterior <- c(0.48, 0.05, 3)
+
+    prior <- set_prior(paste("student_t(",posterior[3],",", posterior[1],",", posterior[2],")"),
+                       class = "Intercept")
+
+    main_model <-
+      brm(
+        yi | se(sqrt(vi)) ~ 1 + (1 | study / experiment / group / effect),
+        data = data_year,
+        prior = prior,
+        chains = 4,
+        cores = 4,
+        seed = 1988,
+        warmup = 2000,
+        iter = 6000,
+        control = list(adapt_delta = 0.99)
+      )
+
+    draws <- main_model %>%
+      spread_draws(b_Intercept)
+
+    posterior <- MASS::fitdistr(draws$b_Intercept, "t")$estimate
+
+    cumulative_draws <- rbind(cumulative_draws,
+                               data.frame(year = i,
+                                          b_Intercept = draws$b_Intercept,
+                                          prior = paste("student_t(",posterior[3],",", posterior[1],",", posterior[2],")"))
+    )
+
+  }
+
+  return(cumulative_draws)
+
+}
+
 # Plots
 plot_main_model <- function(data, prior_model, model, BF_curve) {
 
@@ -1727,7 +1778,7 @@ plot_panel_moderators <- function(plot1, plot2, plot3,
 
 }
 
-# Supplemental plots (moderator change in evidence)
+# Supplemental plots (moderator change in evidence and cummulative plot)
 plot_BF_curve_motor_demands <- function(BF_curve) {
 
   BF_curve %>%
@@ -2119,6 +2170,84 @@ plot_BF_curve_study_design <- function(BF_curve) {
     theme(panel.border = element_rect(fill = NA),
           plot.subtitle = element_text(size = 6))
 
+}
+
+plot_cumulative_main_model <- function(data, prior_model, cumulative_draws) {
+
+  prior_draws <- prior_model %>%
+    spread_draws(b_Intercept) %>%
+    mutate(year = "Hatzigeorgiadis et al., (2011)",
+           prior = NA) %>%
+    select(year, b_Intercept, prior)
+
+  cumulative_draws <- rbind(prior_draws, cumulative_draws) %>%
+    mutate(year = factor(year, levels = c(
+      "Hatzigeorgiadis et al., (2011)",
+      "2011",
+      "2012",
+      "2013",
+      "2014",
+      "2015",
+      "2016",
+      "2017",
+      "2018",
+      "2019",
+      "2020",
+      "2021",
+      "2022"
+    )))
+
+  posterior_summary <- group_by(cumulative_draws, year) %>%
+    mean_qi(b_Intercept)
+
+  cumulative_draws %>%
+    ggplot(aes(y = year, x = b_Intercept)) +
+
+    # Add ref line at zero
+    geom_vline(xintercept = 0, linetype = 2) +
+
+    # Add densities and point intervals
+    geom_density_ridges(
+      fill = "darkgrey",
+      rel_min_height = 0.01,
+      scale = 1,
+      alpha = 0.8
+    ) +
+    stat_pointinterval(point_interval = mean_qi,
+                       .width = .95,
+                       size = 1) +
+
+    # Add individual study data subset(Data_effects, !is.na(yi)), aes(x = yi, y = study_name)
+    geom_point(
+      data = subset(data,!is.na(yi)),
+      aes(x = yi, y = as.factor(year)),
+      position = position_nudge(y = -0.1),
+      shape = "|"
+    ) +
+
+    # Add text and labels
+    geom_text(
+      data = mutate_if(posterior_summary,
+                       is.numeric, round, 2),
+      aes(
+        label = glue::glue("{b_Intercept} [{.lower}, {.upper}]"),
+        x = 4
+      ),
+      hjust = "inward",
+      size = 3
+    ) +
+
+    # Add labs and theme
+    labs(y = "Year",
+         x = "Standardised Mean Difference (Positive Values Favour Self-Talk)",
+         title = "Cumulative Updating of Posterior Pooled Estimate",
+         subtitle = "Each year uses the previous years posterior pooled estimate as its prior\nPosterior distributions, mean and 95% quantile intervals, and individual effects (ticks)") +
+    # scale_y_continuous(limits = c(-0.5, 1), breaks = c(-0.5, 0, 0.5, 1)) +
+    scale_y_discrete(limits = rev,
+                     labels = function(x) str_wrap(x, width = 15)) +
+    theme_classic() +
+    theme(panel.border = element_rect(fill = NA),
+          plot.subtitle = element_text(size=6))
 }
 
 # Model checks

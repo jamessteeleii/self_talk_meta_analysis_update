@@ -22,20 +22,8 @@ tar_option_set(
     "base",
     "furrr",
     "patchwork",
-    # "scales",
-    # "ggtext",
-    # "zoo",
-    # "performance",
-    # "see",
-    # "lme4",
     "marginaleffects"
-    # "broom.mixed",
-    # "kableExtra",
-    # "knitr",
-    # "quarto",
-    # "officer",
-    # "officedown"
-  )
+    )
 )
 
 list(
@@ -165,19 +153,23 @@ list(
   tar_target(BF_curve_training_plot, plot_BF_curve_training(training_model_logBF_curve)),
   tar_target(BF_curve_study_design_plot, plot_BF_curve_study_design(study_design_model_logBF_curve)),
 
+  # Make cumulative model and plot
+  tar_target(cumulative_draws, fit_cumulative_main_model(data_effect_sizes)),
+  tar_target(cumulative_main_model_plot, plot_cumulative_main_model(data_effect_sizes, prior_main_model, cumulative_draws)),
 
   # Make plots tiffs
   tar_target(main_model_plot_tiff, make_plot_tiff(main_model_plot, 7.5, 13.33, "plots/main_model_plot.tiff")),
   tar_target(moderators_panel_plot_tiff, make_plot_tiff(moderators_panel_plot, 21, 9, "plots/moderators_panel_plot.tiff")),
-  tar_target(BF_curve_motor_demands_plot_tiff, make_plot_tiff(BF_curve_motor_demands_plot, 7.5, 5, "plots/BF_curve_motor_demands_plot_plot.tiff")),
-  tar_target(BF_curve_participant_group_plot_tiff, make_plot_tiff(BF_curve_participant_group_plot, 7.5, 5, "plots/BF_curve_participant_group_plot_plot.tiff")),
-  tar_target(BF_curve_selftalk_content_plot_tiff, make_plot_tiff(BF_curve_selftalk_content_plot, 7.5, 5, "plots/BF_curve_selftalk_content_plot_plot.tiff")),
-  tar_target(BF_curve_matching_plot_tiff, make_plot_tiff(BF_curve_matching_plot, 7.5, 5, "plots/BF_curve_matching_plot_plot.tiff")),
-  tar_target(BF_curve_task_novelty_plot_tiff, make_plot_tiff(BF_curve_task_novelty_plot, 7.5, 5, "plots/BF_curve_task_novelty_plot_plot.tiff")),
-  tar_target(BF_curve_cue_selection_plot_tiff, make_plot_tiff(BF_curve_cue_selection_plot, 7.5, 5, "plots/BF_curve_cue_selection_plot_plot.tiff")),
-  tar_target(BF_curve_overtness_selection_plot_tiff, make_plot_tiff(BF_curve_overtness_selection_plot, 7.5, 5, "plots/BF_curve_overtness_selection_plot_plot.tiff")),
-  tar_target(BF_curve_training_plot_tiff, make_plot_tiff(BF_curve_training_plot, 7.5, 5, "plots/BF_curve_training_plot_plot.tiff")),
-  tar_target(BF_curve_study_design_plot_tiff, make_plot_tiff(BF_curve_study_design_plot, 7.5, 5, "plots/BF_curve_study_design_plot_plot.tiff"))
+  tar_target(BF_curve_motor_demands_plot_tiff, make_plot_tiff(BF_curve_motor_demands_plot, 7.5, 5, "plots/BF_curve_motor_demands_plot.tiff")),
+  tar_target(BF_curve_participant_group_plot_tiff, make_plot_tiff(BF_curve_participant_group_plot, 7.5, 5, "plots/BF_curve_participant_group_plot.tiff")),
+  tar_target(BF_curve_selftalk_content_plot_tiff, make_plot_tiff(BF_curve_selftalk_content_plot, 7.5, 5, "plots/BF_curve_selftalk_content_plot.tiff")),
+  tar_target(BF_curve_matching_plot_tiff, make_plot_tiff(BF_curve_matching_plot, 7.5, 5, "plots/BF_curve_matching_plot.tiff")),
+  tar_target(BF_curve_task_novelty_plot_tiff, make_plot_tiff(BF_curve_task_novelty_plot, 7.5, 5, "plots/BF_curve_task_novelty_plot.tiff")),
+  tar_target(BF_curve_cue_selection_plot_tiff, make_plot_tiff(BF_curve_cue_selection_plot, 7.5, 5, "plots/BF_curve_cue_selection_plot.tiff")),
+  tar_target(BF_curve_overtness_selection_plot_tiff, make_plot_tiff(BF_curve_overtness_selection_plot, 7.5, 5, "plots/BF_curve_overtness_selection_plot.tiff")),
+  tar_target(BF_curve_training_plot_tiff, make_plot_tiff(BF_curve_training_plot, 7.5, 5, "plots/BF_curve_training_plot.tiff")),
+  tar_target(BF_curve_study_design_plot_tiff, make_plot_tiff(BF_curve_study_design_plot, 7.5, 5, "plots/BF_curve_study_design_plot.tiff")),
+  tar_target(cumulative_main_model_plot_tiff, make_plot_tiff(cumulative_main_model_plot, 7.5, 5, "plots/cumulative_main_model_plot.tiff"))
 
 
 #
