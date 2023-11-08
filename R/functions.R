@@ -4,6 +4,18 @@ read_prepare_data <- function(file) {
     mutate_at(c(2:9, 41:43, 45:48), as.factor) %>%
     clean_names() %>%
 
+    # Convert SE to SD
+    mutate(
+      pre_sd_st = replace_na(if_else(is.na(pre_sd_st),
+                                     pre_se_st * sqrt(n_st), pre_sd_st)),
+      pre_sd_con = replace_na(if_else(is.na(pre_sd_con),
+                                     pre_se_con * sqrt(n_con), pre_sd_con)),
+      post_sd_st = replace_na(if_else(is.na(post_sd_st),
+                                     post_se_st * sqrt(n_st), post_sd_st)),
+      post_sd_con = replace_na(if_else(is.na(post_sd_con),
+                                      post_se_con * sqrt(n_con), post_sd_con))
+    ) %>%
+
     # Add in pre-post correlations
     mutate(
       # Convert p to t (Change scores)
@@ -21,8 +33,10 @@ read_prepare_data <- function(file) {
       delta_se_con = if_else(delta_se_con < 0, delta_se_con * -1, delta_se_con),
 
       # Convert SE to SD (Change scores)
-      delta_sd_st = replace_na(delta_se_st * sqrt(n_st)),
-      delta_sd_con = replace_na(delta_se_con * sqrt(n_con)),
+      delta_sd_st = replace_na(if_else(is.na(delta_sd_st),
+                                       delta_se_st * sqrt(n_st), delta_sd_st)),
+      delta_sd_con = replace_na(if_else(is.na(delta_sd_con),
+                                        delta_se_con * sqrt(n_con), delta_sd_con)),
 
       # Add missing deltas
       delta_m_st = replace_na(post_m_st - pre_m_st),
