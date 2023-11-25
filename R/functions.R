@@ -257,6 +257,10 @@ get_logBF_curve <- function(model) {
   return(BF_curve)
 }
 
+get_tidy_model <- function(model) {
+  tidy(model)
+}
+
 # Setup rstan to run quicker
 rstan_setup <- function() {
   rstan_options(auto_write = TRUE)
@@ -266,9 +270,11 @@ rstan_setup <- function() {
 # Priors
 set_main_prior <- function() {
 
-  # Taken form Hatsigeorgiadis et al. (2011) overall estimate
+  # Taken fromm Hatsigeorgiadis et al. (2011) overall estimate
   main_model_prior <-
-    prior("student_t(3, 0.48, 0.05)", class = "Intercept")
+    c(
+      prior("student_t(60, 0.48, 0.05)", class = "Intercept")
+    )
 }
 
 sample_prior_main_model <- function(data, prior) {
@@ -292,8 +298,8 @@ set_motor_demands_prior <- function() {
   # Note, this model omits the intercept in order to include the priors on the groups directly
   motor_demands_prior <-
     c(
-      prior("student_t(3, 0.67, 0.07)", class = "b", coef = "motor_demandsFine"),
-      prior("student_t(3, 0.26, 0.04)", class = "b", coef = "motor_demandsGross")
+      prior("student_t(35, 0.67, 0.07)", class = "b", coef = "motor_demandsFine"),
+      prior("student_t(25, 0.26, 0.04)", class = "b", coef = "motor_demandsGross")
     )
 }
 
@@ -318,9 +324,9 @@ set_participant_group_prior <- function() {
   # Note, this model omits the intercept in order to include the priors on the groups directly
   participant_group_prior <-
     c(
-      prior("student_t(3, 0.5, 0.08)", class = "b", coef = "participant_groupNonMathletes"),
-      prior("student_t(3, 0.47, 0.08)", class = "b", coef = "participant_groupBeginnerathletes"),
-      prior("student_t(3, 0.38, 0.14)", class = "b", coef = "participant_groupExperiencedathletes")
+      prior("student_t(30, 0.5, 0.08)", class = "b", coef = "participant_groupNonMathletes"),
+      prior("student_t(20, 0.47, 0.08)", class = "b", coef = "participant_groupBeginnerathletes"),
+      prior("student_t(6, 0.38, 0.14)", class = "b", coef = "participant_groupExperiencedathletes")
     )
 }
 
@@ -346,8 +352,8 @@ set_selftalk_content_prior <- function() {
   # New groups are given the overall prior for the main model
   selftalk_content_prior <-
     c(
-      prior("student_t(3, 0.55, 0.08)", class = "b", coef = "selftalk_contentInstructional"),
-      prior("student_t(3, 0.37, 0.06)", class = "b", coef = "selftalk_contentMotivational"),
+      prior("student_t(36, 0.55, 0.08)", class = "b", coef = "selftalk_contentInstructional"),
+      prior("student_t(18, 0.37, 0.06)", class = "b", coef = "selftalk_contentMotivational"),
       prior("student_t(3, 0.48, 0.05)", class = "b", coef = "selftalk_contentCombinedInstructionalDMotivational"),
       prior("student_t(3, 0.48, 0.05)", class = "b", coef = "selftalk_contentRational")
 
@@ -375,10 +381,10 @@ set_matching_prior <- function() {
   # Note, this model omits the intercept in order to include the priors on the groups directly
   matching_prior <-
     c(
-      prior("student_t(3, 0.83, 0.1)", class = "b", coef = "matchingInstructionalDFine"),
-      prior("student_t(3, 0.22, 0.04)", class = "b", coef = "matchingInstructionalDGross"),
-      prior("student_t(3, 0.41, 0.09)", class = "b", coef = "matchingMotivationalDFine"),
-      prior("student_t(3, 0.33, 0.08)", class = "b", coef = "matchingMotivationalDGross")
+      prior("student_t(22, 0.83, 0.1)", class = "b", coef = "matchingInstructionalDFine"),
+      prior("student_t(12, 0.22, 0.04)", class = "b", coef = "matchingInstructionalDGross"),
+      prior("student_t(8, 0.41, 0.09)", class = "b", coef = "matchingMotivationalDFine"),
+      prior("student_t(8, 0.33, 0.08)", class = "b", coef = "matchingMotivationalDGross")
 
     )
 }
@@ -411,8 +417,8 @@ set_task_novelty_prior <- function() {
   # Note, this model omits the intercept in order to include the priors on the groups directly
   task_novelty_prior <-
     c(
-      prior("student_t(3, 0.41, 0.05)", class = "b", coef = "task_noveltyLearned"),
-      prior("student_t(3, 0.73, 0.14)", class = "b", coef = "task_noveltyNovel")
+      prior("student_t(13, 0.41, 0.05)", class = "b", coef = "task_noveltyLearned"),
+      prior("student_t(45, 0.73, 0.14)", class = "b", coef = "task_noveltyNovel")
 
     )
 }
@@ -439,8 +445,8 @@ set_cue_selection_prior <- function() {
   # Note, this model omits the intercept in order to include the priors on the groups directly
   cue_selection_prior <-
     c(
-      prior("student_t(3, 0.49, 0.07)", class = "b", coef = "cue_selectionAssigned"),
-      prior("student_t(3, 0.44, 0.07)", class = "b", coef = "cue_selectionSelfMselected")
+      prior("student_t(44, 0.49, 0.07)", class = "b", coef = "cue_selectionAssigned"),
+      prior("student_t(14, 0.44, 0.07)", class = "b", coef = "cue_selectionSelfMselected")
 
     )
 }
@@ -467,8 +473,8 @@ set_overtness_selection_prior <- function() {
   # Note, this model omits the intercept in order to include the priors on the groups directly
   overtness_selection_prior <-
     c(
-      prior("student_t(3, 0.49, 0.08)", class = "b", coef = "overtness_selectionAssigned"),
-      prior("student_t(3, 0.48, 0.08)", class = "b", coef = "overtness_selectionSelfMselected")
+      prior("student_t(28, 0.49, 0.08)", class = "b", coef = "overtness_selectionAssigned"),
+      prior("student_t(25, 0.48, 0.08)", class = "b", coef = "overtness_selectionSelfMselected")
 
     )
 }
@@ -495,8 +501,8 @@ set_training_prior <- function() {
   # Note, this model omits the intercept in order to include the priors on the groups directly
   training_prior <-
     c(
-      prior("student_t(3, 0.37, 0.04)", class = "b", coef = "trainingNotraining"),
-      prior("student_t(3, 0.8, 0.12)", class = "b", coef = "trainingTraining")
+      prior("student_t(37, 0.37, 0.04)", class = "b", coef = "trainingNotraining"),
+      prior("student_t(21, 0.8, 0.12)", class = "b", coef = "trainingTraining")
 
     )
 }
@@ -524,8 +530,8 @@ set_study_design_prior <- function() {
   study_design_prior <-
     c(
       prior("student_t(3, 0.37, 0.09)", class = "b", coef = "study_designPostMexperimentalDcontrol"),
-      prior("student_t(3, 0.36, 0.1)", class = "b", coef = "study_designPreDpostMexperimental"),
-      prior("student_t(3, 0.53, 0.06)", class = "b", coef = "study_designPreDpostMexperimentalDcontrol")
+      prior("student_t(14, 0.36, 0.1)", class = "b", coef = "study_designPreDpostMexperimental"),
+      prior("student_t(33, 0.53, 0.06)", class = "b", coef = "study_designPreDpostMexperimentalDcontrol")
 
     )
 }
@@ -730,7 +736,7 @@ fit_cumulative_main_model <- function(data) {
     data_year <- data %>%
       filter(year == i)
 
-    posterior <- c(0.48, 0.05, 3)
+    posterior <- c(0.48, 0.05, 60)
 
     prior <- set_prior(paste("student_t(",posterior[3],",", posterior[1],",", posterior[2],")"),
                        class = "Intercept")
@@ -766,14 +772,7 @@ fit_cumulative_main_model <- function(data) {
 }
 
 # Plots
-plot_main_model <- function(data, prior_model, model, BF_curve) {
-
-  # Sample draws from the prior distribution
-  prior_draws <-
-    prior_model %>%
-    spread_draws(b_Intercept) %>%
-    mutate(study = "Prior (Hatzigeorgiadis et al., 2011)",
-           label = "Prior (Hatzigeorgiadis et al., 2011)")
+plot_main_model_forest <- function(data, model) {
 
   # Sample draws from the individual studies
   study_draws <- model %>%
@@ -784,18 +783,6 @@ plot_main_model <- function(data, prior_model, model, BF_curve) {
     merge(data[, c(1,3)], by = "study")
 
   study_summary <- group_by(study_draws, label) %>%
-    mean_qi(b_Intercept) %>%
-    mutate(b_Intercept = b_Intercept,
-           .lower = .lower,
-           .upper = .upper)
-
-  # Sample draws from the posterior distribution
-  posterior_draws <- model %>%
-    spread_draws(b_Intercept) %>%
-    mutate(study = "Posterior Pooled Estimate",
-           label = "Posterior Pooled Estimate")
-
-  posterior_summary <- group_by(posterior_draws, label) %>%
     mean_qi(b_Intercept) %>%
     mutate(b_Intercept = b_Intercept,
            .lower = .lower,
@@ -880,6 +867,29 @@ plot_main_model <- function(data, prior_model, model, BF_curve) {
     theme(panel.border = element_rect(fill = NA),
           plot.subtitle = element_text(size = 6))
 
+}
+
+plot_main_model_update <- function(prior_model, model) {
+  # Sample draws from the prior distribution
+  prior_draws <-
+    prior_model %>%
+    spread_draws(b_Intercept) %>%
+    mutate(study = "Prior (Hatzigeorgiadis et al., 2011)",
+           label = "Prior (Hatzigeorgiadis et al., 2011)")
+
+
+  # Sample draws from the posterior distribution
+  posterior_draws <- model %>%
+    spread_draws(b_Intercept) %>%
+    mutate(study = "Posterior Pooled Estimate",
+           label = "Posterior Pooled Estimate")
+
+  posterior_summary <- group_by(posterior_draws, label) %>%
+    mean_qi(b_Intercept) %>%
+    mutate(b_Intercept = b_Intercept,
+           .lower = .lower,
+           .upper = .upper)
+
   # Combine prior dataframe with pooled draws
   prior_posterior <- rbind(posterior_draws[, c(4, 6)], prior_draws[, c(4, 6)]) %>%
     mutate(label = factor(label, levels = c("Posterior Pooled Estimate",
@@ -933,6 +943,10 @@ plot_main_model <- function(data, prior_model, model, BF_curve) {
       plot.subtitle = element_text(size = 6)
     )
 
+}
+
+plot_BF_curve_main_model <- function(BF_curve) {
+
   # Bayes Factor curve plot
   BF_curve_plot <- BF_curve %>% ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
 
@@ -957,7 +971,7 @@ plot_main_model <- function(data, prior_model, model, BF_curve) {
     labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
          y = "log10(BF)",
          title = "Change in Evidence",
-         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys scale"
     ) +
     scale_x_continuous(limits = c(-0.55, 1.1),
                        breaks = c(-0.5, 0, 0.5, 1)) +
@@ -965,12 +979,6 @@ plot_main_model <- function(data, prior_model, model, BF_curve) {
     theme(panel.border = element_rect(fill = NA),
           axis.title.y = element_text(vjust = -40),
           plot.subtitle = element_text(size = 6))
-
-  # Combine plots
-  (forest_study / posterior_update / BF_curve_plot) +
-    plot_layout(heights = c(2, 1,1)) +
-    plot_annotation(tag_levels = "A")
-
 }
 
 plot_motor_demands_model <- function(data, prior_model, model) {
@@ -1792,6 +1800,13 @@ plot_panel_moderators <- function(plot1, plot2, plot3,
 
 }
 
+plot_panel_main_model <- function(plot1, plot2, plot3) {
+  # Combine plots
+  (plot1 / plot2 / plot3) +
+    plot_layout(heights = c(2, 1,1)) +
+    plot_annotation(tag_levels = "A")
+}
+
 # Supplemental plots (moderator change in evidence and cummulative plot)
 plot_BF_curve_motor_demands <- function(BF_curve) {
 
@@ -1825,7 +1840,7 @@ plot_BF_curve_motor_demands <- function(BF_curve) {
     labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
          y = "log10(BF)",
          title = "Change in Evidence (Motor Demands)",
-         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys scale"
     ) +
     scale_x_continuous(limits = c(-0.55, 1.1),
                        breaks = c(-0.5, 0, 0.5, 1)) +
@@ -1869,7 +1884,7 @@ plot_BF_curve_participant_group <- function(BF_curve) {
     labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
          y = "log10(BF)",
          title = "Change in Evidence (Participants)",
-         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys scale"
     ) +
     scale_x_continuous(limits = c(-0.55, 1.1),
                        breaks = c(-0.5, 0, 0.5, 1)) +
@@ -1914,7 +1929,7 @@ plot_BF_curve_selftalk_content <- function(BF_curve) {
     labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
          y = "log10(BF)",
          title = "Change in Evidence (Self-Talk Content)",
-         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys scale"
     ) +
     scale_x_continuous(limits = c(-0.55, 1.1),
                        breaks = c(-0.5, 0, 0.5, 1)) +
@@ -1959,7 +1974,7 @@ plot_BF_curve_matching <- function(BF_curve) {
     labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
          y = "log10(BF)",
          title = "Change in Evidence (Matching Hypothesis)",
-         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys scale"
     ) +
     scale_x_continuous(limits = c(-0.55, 1.1),
                        breaks = c(-0.5, 0, 0.5, 1)) +
@@ -2002,7 +2017,7 @@ plot_BF_curve_task_novelty <- function(BF_curve) {
     labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
          y = "log10(BF)",
          title = "Change in Evidence (Task Novelty)",
-         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys scale"
     ) +
     scale_x_continuous(limits = c(-0.55, 1.1),
                        breaks = c(-0.5, 0, 0.5, 1)) +
@@ -2045,7 +2060,7 @@ plot_BF_curve_cue_selection <- function(BF_curve) {
     labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
          y = "log10(BF)",
          title = "Change in Evidence (Cue Selection)",
-         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys scale"
     ) +
     scale_x_continuous(limits = c(-0.55, 1.1),
                        breaks = c(-0.5, 0, 0.5, 1)) +
@@ -2088,7 +2103,7 @@ plot_BF_curve_overtness_selection <- function(BF_curve) {
     labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
          y = "log10(BF)",
          title = "Change in Evidence (Overtness Selection)",
-         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys scale"
     ) +
     scale_x_continuous(limits = c(-0.55, 1.1),
                        breaks = c(-0.5, 0, 0.5, 1)) +
@@ -2131,7 +2146,7 @@ plot_BF_curve_training <- function(BF_curve) {
     labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
          y = "log10(BF)",
          title = "Change in Evidence (Motor Demands)",
-         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys scale"
     ) +
     scale_x_continuous(limits = c(-0.55, 1.1),
                        breaks = c(-0.5, 0, 0.5, 1)) +
@@ -2175,7 +2190,7 @@ plot_BF_curve_study_design <- function(BF_curve) {
     labs(x = expression(paste("Standardised Mean Difference BF Calculated ", italic("Against"))),
          y = "log10(BF)",
          title = "Change in Evidence (Motor Demands)",
-         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys (1961) scale"
+         subtitle = "Positive values indicate greater evidence against standardised mean difference after updating prior\nNote, thresholds for evidence are indicated for Jeffreys scale"
     ) +
     scale_x_continuous(limits = c(-0.55, 1.1),
                        breaks = c(-0.5, 0, 0.5, 1)) +

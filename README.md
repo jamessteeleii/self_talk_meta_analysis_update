@@ -27,4 +27,3 @@ Useful console functions:
 - `tar_make()` to run targets
 - `tar_visnetwork()` to view pipeline
 
-You can view the current interactive pipeline by clicking [here](https://raw.githack.com/jamessteeleii/self_talk_meta_analysis/main/visnetwork.html).

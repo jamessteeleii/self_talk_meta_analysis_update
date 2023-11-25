@@ -22,7 +22,8 @@ tar_option_set(
     "base",
     "furrr",
     "patchwork",
-    "marginaleffects"
+    "marginaleffects",
+    "broom.mixed"
     )
 )
 
@@ -43,7 +44,11 @@ list(
   tar_target(trace_plot_main_model, make_trace_plot(main_model)),
   tar_target(pp_check_main_model, make_pp_check(main_model)),
   tar_target(main_model_logBF_curve, get_logBF_curve(main_model)),
-  tar_target(main_model_plot, plot_main_model(data_effect_sizes, prior_main_model, main_model, main_model_logBF_curve)),
+  tar_target(main_model_forest_plot, plot_main_model_forest(data_effect_sizes, main_model)),
+  tar_target(main_model_update_plot, plot_main_model_update(prior_main_model, main_model)),
+  tar_target(BF_curve_main_model_plot, plot_BF_curve_main_model(main_model_logBF_curve)),
+  tar_target(main_model_plot, plot_panel_main_model(main_model_forest_plot,main_model_update_plot,BF_curve_main_model_plot)),
+  tar_target(tidy_main_model, get_tidy_model(main_model)),
 
   # Fit, check, and plot motor demands model
   tar_target(motor_demands_prior, set_motor_demands_prior()),
@@ -54,6 +59,7 @@ list(
   tar_target(pp_check_motor_demands_model, make_pp_check(motor_demands_model)),
   tar_target(motor_demands_model_plot, plot_motor_demands_model(data_effect_sizes, prior_motor_demands_model, motor_demands_model)),
   tar_target(motor_demands_model_logBF_curve, get_logBF_curve(motor_demands_model)),
+  tar_target(tidy_motor_demands_model, get_tidy_model(motor_demands_model)),
 
   # Fit, check, and plot participant group model
   tar_target(participant_group_prior, set_participant_group_prior()),
@@ -64,6 +70,7 @@ list(
   tar_target(pp_check_participant_group_model, make_pp_check(participant_group_model)),
   tar_target(participant_group_model_plot, plot_participant_group_model(data_effect_sizes, prior_participant_group_model, participant_group_model)),
   tar_target(participant_group_model_logBF_curve, get_logBF_curve(participant_group_model)),
+  tar_target(tidy_participant_group_model, get_tidy_model(participant_group_model)),
 
   # Fit, check, and plot self-talk content model
   tar_target(selftalk_content_prior, set_selftalk_content_prior()),
@@ -74,6 +81,7 @@ list(
   tar_target(pp_check_selftalk_content_model, make_pp_check(selftalk_content_model)),
   tar_target(selftalk_content_model_plot, plot_selftalk_content_model(data_effect_sizes, prior_selftalk_content_model, selftalk_content_model)),
   tar_target(selftalk_content_model_logBF_curve, get_logBF_curve(selftalk_content_model)),
+  tar_target(tidy_selftalk_content_model, get_tidy_model(selftalk_content_model)),
 
   # Fit, check, and plot matching hypothesis model
   tar_target(matching_prior, set_matching_prior()),
@@ -84,6 +92,7 @@ list(
   tar_target(pp_check_matching_model, make_pp_check(matching_model)),
   tar_target(matching_model_plot, plot_matching_model(data_effect_sizes, prior_matching_model, matching_model)),
   tar_target(matching_model_logBF_curve, get_logBF_curve(matching_model)),
+  tar_target(tidy_matching_model, get_tidy_model(matching_model)),
 
   # Fit, check, and plot task_novelty model
   tar_target(task_novelty_prior, set_task_novelty_prior()),
@@ -94,6 +103,7 @@ list(
   tar_target(pp_check_task_novelty_model, make_pp_check(task_novelty_model)),
   tar_target(task_novelty_model_plot, plot_task_novelty_model(data_effect_sizes, prior_task_novelty_model, task_novelty_model)),
   tar_target(task_novelty_model_logBF_curve, get_logBF_curve(task_novelty_model)),
+  tar_target(tidy_task_novelty_model, get_tidy_model(task_novelty_model)),
 
   # Fit, check, and plot cue_selection model
   tar_target(cue_selection_prior, set_cue_selection_prior()),
@@ -104,6 +114,7 @@ list(
   tar_target(pp_check_cue_selection_model, make_pp_check(cue_selection_model)),
   tar_target(cue_selection_model_plot, plot_cue_selection_model(data_effect_sizes, prior_cue_selection_model, cue_selection_model)),
   tar_target(cue_selection_model_logBF_curve, get_logBF_curve(cue_selection_model)),
+  tar_target(tidy_cue_selection_model, get_tidy_model(cue_selection_model)),
 
   # Fit, check, and plot overtness_selection model
   tar_target(overtness_selection_prior, set_overtness_selection_prior()),
@@ -114,6 +125,7 @@ list(
   tar_target(pp_check_overtness_selection_model, make_pp_check(overtness_selection_model)),
   tar_target(overtness_selection_model_plot, plot_overtness_selection_model(data_effect_sizes, prior_overtness_selection_model, overtness_selection_model)),
   tar_target(overtness_selection_model_logBF_curve, get_logBF_curve(overtness_selection_model)),
+  tar_target(tidy_overtness_selection_model, get_tidy_model(overtness_selection_model)),
 
   # Fit, check, and plot training model
   tar_target(training_prior, set_training_prior()),
@@ -124,6 +136,7 @@ list(
   tar_target(pp_check_training_model, make_pp_check(training_model)),
   tar_target(training_model_plot, plot_training_model(data_effect_sizes, prior_training_model, training_model)),
   tar_target(training_model_logBF_curve, get_logBF_curve(training_model)),
+  tar_target(tidy_training_model, get_tidy_model(training_model)),
 
   # Fit, check, and plot study_design model
   tar_target(study_design_prior, set_study_design_prior()),
@@ -134,6 +147,7 @@ list(
   tar_target(pp_check_study_design_model, make_pp_check(study_design_model)),
   tar_target(study_design_model_plot, plot_study_design_model(data_effect_sizes, prior_study_design_model, study_design_model)),
   tar_target(study_design_model_logBF_curve, get_logBF_curve(study_design_model)),
+  tar_target(tidy_study_design_model, get_tidy_model(study_design_model)),
 
   # Make panel plot of moderators
   tar_target(moderators_panel_plot, plot_panel_moderators(

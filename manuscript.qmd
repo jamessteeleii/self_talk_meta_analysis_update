@@ -1,0 +1,184 @@
+---
+title: "Self-talk interventions and sport/motor performance: An updated systematic review and Bayesian meta-analysis"
+author: "Hannah Corcoran, James Steele"
+format:
+  pdf:
+    include-in-header:
+      text: |
+       \usepackage[font=scrtipsize]{caption}
+
+abstract: "Self-talk has been researched as an aspect of mental preparation for performance in sports and other motor tasks since the late 1980s. In 2011 Hatzigeorgiadis and colleagues systematically reviewed and meta-analysed three decades of self-talk intervention research including 32 studies. Yet, despite the general proliferation of meta-analyses, this topic has not been meta-analysed in the decade since their review which, at least for the main effect, provided a reasonably precise standardised mean difference estimate (0.48 [95% confidence interval: 0.38, 0.58]). Several further studies on self-talk interventions have been conducted in that time and it is of interest to explore what additional evidence they offer regarding the effects of self-talk interventions on sport/motor performance. Bayesian approaches are well positioned to explore how additional evidence changes our understanding of an effect; to see whether it has changed in sign, magnitude, or precision, or whether further research has largely been a ‘waste’. Therefore, our aim was to conduct an updated systematic review and Bayesian meta-analysis replicating the search, inclusion, and models of Hatzigeorgiadis et al. Informative priors were taken directly from Hatzigeorgiadis et al. A total of 28 studies were included in the final updated meta-analysis. The overall posterior pooled estimate for the standardised mean difference was almost exactly the same as the prior (mean: 0.46 [95% quantile interval: 0.38, 0.59]). Bayes factors were calculated for a range of effect sizes and indicated that the included studies largely reflected ‘weak’ evidence against effects ranging from ~0.3 to 0.7, and only provided ‘substantial’ evidence or greater against more extreme effects (either very small or very large). Results were largely similar for all moderator analyses which were updated too; either providing relatively weak evidence against effects found in the previous meta-analysis or evidence suggesting smaller effects for certain moderators. The findings of our updated Bayesian meta-analyses reiterate the positive effect of self-talk interventions on sport/motor performance. However, they also suggest that cumulatively the past decade and more of research has done little to further our understanding of these effects. Considering the limited resources and time for conducting research, it may be worth moving onto to other more pertinent questions regarding psychological interventions for sport/motor performance."
+editor: 
+  markdown: 
+    wrap: sentence
+bibliography: references.bib
+csl: apa.csl
+execute: 
+  echo: false
+  message: false
+  warning: false
+
+---
+```{r}
+library(patchwork)
+
+```
+
+
+<!-- Notes: Hatzigeorgiadis et al meta Focused on various aspects of task, self-talk, participants, and intervention... also explored "matching hypothesis" -->
+
+<!-- Hardy et al - reflections paper Focus on measurement? -->
+
+<!-- Should we also conduct a moderator analysis of studies doing manipulation checks and measurement of self-talk? -->
+
+<!-- Other moderators? -->
+
+<!-- Pressure? -->
+
+<!-- Attention? -->
+
+<!-- Interaction of population and type of self talk (instructional/motivational)? -->
+
+<!-- Focus the review atheoretically? -->
+
+<!-- Examining the effect of self-talk interventions -->
+
+<!-- Add impact on attentional focus outcomes? -->
+
+# Introduction
+
+Self-talk has a long history of philosophical, theoretical, and empirical work [@geurtsMakingSenseSelf2018; @brinthauptSelftalkResearchChallenges2023; @latinjakSelfTalkInterdisciplinaryReview2023].
+One area in which self-talk remains a popular topic of research up to this day is in the sport sciences [@vanraalteSelftalkReviewSportspecific2016; @hardyReflectionsMaturingResearch2018; @latinjakSelfTalkInterdisciplinaryReview2023].
+Sport psychology as a broad field has focused on the theorising of psychological constructs that might impact upon performance, and the subsequent experimental testing of theoretically informed interventions to address these constructs.
+For example, a recent umbrella review identified thirty meta-analyses exploring the effects of different sport psychology constructs upon performance, thirteen of them examining the effects of interventions, finding an overall standardised mean effect for positive constructs of 0.51 \[95% confidence interval: 0.42, 0.58\] [@lochbaumSportPsychologyPerformance2022].
+Only one meta-analysis explored the effects of self-talk interventions; Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011].
+
+The meta-analysis by Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] included a total of 32 studies and 62 effect size estimates revealing an overall standardised mean difference estimate of 0.48 \[95% confidence interval: 0.38, 0.58\] and also explored the effects of various moderators of the effectiveness of self-talk interventions.
+Around the time that Hatzigeorgiadis et al. conducted their meta-analysis the quantitative synthesis of research findings using meta-analytic tools was still relatively new in the sport sciences [@haggerMetaanalysisSportExercise2006].
+However in the last decade, particularly in sport psychology, there has been an increasing reliance on meta-analyses [@lochbaumSportPsychologyPerformance2022; @haggerMetaanalysis2022].
+Yet, despite the general proliferation of meta-analyses in the past decade, the effects of self-talk interventions has not been re-evaluated by means of such quantitative synthesis since 2011 when Hatzigeorgiadis et al. completed their work.
+During this period though, empirical research regarding self-talk interventions for sport and motor performance has burgeoned leading some to reflect on the field as "maturing" post-2011 [@hardyReflectionsMaturingResearch2018].
+
+Whilst self-talk as a field may have matured in the post-2011 years with theoretical advancements in conceptualisation of the construct and mediators of its effects on performance, efforts to improve operationalisation/measurement, and efforts to improve methodology used in studying self-talk [@brinthauptSelftalkResearchChallenges2023; @geurtsMakingSenseSelf2018; @hardyReflectionsMaturingResearch2018; @latinjakSelfTalkInterdisciplinaryReview2023; @vanraalteSelftalkReviewSportspecific2016] it could be argued that understanding of the effectiveness of self-talk interventions was "mature" prior to 2011.
+The effect estimate from the meta-analysis of Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] was already fairly precise, and indeed so to where many of the moderator estimates.
+Several further studies on self-talk interventions have been conducted since 2011 and it is a reasonable question to ask, given the limited time and resource for conducting research in the field of sport science, to whether and to what extent these have advanced our understanding or whether they have largely contributed to "research waste".
+
+Two questions that should (though arguably are not often enough particularly in sport science) be asked by researchers when planning a study of an experimental intervention is "what is the likelihood that the experimental intervention is superior to the control intervention given the evidence accumulated so far?" and "what is the likelihood that a new trial, given some design parameters and previous evidence, will demonstrate the superiority of the experimental intervention?".
+The key here is to consider the *cumulative* nature of evidence provided by research.
+Cumulative meta-analyses were proposed in the early 1990s and have since then been argued to be key tools to answering these questions and considering whether or not additional research is a worthwhile use of resources [@clarkeAccumulatingResearchSystematic2014; @graingerEvidenceSynthesisTackling2020] and Bayesian approaches are well positioned to tackle this [@biauUsingBayesianStatistics2017].
+Within Bayesian statistical inference a prior probability distribution regarding the effect of interest is *updated* after the introduction of new evidence to a posterior probability distribution given Bayes theorem.
+
+Given that there has not been, to the best of our knowledge, a meta-analytic synthesis of the effects of self-talk interventions effects upon sport/motor performance since Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] it is unclear the extent to which the past decade and more of research has advanced our understanding or potentially contributed to research waste.
+Therefore, our aim was to conduct an updated systematic review and Bayesian meta-analysis replicating the search, inclusion, and models of Hatzigeorgiadis et al.
+
+# Method
+
+The method for this systematic review and meta-analysis was adapted from Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011].
+We extended their previous research by following the Preferred Reporting Items for Systematic reviews and Meta-analysis (PRISMA) guidelines [@pagePRISMA2020Statement2021].
+We limited our searches to the date range of November 2011 to November 2023 to avoid double counting as we used the estimates from Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] as informative priors in our meta-analyses which contain the information from studies prior to November 2011.
+
+## Criteria for including studies
+
+Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] did not explicitly state a process or strategy to formulating their research question and search methods.
+However, we assume that the PICO (Participants, Intervention, Comparator and Outcome) framework was implicitly used and, with that assumption, we adopted the following inclusion criteria based on their description.
+Participants were healthy and of any performance level.
+The intervention was instruction to engage in positive self-talk[^1].
+The comparator was no self-talk or unrelated self-talk.
+Outcomes were sport or motor task performance.
+We included both between and within group experimental designs with either pre-post, or post-only measurements of performance as well as within group pre-post trials.
+
+[^1]: Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] stated: *"As our purpose was to test the effectiveness of interventions aiming to improve performance, groups or conditions using negative ... or inappropriate self-talk ... were excluded. In addition, groups or conditions using assisted self-talk ... were also excluded as assisted self-talk involves the use of external aids, such as headphones, and was not considered pure self-talk intervention."*
+
+## Search strategy
+
+Studies were obtained through electronic journal searches and review articles along with personal records and communication.
+The following databases -- Sport Discus, PsycINFO, PsycARTICLES and Medline -- were selected through the EBSCO database to search for the keywords.
+The SCOPUS database was not used as it was not accessible through Solent University[^2].
+Boolean commands of AND and OR were used with the keywords.
+These keywords were searched in the format of, with the application of the Boolean commands, (self-talk OR self-instruction OR self-statements OR self-verbalizations OR verbal cues OR stimulus cueing OR thought content instructions) AND (sport OR performance OR motor performance OR task performance).
+The studies were all peer-reviewed, full text and published in English language journals.
+The search was limited to the date range of November 2011-November 2023.
+An initial search took place from October 2022-November 2022 as this project was completed as part of the lead authors undergraduate thesis.
+We subsequently updated the search from November 2022-November 2023 prior to preparing this manuscript for publication.
+
+[^2]: Though we feel fairly confident, given the number of studies identified and the findings of our models reported below, that any missed studies would be unlikely to qualitatively impact the overall findings and conclusions of this work.
+
+## Selection of studies
+
+TO ADD
+
+<!-- The PRISMA flow diagram was used to show a clear layout of the systematic review process. Studies were identified by searching the keywords (stated in the search strategy) in the databases (stated in the search strategy). Those studies were then downloaded into Covidence, a screening programme, where duplicates were removed (Covidence 2022). The remaining studies were screened by their title and abstract to see if they met the requirements of the inclusion criteria. Once that was completed, those studies were exported into excel as comma-separated values (csv). This showed that if any studies did not meet the criteria, they were removed. The next part of the screening phase consisted of assessing the full text of the studies for eligibility. This led to the final pool of studies that were assessed for inclusion in the review and meta-analysis. -->
+
+## Data extraction
+
+The data extracted from the studies were for all positive self-talk intervention groups/conditions and for control comparison designs for the relevant comparator group/condition.
+Pre and/or post intervention and comparator, means, sample sizes and either standard deviation, standard errors, variances or confidence intervals were extracted in order to calculate the effect sizes. Also, in order to update the moderator analyses conducted by Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] we also coded each effect size for motor demands (fine or gross), participant group (non-athletes[^3] vs beginner athletes vs experienced athletes), self-talk content[^4] (motivational vs instructional), the combination of motor demands and self-talk content to examine the matching hypothesis (motivational/gross vs motivational/fine vs instructional/gross vs instructional/fine), the task novelty (novel vs learned), cue selection and overtness selection (self-selected vs assigned), if the study was acute or involved a chronic training intervention (no-training vs training), and the study design[^5] (pre/post - experimental/control vs pre/post - experimental vs post - experimental/control). The data extracted was imported into a spreadsheet in excel as a csv.
+
+[^3]: Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] referred to their non-athlete group as "students" presumably because in all studies they included it was the case that all non-athletes were from student populations. As this was not necessarily the case for studies included in our updated analyses we refer to them as "non-athletes".
+
+[^4]: Some studies we included in our updated analysis used combined instructional and motivational, and also other forms of self-talk content e.g., rational. We coded these new categories also.
+
+[^5]: Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] included studies with multiple baseline measures but we did not identify any studies meeting this design in our updated analysis. 
+
+## Statistical analysis
+
+Statistical analysis of the data extracted was performed in R, (v 4.2.2; R Core Team, https://www.r-project.org/) and RStudio (.
+As noted, we adopted a Bayesian approach to the present meta-analysis.
+Specifically, we adopted informative priors from the models reported by Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] and replicated their analyses using appropriate model specifications given the structure of the data.
+All code utilised for data preparation and analyses are available in either the Open Science Framework page for this project [https://osf.io/dqwh5/](https://osf.io/dqwh5/) or the corresponding GitHub repository [https://github.com/jamessteeleii/self_talk_meta_analysis_update](https://github.com/jamessteeleii/self_talk_meta_analysis_update).
+The `renv` package [@usheyRenvProjectEnvironments2023] was used for package version reproducibility, and the a function based analysis pipeline using the `targets` package [@landauTargetsDynamicFunctionOriented2023] was employed (the analysis pipeline can be viewed here *ADD VISNETWORK*). Standardised effect sizes were all calculated using the `metafor` package [@viechtbauerMetaforMetaAnalysisPackage2023]. The main package `brms` [@burknerBrmsBayesianRegression2023] was used in fitting all the Bayesian meta-analysis models. Prior and posterior draws were taken using `tidybayes` [@kayTidybayesTidyData2023] and `marginaleffects` [@arel-bundockMarginaleffectsPredictionsComparisons2023] packages. Bayes factors were calculated using the `bayestestR` package [@makowskiBayestestRUnderstandDescribe2023]. All visualisations were created using `ggplot2` [@wickhamGgplot2CreateElegant2023], `tidybayes`, and the `patchwork` [@pedersenPatchworkComposerPlots2023] packages.
+
+Effect sizes were calculated as standardised mean differences dependent on the design of the study. Firstly all were signed such that a positive effect indicated that the self-talk intervention was favoured. For studies utilising a pre-post-test control comparison design we calculated the standardised mean difference between groups/conditions using the pooled pre-test standard deviation as per Morris [@morrisEstimatingEffectSizes2008]. For post-test only control comparison designs we calculated the standardised mean difference between groups/conditions based upon the pooled post-test standard deviation. Lastly, for single arm within group pre-post designs we calculated the standardised mean difference from pre- to post-intervention using the pre-test standard deviation. All were calculated using the `escalc` function from the `metafor` package. 
+
+Though it was not entirely clear from the reporting in the meta-analysis of Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011], they noted including a greater number of effect sizes than individual studies. As such it was likely that their data had a hierarchical structure with effects nested within studies whether they explicitly applied a hierarchical model to it or not. The studies we identified and included also had hierarchical structure whereby we had effects nested within groups (for example when there were multiple self-talk interventions examined) nested within experiments (for example when a study reported on multiple experiments using different samples and/or designs) nested within studies. As such, we used multilevel mixed effects meta-analyses with nested random intercepts for effects, groups, experiments, and studies. Effects were all weighted by the inverse sampling variance. A main model was produced which included all effects and was intended to update the overall model from Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] whereby their overall estimate reflected the fixed model intercept. In addition we produced models for each of the aforementioned categorical moderators where we excluded the model intercept in order to set priors for each category directly based on the estimates and their precision reported by Hatzigeorgiadis et al.[^6]. 
+
+[^6]: It is not clear exactly from the reporting by Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] as to whether their moderator analyses involved fitting their models to datasets constructed separately whereby they were filtered to only include the relevant category for the moderator, or if they were fit together including all categories. We opted to fit them together for parsimony here.
+
+Priors for each model were set informatively for the intervention effects, and were set to be weakly regularising for the heterogeneity (i.e., $\tau$) at all levels of the model[^7]. Intervention effects were set with priors based on the effect estimates from Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] reported in their table 1 using a $t$-distribution ($t(k,\mu,\sigma)$) with $k-2$ degrees of freedom [@higginsReevaluationRandomeffectsMetaanalysis2009] in which we assumed $k$ to be the number of effects included in the models reported by Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011]. For the main model the prior for the intervention effect was set directly on the model intercept i.e., $t(60, 0.48, 0.05)$. For the moderator models as noted we removed the model intercept allowing us to set the priors directly on each category for each moderator based on the estimates from Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] table 1. In cases where moderators had new categories introduced in the newer studies included in our analyses we used $\mu=0.48$ and $\sigma=0.05$ taken from the overall estimate of Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] and applied degrees of freedom $k=3$ to be more conservative and allow greater mass in the tails of the prior distribution for these categories. In all models the heterogeneity priors at each level were set using the default weakly regularising prior in `brms`; a half-$t$-distribution with $\mu=0$, $\sigma=2.5$, and $k=3$. This constrained the prior to only allow positively signed values for $\tau$ though over a wide range of possible values. 
+
+[^7]: Though Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] report on $\tau$ it is not clear what level this applies to (and as noted it is not clear if they employed a hierachical model) and they do not report any interval estimate for this making it difficult to specify an informative prior distribution. As such, and given suggestions regarding heterogeneity priors [@williamsBayesianMetaAnalysisWeakly2018; @roverWeaklyInformativePrior2021], we opted for a weakly regularising distribution at all levels.
+
+As we were interested in determining how much the new evidence produced since Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] had updated our understanding of the effects of self-talk interventions we fit each model using four Monte Carlo Markov Chains each with 4000 warmup and 40000 sampling iterations. This was in order to obtain precise Bayes Factors using the Savage-Dickey ratio [@gronauBridgesamplingPackageEstimating2020]. 
+
+From each model we obtained draws from the posterior distributions for the intervention effects (i.e., the expectation of the value of the parameters posterior probability distribution) in order to present probability density functions visually, and also to calculate mean and 95% quantile intervals (i.e., 'credible' or 'compatibility' intervals) for each estimate. These gave us the most probably value of the parameter in addition to the range from 2.5% to 97.5% percentiles. The same was done drawing samples from the prior distributions only in order to present both distributions visually for comparison of the prior to posterior updating. For the main model draws were taken at the study level and an ordered forest plot produced showing each studies posterior distribution along with mean and 95% quantile intervals. We also calculated the 95% prediction intervals providing the range over which we can expect 95% of future effect estimates to fall and present each individual effect size on the forest plot. To compliment the visual inspection of prior to posterior updating we also present log10 Bayes Factors (log10[BF]) calculated *against* effects ranging from a standardised mean difference of 0 through to 1 and plot these log10(BF) curves for each model intervention effect estimate. These are compared to Jeffreys [-@jeffreysTheoryProbability1998] scale regarding evidence *against* (i.e., 0 to 0.5 = weak evidence; 0.5 to 1 = substantial evidence; 1 to 1.5 = strong evidence; 1.5 to 2 = very strong evidence; 2 or greater = decisive evidence). Thus, a positive log10(BF) value indicated that, compared to the prior distribution (meaning the estimates of Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011]), there was now greater evidence against the standardised mean difference for which the log10(BF) was calculated.
+
+Lastly, as a supplemental analysis, we produced cumulative versions of our main model over each year since the publication of the meta-analysis from Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011]. The first model started with the prior distribution noted above for our main model and only included effects from studies reported in 2011. Then we took the posterior distribution for the intervention effect from this model as the prior for the next model which only included effects from studies reported in 2012. This was continued through each year up to the latest included studies. We then plotted the cumulative updating of the intervention effect based on the addition of each years newly reported studies. Note, for each of these models we employed four Monte Carlo Markov Chains each with 2000 warmup and 6000 sampling iterations given the focus was on presenting the updated estimates and to reduce the time required for cumulative models to be fit.
+
+# Results
+
+## Systematic review
+
+TO ADD
+
+## Main model
+```{r}
+targets::tar_load(main_model)
+targets::tar_load(tidy_main_model)
+targets::tar_load(main_model_logBF_curve)
+
+```
+
+The main model included `r length(unique(main_model$data$effect))` effects nested in `r length(unique(main_model$data$group))` groups nested in `r length(unique(main_model$data$experiment))` experiments nested in `r length(unique(main_model$data$study))` studies. The overall mean and interval estimate for the standardised mean difference for self-talk interventions was `r round(tidy_main_model$estimate[1],2)` [95% quantile interval: `r round(tidy_main_model$conf.low[1],2)`, `r round(tidy_main_model$conf.high[1],2)`]. This was very similar to the estimate of overall effect in Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011]. Heterogeneity ($\tau$) at the study level was also similar to that reported by Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011], though as noted it is not clear what level theirs pertained to exactly. At the study level $\tau$ = `r round(tidy_main_model$estimate[2],2)` [95% quantile interval: `r round(tidy_main_model$conf.low[2],2)`, `r round(tidy_main_model$conf.high[2],2)`], at the experiment level $\tau=$`r round(tidy_main_model$estimate[3],2)` [95% quantile interval: `r round(tidy_main_model$conf.low[3],2)`, `r round(tidy_main_model$conf.high[3],2)`], at the group level $\tau$ = `r round(tidy_main_model$estimate[4],2)` [95% quantile interval: `r round(tidy_main_model$conf.low[4],2)`, `r round(tidy_main_model$conf.high[4],2)`], and at the effect level $\tau$ = `r round(tidy_main_model$estimate[5],2)` [95% quantile interval: `r round(tidy_main_model$conf.low[5],2)`, `r round(tidy_main_model$conf.high[5],2)`]. An ordered forest plot of study level estimates is shown in @fig-main-model panel (A), and the posterior pooled estimate for the overall effect compared with the prior is shown in panel (B).
+
+```{r}
+#| label: fig-main-model 
+#| fig-width: 9.375
+#| fig-height: 16.6625
+#| fig-cap: Panel (A) shows and ordered forest plot with study level posterior probability distributions, mean and 95% quantile intervals, individual effects (ticks), and the 95% prediction interval (grey band). Panel (B) shows the prior and posterior distributions for the overall pooled estimates. Panel (C) shows log10(BF) calculated against each each point effect size from 0 to 1 indicating whether there was greater evidence against them after updating the prior to the posterior (i.e., after the introduction of new evidence) and shows qualitative thresholds for interpretation based on Jeffreys scale.
+
+targets::tar_load(main_model_forest_plot)
+targets::tar_load(main_model_update_plot)
+targets::tar_load(BF_curve_main_model_plot)
+
+
+  # Combine plots
+  (main_model_forest_plot / main_model_update_plot / BF_curve_main_model_plot) +
+    plot_layout(heights = c(2, 1,1)) +
+    plot_annotation(tag_levels = "A")
+
+```
+
+
+
+# References
+
