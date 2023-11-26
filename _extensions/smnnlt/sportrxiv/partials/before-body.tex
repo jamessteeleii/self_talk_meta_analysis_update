@@ -9,7 +9,7 @@ $-- %%%%%%%%%%%%%%%%
 $for(by-author)$\stepcounter{nauthor}$endfor$
 \ifnum\thenauthor>2
 \renewcommand{\shortauthor}{$author/first$ et al. }
-\else 
+\else
 \renewcommand{\shortauthor}{${ for(by-author) }${ by-author.name.family }${ sep } \& ${ endfor } }
 \fi
 
@@ -36,7 +36,7 @@ $by-author:_authors.tex()[, ]$
 $by-affiliation:_affiliations.tex()[\\ ]$
 \\
 \bigskip
-*Correspondence: 
+*Correspondence:
 $for(by-author)$
 $if(by-author.attributes.corresponding)$
 \href{mailto:$by-author.email$}{\color{black}$by-author.email$}
@@ -45,7 +45,7 @@ $endfor$
 \\
 \bigskip
 \begin{spacing}{1}
-Cite as: \shortauthor$if(year)$($year$)$else$(\the\year)$endif$. $articletitle$. \emph{SportRxiv.} \\
+Cite as: \shortauthor$if(year)$($year$)$else$(\the\year)$endif$. $articletitle$. \emph{SportRxiv.} DOI: 10.51224/SRXIV.348 \\
 \end{spacing}
 $if(suppl-link)$
   \vspace{1mm} Supplementary Materials: \href{$suppl-link$}{$suppl-link$} \\
@@ -69,9 +69,9 @@ $endif$
 ]{abstractbox}
 
 \begin{abstractbox}
-  $abstract$ 
+  $abstract$
   $if(keywords)$
   \\ \\
   Keywords: \emph{${for(keywords)}${keywords}${sep}; ${endfor}}
-  $endif$ 
+  $endif$
 \end{abstractbox}
