@@ -2223,7 +2223,8 @@ plot_cumulative_main_model <- function(data, prior_model, cumulative_draws) {
       "2019",
       "2020",
       "2021",
-      "2022"
+      "2022",
+      "2023"
     )))
 
   posterior_summary <- group_by(cumulative_draws, year) %>%
