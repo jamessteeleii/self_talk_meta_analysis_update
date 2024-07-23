@@ -1,7 +1,7 @@
 # _targets.R file
 library(targets)
 library(tarchetypes)
-# library(crew)
+library(crew)
 source("R/functions.R")
 tar_option_set(
   memory = "transient",
@@ -9,7 +9,7 @@ tar_option_set(
   garbage_collection = TRUE,
   storage = "worker",
   retrieval = "worker",
-  controller = crew::crew_controller_local(workers = 2, launch_max = 10),
+  controller = crew_controller_local(workers = 2, launch_max = 10),
   packages = c(
     "here",
     "metafor",
@@ -58,7 +58,7 @@ list(
   tar_target(main_model_update_plot, plot_main_model_update(prior_main_model, main_model)),
   tar_target(BF_curve_main_model_plot, plot_BF_curve_main_model(main_model_logBF_curve)),
   tar_target(main_model_plot, plot_panel_main_model(main_model_forest_plot,main_model_update_plot,BF_curve_main_model_plot)),
-  tar_target(tidy_main_model, get_tidy_model(main_model)),
+  tar_target(tidy_main_model, get_tidy_model(main_model))
 
   # # # Small study/Publication bias for main model
   # tar_target(pet_model, fit_pet_model(data_effect_sizes)),
@@ -69,27 +69,27 @@ list(
   # tar_target(null_robma_model, fit_null_robma_model(data_effect_sizes)),
   # tar_target(prior_robma_model, fit_prior_robma_model(data_effect_sizes)),
   #
-  # # Fit, check, and plot motor demands model
-  tar_target(motor_demands_prior, set_motor_demands_prior()),
-  tar_target(prior_motor_demands_model, sample_prior_motor_demands_model(data_effect_sizes, motor_demands_prior)),
-  tar_target(motor_demands_model, fit_motor_demands_model(data_effect_sizes, motor_demands_prior)),
-  tar_target(rhat_motor_demands_model, make_rhat_plot(motor_demands_model)),
-  tar_target(trace_plot_motor_demands_model, make_trace_plot(motor_demands_model)),
-  tar_target(pp_check_motor_demands_model, make_pp_check(motor_demands_model)),
-  tar_target(motor_demands_model_plot, plot_motor_demands_model(data_effect_sizes, prior_motor_demands_model, motor_demands_model)),
-  tar_target(motor_demands_model_logBF_curve, get_logBF_curve(motor_demands_model)),
-  tar_target(tidy_motor_demands_model, get_tidy_model(motor_demands_model)),
-
-  # Fit, check, and plot participant group model
-  tar_target(participant_group_prior, set_participant_group_prior()),
-  tar_target(prior_participant_group_model, sample_prior_participant_group_model(data_effect_sizes, participant_group_prior)),
-  tar_target(participant_group_model, fit_participant_group_model(data_effect_sizes, participant_group_prior)),
-  tar_target(rhat_participant_group_model, make_rhat_plot(participant_group_model)),
-  tar_target(trace_plot_participant_group_model, make_trace_plot(participant_group_model)),
-  tar_target(pp_check_participant_group_model, make_pp_check(participant_group_model)),
-  tar_target(participant_group_model_plot, plot_participant_group_model(data_effect_sizes, prior_participant_group_model, participant_group_model)),
-  tar_target(participant_group_model_logBF_curve, get_logBF_curve(participant_group_model)),
-  tar_target(tidy_participant_group_model, get_tidy_model(participant_group_model))
+  # # # Fit, check, and plot motor demands model
+  # tar_target(motor_demands_prior, set_motor_demands_prior()),
+  # tar_target(prior_motor_demands_model, sample_prior_motor_demands_model(data_effect_sizes, motor_demands_prior)),
+  # tar_target(motor_demands_model, fit_motor_demands_model(data_effect_sizes, motor_demands_prior)),
+  # tar_target(rhat_motor_demands_model, make_rhat_plot(motor_demands_model)),
+  # tar_target(trace_plot_motor_demands_model, make_trace_plot(motor_demands_model)),
+  # tar_target(pp_check_motor_demands_model, make_pp_check(motor_demands_model)),
+  # tar_target(motor_demands_model_plot, plot_motor_demands_model(data_effect_sizes, prior_motor_demands_model, motor_demands_model)),
+  # tar_target(motor_demands_model_logBF_curve, get_logBF_curve(motor_demands_model)),
+  # tar_target(tidy_motor_demands_model, get_tidy_model(motor_demands_model)),
+  #
+  # # Fit, check, and plot participant group model
+  # tar_target(participant_group_prior, set_participant_group_prior()),
+  # tar_target(prior_participant_group_model, sample_prior_participant_group_model(data_effect_sizes, participant_group_prior)),
+  # tar_target(participant_group_model, fit_participant_group_model(data_effect_sizes, participant_group_prior)),
+  # tar_target(rhat_participant_group_model, make_rhat_plot(participant_group_model)),
+  # tar_target(trace_plot_participant_group_model, make_trace_plot(participant_group_model)),
+  # tar_target(pp_check_participant_group_model, make_pp_check(participant_group_model)),
+  # tar_target(participant_group_model_plot, plot_participant_group_model(data_effect_sizes, prior_participant_group_model, participant_group_model)),
+  # tar_target(participant_group_model_logBF_curve, get_logBF_curve(participant_group_model)),
+  # tar_target(tidy_participant_group_model, get_tidy_model(participant_group_model)),
 
   # # Fit, check, and plot self-talk content model
   # tar_target(selftalk_content_prior, set_selftalk_content_prior()),
