@@ -1,8 +1,8 @@
 # Read in and prepare data for effect size calculations and models
 read_prepare_data <- function(file) {
-  data <- read_csv(here("data", "Final data.csv")) %>%
-    mutate_at(c(2:9, 41:43, 45:48), as.factor) %>%
-    clean_names() %>%
+  data <- read_csv(here("data", "Final data.csv")) |>
+    mutate_at(c(2:9, 41:43, 45:48), as.factor) |>
+    clean_names() |>
 
     # Convert SE to SD
     mutate(
@@ -14,7 +14,7 @@ read_prepare_data <- function(file) {
                                      post_se_st * sqrt(n_st), post_sd_st)),
       post_sd_con = replace_na(if_else(is.na(post_sd_con),
                                       post_se_con * sqrt(n_con), post_sd_con))
-    ) %>%
+    ) |>
 
     # Add in pre-post correlations
     mutate(
@@ -54,7 +54,7 @@ read_prepare_data <- function(file) {
       ri_st = replace_na(ri_st, 0.7),
       ri_con = replace_na(ri_con, 0.7)
 
-    )  %>%
+    )  |>
 
     # add calculation of pooled baseline standard deviations
     mutate(pre_sd_pool = sqrt(((n_st - 1) * pre_sd_st ^ 2 +
@@ -64,19 +64,19 @@ read_prepare_data <- function(file) {
     post_sd_pool = sqrt(((n_st - 1) * post_sd_st ^ 2 +
                            (n_con - 1) * post_sd_con ^ 2
     ) /
-      (n_st + n_con - 2))) %>%
+      (n_st + n_con - 2))) |>
 
     # Formatting variables for moderator models
     unite(c("selftalk_content", "motor_demands"), col="matching", sep = "/",
-          remove = FALSE) %>%
+          remove = FALSE) |>
 
 
     separate(novelty, into=c("selftalk_novelty1", "task_novelty1"), sep = '\\s*and\\s*',
-             remove = FALSE) %>%
+             remove = FALSE) |>
     separate(novelty, into=c("selftalk_novelty2", "task_novelty2"), sep = '\\s*but\\s*',
-             remove = FALSE) %>%
-    mutate(task_novelty = if_else(task_novelty2 == "with the sport", "Learned", "Novel", missing = "Novel")) %>%
-    select(-selftalk_novelty1, -selftalk_novelty2, -task_novelty1, -task_novelty2) %>%
+             remove = FALSE) |>
+    mutate(task_novelty = if_else(task_novelty2 == "with the sport", "Learned", "Novel", missing = "Novel")) |>
+    select(-selftalk_novelty1, -selftalk_novelty2, -task_novelty1, -task_novelty2) |>
 
     mutate(cue_selection = if_else(cue_selection == "No", "Assigned", "Self-selected"),
            overtness_selection = if_else(overtness_selection == "No", "Assigned",
@@ -245,7 +245,7 @@ make_plot_tiff <- function(plot, width, height, path) {
 
 get_logBF_curve <- function(model) {
 
-  plan(cluster, workers = 10)
+  plan(multisession, workers = 5)
 
   BF_curve <- future_map_dfr(.x = seq(0,1,length=100), .f = function(.x) {
     return(data.frame(effect = .x,
@@ -278,19 +278,27 @@ set_main_prior <- function() {
 }
 
 sample_prior_main_model <- function(data, prior) {
+
+  plan(multisession, workers = 4)
+
   prior_main_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 1 + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 1 + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
-      cores = 4,
+      # cores = 4,
+      future = TRUE,
       seed = 1988,
       warmup = 2000,
       iter = 8000,
       control = list(adapt_delta = 0.99),
       sample_prior = "only",
     )
+
+  plan(sequential)
+
+  prior_main_model
 }
 
 set_motor_demands_prior <- function() {
@@ -306,7 +314,7 @@ set_motor_demands_prior <- function() {
 sample_prior_motor_demands_model <- function(data, prior) {
   prior_motor_demands_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + motor_demands + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + motor_demands + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -333,7 +341,7 @@ set_participant_group_prior <- function() {
 sample_prior_participant_group_model <- function(data, prior) {
   prior_participant_group_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + participant_group + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + participant_group + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -363,7 +371,7 @@ set_selftalk_content_prior <- function() {
 sample_prior_selftalk_content_model <- function(data, prior) {
   prior_selftalk_content_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + selftalk_content + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + selftalk_content + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -391,7 +399,7 @@ set_matching_prior <- function() {
 
 sample_prior_matching_model <- function(data, prior) {
 
-  data <- data %>%
+  data <- data |>
     filter(matching == "Motivational/Fine" |
              matching == "Motivational/Gross" |
              matching == "Instructional/Fine" |
@@ -399,7 +407,7 @@ sample_prior_matching_model <- function(data, prior) {
 
   prior_matching_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + matching + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + matching + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -427,7 +435,7 @@ sample_prior_task_novelty_model <- function(data, prior) {
 
   prior_task_novelty_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + task_novelty + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + task_novelty + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -455,7 +463,7 @@ sample_prior_cue_selection_model <- function(data, prior) {
 
   prior_cue_selection_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + cue_selection + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + cue_selection + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -483,7 +491,7 @@ sample_prior_overtness_selection_model <- function(data, prior) {
 
   prior_overtness_selection_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + overtness_selection + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + overtness_selection + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -511,7 +519,7 @@ sample_prior_training_model <- function(data, prior) {
 
   prior_training_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + training + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + training + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -540,7 +548,7 @@ sample_prior_study_design_model <- function(data, prior) {
 
   prior_study_design_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + study_design + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + study_design + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -553,26 +561,169 @@ sample_prior_study_design_model <- function(data, prior) {
     )
 }
 
+# # Simulation of additional new study
+# additional_new_study_sim <- function() {
+#
+#   sim <- function(participant_n = as.double(),
+#                   b0 = as.double(), b_time = as.double(), b_cond = as.double(), b_cond_time = as.double(),         # fixed effects
+#                   u_participant = as.double(), # random intercepts
+#                   sigma = as.double(),       # measurement error
+#                   ... # helps the function work with pmap() below
+#   ) {
+#
+#     # Taken fromm Hatsigeorgiadis et al. (2011) overall estimate
+#     main_model_prior <-
+#       c(
+#         brms::prior("student_t(60, 0.48, 0.05)", class = "Intercept")
+#       )
+#
+#     # set up data structure
+#     dat <- add_random(participant = 100) |>
+#       add_between("participant", cond = c("control", "self_talk")) |>
+#       add_recode("cond", "cond_dummy", control = 0, self_talk = 1) |>
+#       add_within("participant", time = seq(0,1)) |>
+#       add_ranef("participant", u_participant = 1) |>
+#       add_ranef(sigma = 0.5) |>
+#       mutate(dv = (0 + u_participant) + (1 * time) + (0 * cond_dummy) + (0.5 * cond_dummy * time) + sigma)
+#
+#     ri_self_talk <- cor(filter(dat, cond == "self_talk" & time == 0)$dv,
+#                         filter(dat, cond == "self_talk" & time == 1)$dv)
+#
+#     ri_control <- cor(filter(dat, cond == "control" & time == 0)$dv,
+#                       filter(dat, cond == "control" & time == 1)$dv)
+#
+#     summary_dat <- dat |>
+#       group_by(time, cond) |>
+#       add_count() |>
+#       summarise(n = first(n),
+#                 mean = mean(dv),
+#                 sd = sd(dv)) |>
+#       pivot_wider(names_from = c(time,cond),
+#                   values_from = c(mean, sd, n)) |>
+#       mutate(pre_sd_pool = sqrt(((n_0_self_talk - 1) * sd_0_self_talk  ^ 2 +
+#                                    (n_0_control - 1) * sd_0_control ^ 2
+#       ) /
+#         (n_0_self_talk + n_0_control - 2)),
+#       ri_self_talk = ri_self_talk,
+#       ri_control = ri_control
+#       )
+#
+#     ppc_dat_st <- escalc(
+#       measure = "SMCR",
+#       m1i = mean_1_self_talk,
+#       m2i = mean_0_self_talk,
+#       sd1i = pre_sd_pool,
+#       ni = n_0_self_talk,
+#       ri = ri_self_talk,
+#       data = summary_dat
+#     )
+#     ppc_dat_con <- escalc(
+#       measure = "SMCR",
+#       m1i = mean_1_control,
+#       m2i = mean_0_control,
+#       sd1i = pre_sd_pool,
+#       ni = n_0_control,
+#       ri = ri_control,
+#       data = summary_dat
+#     )
+#
+#     summary_dat$yi <-
+#       (ppc_dat_st$yi - ppc_dat_con$yi)
+#     summary_dat$vi <-
+#       (ppc_dat_st$vi + ppc_dat_con$vi)
+#
+#     summary_dat$study_code <- 1
+#
+#
+#     main_model <-
+#       brm(
+#         yi | se(sqrt(vi)) ~ 1 + (1 | study_code),
+#         data = summary_dat,
+#         prior = main_model_prior,
+#         chains = 4,
+#         cores = 4,
+#         seed = 1988,
+#         warmup = 4000,
+#         iter = 6000,
+#         control = list(adapt_delta = 0.99)
+#       )
+#
+#     percentage_in_rope <- rope(main_model, ci = 1, range = c(0.38, 0.58))
+#
+#     remove(main_model)
+#
+#     gc()
+#
+#     return(percentage_in_rope)
+#
+#   }
+#
+#
+#   plan(multisession, workers = 2)
+#
+#   sims <- crossing(
+#     rep = 1:1000, # number of replicates
+#     participant_n = c(10,20,40,80,160,320,640,1282,2560,5120), # range of participant N
+#     b_cond_time = seq(0,1, by = 0.2) # estimand of interest
+#   ) |>
+#     mutate(
+#       b0 = 0, b_time = 1, b_cond = 0,         # fixed effects
+#       u_participant = 0.5,   # random intercept participant
+#       sigma = 0.5         # measurement error
+#     ) |>
+#     mutate(analysis = future_pmap(., sim)) %>% # not sure why base pipe doesn't work here
+#     unnest(analysis)
+#
+#   plan(sequential)
+#
+#   sims
+# }
+#
+# plot_additional_new_study_sims <- function(sims) {
+#   sims |>
+#     ggplot(aes(x=factor(participant_n), y = ROPE_Percentage)) +
+#     stat_slab() +
+#     labs(x = "Sample Size (n)",
+#          y = "Percentage (%)",
+#          title = "Percentage of Posterior Distribution within Prior 95% Quantile Interval",
+#          subtitle = "A percentage close to 95% indicates that the posterior distribution has a similar mass within the range of the 95% quantile interval of the prior estimate"
+#     ) +
+#
+#     ggh4x::facet_nested(. ~ effect_lab + b_cond_time) +
+#     coord_flip() +
+#     theme_classic() +
+#     theme(panel.border = element_rect(fill = NA),
+#           plot.subtitle = element_text(size = 6))
+# }
+
 # Models
 fit_main_model <- function(data, prior) {
+
+  plan(multisession, workers = 4)
+
   main_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 1 + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 1 + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
-      cores = 4,
+      # cores = 4,
+      future = TRUE,
       seed = 1988,
       warmup = 4000,
       iter = 40000,
       control = list(adapt_delta = 0.99)
     )
+
+  plan(sequential)
+
+  main_model
 }
 
 fit_motor_demands_model <- function(data, prior) {
   motor_demands_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + motor_demands + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + motor_demands + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -587,7 +738,7 @@ fit_motor_demands_model <- function(data, prior) {
 fit_participant_group_model <- function(data, prior) {
   participant_group_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + participant_group + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + participant_group + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -602,7 +753,7 @@ fit_participant_group_model <- function(data, prior) {
 fit_selftalk_content_model <- function(data, prior) {
   selftalk_content_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + selftalk_content + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + selftalk_content + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -616,7 +767,7 @@ fit_selftalk_content_model <- function(data, prior) {
 
 fit_matching_model <- function(data, prior) {
 
-  data <- data %>%
+  data <- data |>
     filter(matching == "Motivational/Fine" |
              matching == "Motivational/Gross" |
              matching == "Instructional/Fine" |
@@ -624,7 +775,7 @@ fit_matching_model <- function(data, prior) {
 
   matching_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + matching + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + matching + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -640,7 +791,7 @@ fit_task_novelty_model <- function(data, prior) {
 
   task_novelty_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + task_novelty + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + task_novelty + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -656,7 +807,7 @@ fit_cue_selection_model <- function(data, prior) {
 
   cue_selection_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + cue_selection + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + cue_selection + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -670,13 +821,13 @@ fit_cue_selection_model <- function(data, prior) {
 
 fit_overtness_selection_model <- function(data, prior) {
 
-  data <- data %>%
+  data <- data |>
     filter(overtness_selection == "Assigned" |
              overtness_selection == "Self-selected")
 
   overtness_selection_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + overtness_selection + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + overtness_selection + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -692,7 +843,7 @@ fit_training_model <- function(data, prior) {
 
   training_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + training + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + training + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -708,7 +859,7 @@ fit_study_design_model <- function(data, prior) {
 
   study_design_model <-
     brm(
-      yi | se(sqrt(vi)) ~ 0 + study_design + (1 | study / experiment / group / effect),
+      yi | se(sqrt(vi)) ~ 0 + study_design + (1 | study_code / experiment_code / group_code / effect_code),
       data = data,
       prior = prior,
       chains = 4,
@@ -722,7 +873,7 @@ fit_study_design_model <- function(data, prior) {
 
 fit_cumulative_main_model <- function(data) {
 
-  data <- data %>%
+  data <- data |>
     mutate(year = as.numeric(as.character(year)))
 
   # Create empty data frame for draws
@@ -730,20 +881,21 @@ fit_cumulative_main_model <- function(data) {
                                   b_Intercept = as.numeric,
                                  prior = as.character())
 
+  # Initial posterior as prior
+  posterior <- c(0.48, 0.05, 60)
+
   # Loop through each model using previous years posterior as prior
   for (i in unique(data$year)){
 
-    data_year <- data %>%
+    data_year <- data |>
       filter(year == i)
-
-    posterior <- c(0.48, 0.05, 60)
 
     prior <- set_prior(paste("student_t(",posterior[3],",", posterior[1],",", posterior[2],")"),
                        class = "Intercept")
 
     main_model <-
       brm(
-        yi | se(sqrt(vi)) ~ 1 + (1 | study / experiment / group / effect),
+        yi | se(sqrt(vi)) ~ 1 + (1 | study_code / experiment_code / group_code / effect_code),
         data = data_year,
         prior = prior,
         chains = 4,
@@ -754,7 +906,7 @@ fit_cumulative_main_model <- function(data) {
         control = list(adapt_delta = 0.99)
       )
 
-    draws <- main_model %>%
+    draws <- main_model |>
       spread_draws(b_Intercept)
 
     posterior <- MASS::fitdistr(draws$b_Intercept, "t")$estimate
@@ -771,19 +923,67 @@ fit_cumulative_main_model <- function(data) {
 
 }
 
+# Small study/Publication bias effects
+fit_pet_model <- function(data) {
+
+
+  pet_main_model_rma.mv <- rma.mv(yi, vi,
+                                  random = ~ 1 | study_code / experiment_code / group_code / effect_code,
+                                  mods = ~ sqrt(vi),
+                                  data = data,
+                                  method = "REML",
+                                  test = "t"
+  )
+}
+
+fit_rma.mv_model <- function(data) {
+
+  rma.mv_model <- rma.mv(yi, vi,
+                         random = ~ 1 | study_code / experiment_code / group_code / effect_code,
+                         data = data,
+                         method = "REML",
+                         test = "t")
+}
+
+fit_null_robma_model <- function(data) {
+
+  RoBMA::RoBMA.options(max_cores = 5)
+
+  data_RoBMA <- data |>
+    filter(!is.na(vi))
+
+  null_RoBMA <- RoBMA::RoBMA(d = data_RoBMA$yi, v = data_RoBMA$vi,
+                      parallel = TRUE,
+                      seed = 1988)
+}
+
+fit_prior_robma_model <- function(data) {
+
+  RoBMA::RoBMA.options(max_cores = 5)
+
+  data_RoBMA <- data |>
+    filter(!is.na(vi))
+
+  prior_RoBMA <- RoBMA::RoBMA(d = data_RoBMA$yi, v = data_RoBMA$vi,
+                       priors_effect = RoBMA::prior(distribution = "t", parameters = list(location = 0.48, scale = 0.05, df = 60)),
+                       parallel = TRUE,
+                       seed = 1988,
+  )
+}
+
 # Plots
 plot_main_model_forest <- function(data, model) {
 
   # Sample draws from the individual studies
-  study_draws <- model %>%
-    spread_draws(b_Intercept, r_study[study, ]) %>%
-    mutate(b_Intercept = b_Intercept + r_study,
-           study = as.factor(study)) %>%
-    select(.chain, .iteration, .draw, b_Intercept, study) %>%
-    merge(data[, c(1,3)], by = "study")
+  study_draws <- model |>
+    spread_draws(b_Intercept, r_study_code[study_code, ]) |>
+    mutate(b_Intercept = b_Intercept + r_study_code,
+           study_code = as.factor(study_code)) |>
+    select(.chain, .iteration, .draw, b_Intercept, study_code) |>
+    merge(data[, c(1,3)], by = "study_code")
 
-  study_summary <- group_by(study_draws, label) %>%
-    mean_qi(b_Intercept) %>%
+  study_summary <- group_by(study_draws, label) |>
+    mean_qi(b_Intercept) |>
     mutate(b_Intercept = b_Intercept,
            .lower = .lower,
            .upper = .upper)
@@ -799,8 +999,10 @@ plot_main_model_forest <- function(data, model) {
     sample_new_levels = "gaussian"
   )
 
-  pred_int_data <- median_qi(pred_int_data) %>%
+  pred_int_data <- median_qi(pred_int_data) |>
     mutate(label = as.character("Posterior Pooled Estimate"))
+
+  remove(model)
 
   # Forest plot of study level estimates
   forest_study <- ggplot(aes(x = b_Intercept,
@@ -869,29 +1071,87 @@ plot_main_model_forest <- function(data, model) {
 
 }
 
+plot_contour_funnel <- function(data, tidy_model, pet_model, tidy_pet_model) {
+
+  data <- data |>
+    mutate(
+      wi = 1/sqrt(vi),
+      size = 0.5 + 3.0 * (wi - min(wi, na.rm=TRUE))/(max(wi, na.rm=TRUE) - min(wi, na.rm=TRUE)))
+
+  contours <- data.frame(se.seq = seq(0, max(sqrt(data$vi), na.rm = TRUE), 0.001),
+                         ll95 = 0-(1.96*seq(0, max(sqrt(data$vi), na.rm = TRUE), 0.001)),
+                         ul95 = 0+(1.96*seq(0, max(sqrt(data$vi), na.rm = TRUE), 0.001)),
+                         ll99 = 0-(3.29*seq(0, max(sqrt(data$vi), na.rm = TRUE), 0.001)),
+                         ul99 = 0+(3.29*seq(0, max(sqrt(data$vi), na.rm = TRUE), 0.001)))
+
+  pet_preds <- as.data.frame(predict(pet_model, newmods=seq(0, sqrt(max(data$vi, na.rm = TRUE)), length.out = 500))) |>
+    mutate(x = seq(0, sqrt(max(data$vi, na.rm = TRUE)), length.out = 500))
+
+  ggplot(aes(y = yi, x = sqrt(vi)), data = data) +
+    geom_point(aes(size = size), alpha = 0.25) +
+    geom_pointrange(aes(x = -0.05, y = estimate, ymin = conf.low, ymax = conf.high),
+                    data = tidy_model[1,]) +
+    annotate("text", y = tidy_model$estimate[1], x = -0.1, label = "Main Model\nEstimate", size = 2) +
+    geom_pointrange(aes(x = -0.05, y = estimate, ymin = conf.low, ymax = conf.high),
+                    data = tidy_pet_model[1,]) +
+    annotate("text", y = tidy_pet_model$estimate[1], x = -0.1, label = "Multilevel PET\nEstimate", size = 2) +
+    geom_segment(aes(y = 0, yend = 0, x = 0, xend = max(sqrt(vi), na.rm=TRUE)),
+                 linetype = 3) +
+    geom_line(aes(y = ll95, x = se.seq), linetype = 'dotted', data = contours) +
+    geom_line(aes(y = ul95, x = se.seq), linetype = 'dotted', data = contours) +
+    geom_line(aes(y = ll99, x = se.seq), linetype = 'dashed', data = contours) +
+    geom_line(aes(y = ul99, x = se.seq), linetype = 'dashed', data = contours) +
+    annotate("text", y = 1.75, x = 0.65, label = "italic(p) < 0.05",
+             parse = TRUE, size = 2.5) +
+    annotate("text", y = 2.5, x = 0.65, label = "italic(p) < 0.01",
+             parse = TRUE, size = 2.5) +
+    annotate("text", y = -1.75, x = 0.65, label = "italic(p) < 0.05",
+             parse = TRUE, size = 2.5) +
+    annotate("text", y = -2.5, x = 0.65, label = "italic(p) < 0.01",
+             parse = TRUE, size = 2.5) +
+    geom_ribbon(aes(x = x, y = pred, ymin = ci.lb, ymax = ci.ub),
+                alpha = 0.25,
+                data = pet_preds) +
+    geom_line(aes(x = x, y = pred),
+              data = pet_preds) +
+    labs(
+      y = "Standardised Mean Difference",
+      x = "Standard Error",
+      title = "Contour Enhanced Funnel Plot",
+      subtitle = "Estimates from frequentist multilevel main model and PET-PEESE model (regression line and ribbon)\nNote, models only include studies since 2011"
+    ) +
+    guides(size = "none") +
+    coord_flip() +
+    scale_x_reverse() +
+    theme_classic() +
+    theme(panel.border = element_rect(fill = NA),
+          plot.subtitle = element_text(size = 6))
+
+}
+
 plot_main_model_update <- function(prior_model, model) {
   # Sample draws from the prior distribution
   prior_draws <-
-    prior_model %>%
-    spread_draws(b_Intercept) %>%
+    prior_model |>
+    spread_draws(b_Intercept) |>
     mutate(study = "Prior (Hatzigeorgiadis et al., 2011)",
            label = "Prior (Hatzigeorgiadis et al., 2011)")
 
 
   # Sample draws from the posterior distribution
-  posterior_draws <- model %>%
-    spread_draws(b_Intercept) %>%
+  posterior_draws <- model |>
+    spread_draws(b_Intercept) |>
     mutate(study = "Posterior Pooled Estimate",
            label = "Posterior Pooled Estimate")
 
-  posterior_summary <- group_by(posterior_draws, label) %>%
-    mean_qi(b_Intercept) %>%
+  posterior_summary <- group_by(posterior_draws, label) |>
+    mean_qi(b_Intercept) |>
     mutate(b_Intercept = b_Intercept,
            .lower = .lower,
            .upper = .upper)
 
   # Combine prior dataframe with pooled draws
-  prior_posterior <- rbind(posterior_draws[, c(4, 6)], prior_draws[, c(4, 6)]) %>%
+  prior_posterior <- rbind(posterior_draws[, c(4, 6)], prior_draws[, c(4, 6)]) |>
     mutate(label = factor(label, levels = c("Posterior Pooled Estimate",
                                             "Prior (Hatzigeorgiadis et al., 2011)"
     )))
@@ -948,7 +1208,7 @@ plot_main_model_update <- function(prior_model, model) {
 plot_BF_curve_main_model <- function(BF_curve) {
 
   # Bayes Factor curve plot
-  BF_curve_plot <- BF_curve %>% ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
+  BF_curve_plot <- BF_curve |> ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
 
     # Add reference line at zero
     geom_vline(xintercept = 0, linetype = 2) +
@@ -985,32 +1245,34 @@ plot_motor_demands_model <- function(data, prior_model, model) {
 
   # Prior distribution samples
   nd <- datagrid(model = model,
-                 motor_demands = c("Fine", "Gross")
+                 motor_demands = c("Fine", "Gross"),
+                 vi = model$data$vi
   )
 
+  # Prior distribution samples
   prior_preds <- predictions(prior_model, type = "response",
                              newdata = nd,
-                             re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                             re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
 
   # Posterior distribution samples
   posterior_preds <- predictions(model, type = "response",
                                  newdata = nd,
-                                 re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                                 re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Posterior Pooled Estimate")
 
-  posterior_summary <- group_by(posterior_preds, motor_demands, label) %>%
-    mean_qi(draw) %>%
+  posterior_summary <- group_by(posterior_preds, motor_demands, label) |>
+    mean_qi(draw) |>
     mutate(draw = draw,
            .lower = .lower,
            .upper = .upper)
 
   # Combine prior and posterior samples for plot
-  prior_posterior <- rbind(prior_preds, posterior_preds) %>%
+  prior_posterior <- rbind(prior_preds, posterior_preds) |>
     mutate(label = factor(label, levels = c("Posterior Pooled Estimate",
                                             "Prior (Hatzigeorgiadis et al., 2011)"
     )))
@@ -1026,10 +1288,10 @@ plot_motor_demands_model <- function(data, prior_model, model) {
 
     # Add individual study data
     geom_point(
-      data = data %>%
-        filter(!is.na(yi)) %>%
+      data = model$data |>
         mutate(label = NA),
       aes(x = yi, y = motor_demands),
+      fill = NA,
       position = position_nudge(y = -0.05),
       shape = "|"
     ) +
@@ -1055,7 +1317,7 @@ plot_motor_demands_model <- function(data, prior_model, model) {
     labs(x = "Standardised Mean Difference", # summary measure
          y = element_blank(),
          fill = "",
-         title = "Motor Demands (Fine versus Gross)",
+         title = "Motor Demands",
     ) +
     scale_x_continuous(limits = c(-1, 1.5), breaks = c(-1,-0.5, 0, 0.5, 1)) +
     guides(color = "none",
@@ -1063,8 +1325,7 @@ plot_motor_demands_model <- function(data, prior_model, model) {
     theme_classic() +
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
-          title = element_text(size=8),
-          plot.subtitle = element_text(size=6))
+          title = element_text(size=8))
 }
 
 plot_participant_group_model <- function(data, prior_model, model) {
@@ -1073,32 +1334,34 @@ plot_participant_group_model <- function(data, prior_model, model) {
   nd <- datagrid(model = model,
                  participant_group = c("Non-athletes",
                                        "Experienced athletes",
-                                       "Beginner athletes")
+                                       "Beginner athletes"),
+                 vi = model$data$vi
   )
 
+  # Prior distribution samples
   prior_preds <- predictions(prior_model, type = "response",
                              newdata = nd,
-                             re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                             re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
 
   # Posterior distribution samples
   posterior_preds <- predictions(model, type = "response",
                                  newdata = nd,
-                                 re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                                 re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Posterior Pooled Estimate")
 
-  posterior_summary <- group_by(posterior_preds, participant_group, label) %>%
-    mean_qi(draw) %>%
+  posterior_summary <- group_by(posterior_preds, participant_group, label) |>
+    mean_qi(draw) |>
     mutate(draw = draw,
            .lower = .lower,
            .upper = .upper)
 
   # Combine prior and posterior samples for plot
-  prior_posterior <- rbind(prior_preds, posterior_preds) %>%
+  prior_posterior <- rbind(prior_preds, posterior_preds) |>
     mutate(label = factor(label, levels = c("Posterior Pooled Estimate",
                                             "Prior (Hatzigeorgiadis et al., 2011)"
     )))
@@ -1114,10 +1377,10 @@ plot_participant_group_model <- function(data, prior_model, model) {
 
     # Add individual study data
     geom_point(
-      data = data %>%
-        filter(!is.na(yi)) %>%
+      data = model$data |>
         mutate(label = NA),
       aes(x = yi, y = participant_group),
+      fill = NA,
       position = position_nudge(y = -0.05),
       shape = "|"
     ) +
@@ -1137,16 +1400,13 @@ plot_participant_group_model <- function(data, prior_model, model) {
       position = position_nudge(y=0.1)
     ) +
 
-    scale_y_discrete(limits = c("Non-athletes",
-                                "Beginner athletes",
-                                "Experienced athletes")) +
     scale_color_manual(values = c("#009E73", "#E69F00")) +
     scale_fill_manual(values = c("#009E73", "#E69F00")) +
 
     labs(x = "Standardised Mean Difference", # summary measure
          y = element_blank(),
          fill = "",
-         title = "Participants (Non-athletes versus Beginner Athletes versus Experienced Athletes)",
+         title = "Participants",
     ) +
     scale_x_continuous(limits = c(-1, 1.5), breaks = c(-1,-0.5, 0, 0.5, 1)) +
     guides(color = "none",
@@ -1154,8 +1414,7 @@ plot_participant_group_model <- function(data, prior_model, model) {
     theme_classic() +
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
-          title = element_text(size=8),
-          plot.subtitle = element_text(size=6))
+          title = element_text(size=8))
 }
 
 plot_selftalk_content_model <- function(data, prior_model, model) {
@@ -1165,32 +1424,34 @@ plot_selftalk_content_model <- function(data, prior_model, model) {
                  selftalk_content = c("Instructional",
                                       "Motivational",
                                       "Combined Instructional/Motivational",
-                                      "Rational")
+                                      "Rational"),
+                 vi = model$data$vi
   )
 
+  # Prior distribution samples
   prior_preds <- predictions(prior_model, type = "response",
                              newdata = nd,
-                             re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                             re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
 
   # Posterior distribution samples
   posterior_preds <- predictions(model, type = "response",
                                  newdata = nd,
-                                 re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                                 re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Posterior Pooled Estimate")
 
-  posterior_summary <- group_by(posterior_preds, selftalk_content, label) %>%
-    mean_qi(draw) %>%
+  posterior_summary <- group_by(posterior_preds, selftalk_content, label) |>
+    mean_qi(draw) |>
     mutate(draw = draw,
            .lower = .lower,
            .upper = .upper)
 
   # Combine prior and posterior samples for plot
-  prior_posterior <- rbind(prior_preds, posterior_preds) %>%
+  prior_posterior <- rbind(prior_preds, posterior_preds) |>
     mutate(label = factor(label, levels = c("Posterior Pooled Estimate",
                                             "Prior (Hatzigeorgiadis et al., 2011)"
     )))
@@ -1206,10 +1467,10 @@ plot_selftalk_content_model <- function(data, prior_model, model) {
 
     # Add individual study data
     geom_point(
-      data = data %>%
-        filter(!is.na(yi)) %>%
+      data = model$data |>
         mutate(label = NA),
       aes(x = yi, y = selftalk_content),
+      fill = NA,
       position = position_nudge(y = -0.05),
       shape = "|"
     ) +
@@ -1229,18 +1490,13 @@ plot_selftalk_content_model <- function(data, prior_model, model) {
       position = position_nudge(y=0.1)
     ) +
 
-    scale_y_discrete(limits = c("Rational",
-                                "Combined Instructional/Motivational",
-                                "Instructional",
-                                "Motivational"
-                                )) +
     scale_color_manual(values = c("#009E73", "#E69F00")) +
     scale_fill_manual(values = c("#009E73", "#E69F00")) +
 
     labs(x = "Standardised Mean Difference", # summary measure
          y = element_blank(),
          fill = "",
-         title = "Self-Talk Content (Instructional versus Motivational versus Combined versus Rational)",
+         title = "Self-Talk Content",
     ) +
     scale_x_continuous(limits = c(-1, 1.5), breaks = c(-1,-0.5, 0, 0.5, 1)) +
     guides(color = "none",
@@ -1248,50 +1504,44 @@ plot_selftalk_content_model <- function(data, prior_model, model) {
     theme_classic() +
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
-          title = element_text(size=8),
-          plot.subtitle = element_text(size=6))
+          title = element_text(size=8))
 }
 
 plot_matching_model <- function(data, prior_model, model) {
-
-  # Filter for effects in model
-  data <- data %>%
-    filter(matching == "Motivational/Fine" |
-             matching == "Motivational/Gross" |
-             matching == "Instructional/Fine" |
-             matching == "Instructional/Gross")
 
   # Prior distribution samples
   nd <- datagrid(model = model,
                  matching = c("Instructional/Fine",
                               "Instructional/Gross",
                               "Motivational/Fine",
-                              "Motivational/Gross")
+                              "Motivational/Gross"),
+                 vi = model$data$vi
   )
 
+  # Prior distribution samples
   prior_preds <- predictions(prior_model, type = "response",
                              newdata = nd,
-                             re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                             re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
 
   # Posterior distribution samples
   posterior_preds <- predictions(model, type = "response",
                                  newdata = nd,
-                                 re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                                 re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Posterior Pooled Estimate")
 
-  posterior_summary <- group_by(posterior_preds, matching, label) %>%
-    mean_qi(draw) %>%
+  posterior_summary <- group_by(posterior_preds, matching, label) |>
+    mean_qi(draw) |>
     mutate(draw = draw,
            .lower = .lower,
            .upper = .upper)
 
   # Combine prior and posterior samples for plot
-  prior_posterior <- rbind(prior_preds, posterior_preds) %>%
+  prior_posterior <- rbind(prior_preds, posterior_preds) |>
     mutate(label = factor(label, levels = c("Posterior Pooled Estimate",
                                             "Prior (Hatzigeorgiadis et al., 2011)"
     )))
@@ -1307,10 +1557,10 @@ plot_matching_model <- function(data, prior_model, model) {
 
     # Add individual study data
     geom_point(
-      data = data %>%
-        filter(!is.na(yi)) %>%
+      data = model$data |>
         mutate(label = NA),
       aes(x = yi, y = matching),
+      fill = NA,
       position = position_nudge(y = -0.05),
       shape = "|"
     ) +
@@ -1336,7 +1586,7 @@ plot_matching_model <- function(data, prior_model, model) {
     labs(x = "Standardised Mean Difference", # summary measure
          y = element_blank(),
          fill = "",
-         title = "Matching Hypothesis (Instructional/Motivational and Gross/Fine)",
+         title = "Matching Hypothesis",
     ) +
     scale_x_continuous(limits = c(-1, 1.5), breaks = c(-1,-0.5, 0, 0.5, 1)) +
     guides(color = "none",
@@ -1344,8 +1594,7 @@ plot_matching_model <- function(data, prior_model, model) {
     theme_classic() +
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
-          title = element_text(size=8),
-          plot.subtitle = element_text(size=6))
+          title = element_text(size=8))
 }
 
 plot_task_novelty_model <- function(data, prior_model, model) {
@@ -1353,32 +1602,34 @@ plot_task_novelty_model <- function(data, prior_model, model) {
   # Prior distribution samples
   nd <- datagrid(model = model,
                  task_novelty = c("Learned",
-                                  "Novel")
+                                  "Novel"),
+                 vi = model$data$vi
   )
 
+  # Prior distribution samples
   prior_preds <- predictions(prior_model, type = "response",
                              newdata = nd,
-                             re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                             re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
 
   # Posterior distribution samples
   posterior_preds <- predictions(model, type = "response",
                                  newdata = nd,
-                                 re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                                 re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Posterior Pooled Estimate")
 
-  posterior_summary <- group_by(posterior_preds, task_novelty, label) %>%
-    mean_qi(draw) %>%
+  posterior_summary <- group_by(posterior_preds, task_novelty, label) |>
+    mean_qi(draw) |>
     mutate(draw = draw,
            .lower = .lower,
            .upper = .upper)
 
   # Combine prior and posterior samples for plot
-  prior_posterior <- rbind(prior_preds, posterior_preds) %>%
+  prior_posterior <- rbind(prior_preds, posterior_preds) |>
     mutate(label = factor(label, levels = c("Posterior Pooled Estimate",
                                             "Prior (Hatzigeorgiadis et al., 2011)"
     )))
@@ -1394,10 +1645,10 @@ plot_task_novelty_model <- function(data, prior_model, model) {
 
     # Add individual study data
     geom_point(
-      data = data %>%
-        filter(!is.na(yi)) %>%
+      data = model$data |>
         mutate(label = NA),
       aes(x = yi, y = task_novelty),
+      fill = NA,
       position = position_nudge(y = -0.05),
       shape = "|"
     ) +
@@ -1423,7 +1674,7 @@ plot_task_novelty_model <- function(data, prior_model, model) {
     labs(x = "Standardised Mean Difference", # summary measure
          y = element_blank(),
          fill = "",
-         title = "Task Novelty (Novel versus Learned)",
+         title = "Task Novelty",
     ) +
     scale_x_continuous(limits = c(-1, 1.5), breaks = c(-1,-0.5, 0, 0.5, 1)) +
     guides(color = "none",
@@ -1431,8 +1682,7 @@ plot_task_novelty_model <- function(data, prior_model, model) {
     theme_classic() +
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
-          title = element_text(size=8),
-          plot.subtitle = element_text(size=6))
+          title = element_text(size=8))
 }
 
 plot_cue_selection_model <- function(data, prior_model, model) {
@@ -1440,32 +1690,34 @@ plot_cue_selection_model <- function(data, prior_model, model) {
   # Prior distribution samples
   nd <- datagrid(model = model,
                  cue_selection = c("Assigned",
-                                  "Self-selected")
+                                   "Self-selected"),
+                 vi = model$data$vi
   )
 
+  # Prior distribution samples
   prior_preds <- predictions(prior_model, type = "response",
                              newdata = nd,
-                             re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                             re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
 
   # Posterior distribution samples
   posterior_preds <- predictions(model, type = "response",
                                  newdata = nd,
-                                 re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                                 re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Posterior Pooled Estimate")
 
-  posterior_summary <- group_by(posterior_preds, cue_selection, label) %>%
-    mean_qi(draw) %>%
+  posterior_summary <- group_by(posterior_preds, cue_selection, label) |>
+    mean_qi(draw) |>
     mutate(draw = draw,
            .lower = .lower,
            .upper = .upper)
 
   # Combine prior and posterior samples for plot
-  prior_posterior <- rbind(prior_preds, posterior_preds) %>%
+  prior_posterior <- rbind(prior_preds, posterior_preds) |>
     mutate(label = factor(label, levels = c("Posterior Pooled Estimate",
                                             "Prior (Hatzigeorgiadis et al., 2011)"
     )))
@@ -1481,10 +1733,10 @@ plot_cue_selection_model <- function(data, prior_model, model) {
 
     # Add individual study data
     geom_point(
-      data = data %>%
-        filter(!is.na(yi)) %>%
+      data = model$data |>
         mutate(label = NA),
       aes(x = yi, y = cue_selection),
+      fill = NA,
       position = position_nudge(y = -0.05),
       shape = "|"
     ) +
@@ -1510,7 +1762,7 @@ plot_cue_selection_model <- function(data, prior_model, model) {
     labs(x = "Standardised Mean Difference", # summary measure
          y = element_blank(),
          fill = "",
-         title = "Cue Selection (Assigned versus Self-selected)",
+         title = "Cue Selection",
     ) +
     scale_x_continuous(limits = c(-1, 1.5), breaks = c(-1,-0.5, 0, 0.5, 1)) +
     guides(color = "none",
@@ -1518,45 +1770,42 @@ plot_cue_selection_model <- function(data, prior_model, model) {
     theme_classic() +
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
-          title = element_text(size=8),
-          plot.subtitle = element_text(size=6))
+          title = element_text(size=8))
 }
 
 plot_overtness_selection_model <- function(data, prior_model, model) {
 
-  data <- data %>%
-    filter(overtness_selection == "Assigned" |
-             overtness_selection == "Self-selected")
-
   # Prior distribution samples
   nd <- datagrid(model = model,
                  overtness_selection = c("Assigned",
-                                   "Self-selected")
+                                   "Self-selected"),
+                 vi = model$data$vi
   )
 
+  # Prior distribution samples
   prior_preds <- predictions(prior_model, type = "response",
                              newdata = nd,
-                             re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                             re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
 
   # Posterior distribution samples
   posterior_preds <- predictions(model, type = "response",
                                  newdata = nd,
-                                 re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                                 re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Posterior Pooled Estimate")
 
-  posterior_summary <- group_by(posterior_preds, overtness_selection, label) %>%
-    mean_qi(draw) %>%
+  posterior_summary <- group_by(posterior_preds, overtness_selection, label) |>
+    mean_qi(draw) |>
     mutate(draw = draw,
            .lower = .lower,
            .upper = .upper)
 
   # Combine prior and posterior samples for plot
-  prior_posterior <- rbind(prior_preds, posterior_preds) %>%
+  prior_posterior <- rbind(prior_preds, posterior_preds) |>
     mutate(label = factor(label, levels = c("Posterior Pooled Estimate",
                                             "Prior (Hatzigeorgiadis et al., 2011)"
     )))
@@ -1572,10 +1821,10 @@ plot_overtness_selection_model <- function(data, prior_model, model) {
 
     # Add individual study data
     geom_point(
-      data = data %>%
-        filter(!is.na(yi)) %>%
+      data = model$data |>
         mutate(label = NA),
       aes(x = yi, y = overtness_selection),
+      fill = NA,
       position = position_nudge(y = -0.05),
       shape = "|"
     ) +
@@ -1601,7 +1850,7 @@ plot_overtness_selection_model <- function(data, prior_model, model) {
     labs(x = "Standardised Mean Difference", # summary measure
          y = element_blank(),
          fill = "",
-         title = "Overtness Selection (Assigned versus Self-selected)",
+         title = "Overtness Selection",
     ) +
     scale_x_continuous(limits = c(-1, 1.5), breaks = c(-1,-0.5, 0, 0.5, 1)) +
     guides(color = "none",
@@ -1609,8 +1858,7 @@ plot_overtness_selection_model <- function(data, prior_model, model) {
     theme_classic() +
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
-          title = element_text(size=8),
-          plot.subtitle = element_text(size=6))
+          title = element_text(size=8))
 }
 
 plot_training_model <- function(data, prior_model, model) {
@@ -1618,32 +1866,34 @@ plot_training_model <- function(data, prior_model, model) {
   # Prior distribution samples
   nd <- datagrid(model = model,
                  training = c("Training",
-                              "No training")
+                              "No training"),
+                 vi = model$data$vi
   )
 
+  # Prior distribution samples
   prior_preds <- predictions(prior_model, type = "response",
                              newdata = nd,
-                             re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                             re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
 
   # Posterior distribution samples
   posterior_preds <- predictions(model, type = "response",
                                  newdata = nd,
-                                 re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                                 re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Posterior Pooled Estimate")
 
-  posterior_summary <- group_by(posterior_preds, training, label) %>%
-    mean_qi(draw) %>%
+  posterior_summary <- group_by(posterior_preds, training, label) |>
+    mean_qi(draw) |>
     mutate(draw = draw,
            .lower = .lower,
            .upper = .upper)
 
   # Combine prior and posterior samples for plot
-  prior_posterior <- rbind(prior_preds, posterior_preds) %>%
+  prior_posterior <- rbind(prior_preds, posterior_preds) |>
     mutate(label = factor(label, levels = c("Posterior Pooled Estimate",
                                             "Prior (Hatzigeorgiadis et al., 2011)"
     )))
@@ -1659,10 +1909,10 @@ plot_training_model <- function(data, prior_model, model) {
 
     # Add individual study data
     geom_point(
-      data = data %>%
-        filter(!is.na(yi)) %>%
+      data = model$data |>
         mutate(label = NA),
       aes(x = yi, y = training),
+      fill = NA,
       position = position_nudge(y = -0.05),
       shape = "|"
     ) +
@@ -1688,7 +1938,7 @@ plot_training_model <- function(data, prior_model, model) {
     labs(x = "Standardised Mean Difference", # summary measure
          y = element_blank(),
          fill = "",
-         title = "Training Intervention? (No-training versus Training)",
+         title = "Training Intervention",
     ) +
     scale_x_continuous(limits = c(-1, 1.5), breaks = c(-1,-0.5, 0, 0.5, 1)) +
     guides(color = "none",
@@ -1696,40 +1946,41 @@ plot_training_model <- function(data, prior_model, model) {
     theme_classic() +
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
-          title = element_text(size=8),
-          plot.subtitle = element_text(size=6))
+          title = element_text(size=8))
 }
 
 plot_study_design_model <- function(data, prior_model, model) {
 
   # Prior distribution samples
   nd <- datagrid(model = model,
-                 study_design = c("Pre/post - experimental/control", "Post - experimental/control", "Pre/post - experimental")
+                 study_design = c("Pre/post - experimental/control", "Post - experimental/control", "Pre/post - experimental"),
+                 vi = model$data$vi
   )
 
+  # Prior distribution samples
   prior_preds <- predictions(prior_model, type = "response",
                              newdata = nd,
-                             re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                             re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
 
   # Posterior distribution samples
   posterior_preds <- predictions(model, type = "response",
                                  newdata = nd,
-                                 re_formula = NA) %>%
-    posterior_draws() %>%
-    transform(type = "Response") %>%
+                                 re_formula = NA) |>
+    posterior_draws() |>
+    transform(type = "Response") |>
     mutate(label = "Posterior Pooled Estimate")
 
-  posterior_summary <- group_by(posterior_preds, study_design, label) %>%
-    mean_qi(draw) %>%
+  posterior_summary <- group_by(posterior_preds, study_design, label) |>
+    mean_qi(draw) |>
     mutate(draw = draw,
            .lower = .lower,
            .upper = .upper)
 
   # Combine prior and posterior samples for plot
-  prior_posterior <- rbind(prior_preds, posterior_preds) %>%
+  prior_posterior <- rbind(prior_preds, posterior_preds) |>
     mutate(label = factor(label, levels = c("Posterior Pooled Estimate",
                                             "Prior (Hatzigeorgiadis et al., 2011)"
     )))
@@ -1745,10 +1996,10 @@ plot_study_design_model <- function(data, prior_model, model) {
 
     # Add individual study data
     geom_point(
-      data = data %>%
-        filter(!is.na(yi)) %>%
+      data = model$data |>
         mutate(label = NA),
       aes(x = yi, y = study_design),
+      fill = NA,
       position = position_nudge(y = -0.05),
       shape = "|"
     ) +
@@ -1774,7 +2025,7 @@ plot_study_design_model <- function(data, prior_model, model) {
     labs(x = "Standardised Mean Difference", # summary measure
          y = element_blank(),
          fill = "",
-         title = "Study Design (Pre/Post or Post Only With Experimental Only or Control)",
+         title = "Study Design",
     ) +
     scale_x_continuous(limits = c(-1, 1.5), breaks = c(-1,-0.5, 0, 0.5, 1)) +
     guides(color = "none",
@@ -1782,8 +2033,7 @@ plot_study_design_model <- function(data, prior_model, model) {
     theme_classic() +
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
-          title = element_text(size=8),
-          plot.subtitle = element_text(size=6))
+          title = element_text(size=8))
 }
 
 plot_panel_moderators <- function(plot1, plot2, plot3,
@@ -1810,12 +2060,12 @@ plot_panel_main_model <- function(plot1, plot2, plot3) {
 # Supplemental plots (moderator change in evidence and cummulative plot)
 plot_BF_curve_motor_demands <- function(BF_curve) {
 
-  BF_curve %>%
+  BF_curve |>
 
     # Recode levels
     mutate(BF.Parameter=recode(BF.Parameter,
                                'b_motor_demandsFine'='Fine',
-                               'b_motor_demandsGross'='Gross')) %>%
+                               'b_motor_demandsGross'='Gross')) |>
 
     ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
 
@@ -1853,13 +2103,13 @@ plot_BF_curve_motor_demands <- function(BF_curve) {
 
 plot_BF_curve_participant_group <- function(BF_curve) {
 
-  BF_curve %>%
+  BF_curve |>
 
     # Recode levels
     mutate(BF.Parameter=recode(BF.Parameter,
                                'b_participant_groupNonMathletes'='Non-athletes',
                                'b_participant_groupBeginnerathletes'='Beginner athletes',
-                               'b_participant_groupExperiencedathletes'='Experienced athletes')) %>%
+                               'b_participant_groupExperiencedathletes'='Experienced athletes')) |>
 
     ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
 
@@ -1897,14 +2147,14 @@ plot_BF_curve_participant_group <- function(BF_curve) {
 
 plot_BF_curve_selftalk_content <- function(BF_curve) {
 
-  BF_curve %>%
+  BF_curve |>
 
     # Recode levels
     mutate(BF.Parameter=recode(BF.Parameter,
                                'b_selftalk_contentInstructional'='Instructional',
                                'b_selftalk_contentMotivational'='Motivational',
                                'b_selftalk_contentCombinedInstructionalDMotivational'='Combined Instructional/Motivational',
-                               'b_selftalk_contentRational'='Rational')) %>%
+                               'b_selftalk_contentRational'='Rational')) |>
 
     ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
 
@@ -1942,14 +2192,14 @@ plot_BF_curve_selftalk_content <- function(BF_curve) {
 
 plot_BF_curve_matching <- function(BF_curve) {
 
-  BF_curve %>%
+  BF_curve |>
 
     # Recode levels
     mutate(BF.Parameter=recode(BF.Parameter,
                                'b_matchingInstructionalDFine'='Instructional/Fine',
                                'b_matchingInstructionalDGross'='Instructional/Gross',
                                'b_matchingMotivationalDFine'='Motivational/Fine',
-                               'b_matchingMotivationalDGross'='Motivational/Gross')) %>%
+                               'b_matchingMotivationalDGross'='Motivational/Gross')) |>
 
     ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
 
@@ -1987,12 +2237,12 @@ plot_BF_curve_matching <- function(BF_curve) {
 
 plot_BF_curve_task_novelty <- function(BF_curve) {
 
-  BF_curve %>%
+  BF_curve |>
 
     # Recode levels
     mutate(BF.Parameter=recode(BF.Parameter,
                                'b_task_noveltyLearned'='Learned',
-                               'b_task_noveltyNovel'='Novel')) %>%
+                               'b_task_noveltyNovel'='Novel')) |>
 
     ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
 
@@ -2030,12 +2280,12 @@ plot_BF_curve_task_novelty <- function(BF_curve) {
 
 plot_BF_curve_cue_selection <- function(BF_curve) {
 
-  BF_curve %>%
+  BF_curve |>
 
     # Recode levels
     mutate(BF.Parameter=recode(BF.Parameter,
                                'b_cue_selectionAssigned'='Assigned',
-                               'b_cue_selectionSelfMselected'='Self-selected')) %>%
+                               'b_cue_selectionSelfMselected'='Self-selected')) |>
 
     ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
 
@@ -2073,12 +2323,12 @@ plot_BF_curve_cue_selection <- function(BF_curve) {
 
 plot_BF_curve_overtness_selection <- function(BF_curve) {
 
-  BF_curve %>%
+  BF_curve |>
 
     # Recode levels
     mutate(BF.Parameter=recode(BF.Parameter,
                                'b_overtness_selectionAssigned'='Assigned',
-                               'b_overtness_selectionSelfMselected'='Self-selected')) %>%
+                               'b_overtness_selectionSelfMselected'='Self-selected')) |>
 
     ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
 
@@ -2116,12 +2366,12 @@ plot_BF_curve_overtness_selection <- function(BF_curve) {
 
 plot_BF_curve_training <- function(BF_curve) {
 
-  BF_curve %>%
+  BF_curve |>
 
     # Recode levels
     mutate(BF.Parameter=recode(BF.Parameter,
                                'b_trainingNotraining'='No-training',
-                               'b_trainingTraining'='Training')) %>%
+                               'b_trainingTraining'='Training')) |>
 
     ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
 
@@ -2159,13 +2409,13 @@ plot_BF_curve_training <- function(BF_curve) {
 
 plot_BF_curve_study_design <- function(BF_curve) {
 
-  BF_curve %>%
+  BF_curve |>
 
     # Recode levels
     mutate(BF.Parameter=recode(BF.Parameter,
                                'b_study_designPostMexperimentalDcontrol'='Post - experimental/control',
                                'b_study_designPreDpostMexperimental'='Pre/post - experimental',
-                               'b_study_designPreDpostMexperimentalDcontrol'='Pre/post - experimental/control')) %>%
+                               'b_study_designPreDpostMexperimentalDcontrol'='Pre/post - experimental/control')) |>
 
     ggplot(aes(x=effect, y=log10(exp(BF.log_BF)))) +
 
@@ -2203,13 +2453,13 @@ plot_BF_curve_study_design <- function(BF_curve) {
 
 plot_cumulative_main_model <- function(data, prior_model, cumulative_draws) {
 
-  prior_draws <- prior_model %>%
-    spread_draws(b_Intercept) %>%
+  prior_draws <- prior_model |>
+    spread_draws(b_Intercept) |>
     mutate(year = "Hatzigeorgiadis et al., (2011)",
-           prior = NA) %>%
+           prior = NA) |>
     select(year, b_Intercept, prior)
 
-  cumulative_draws <- rbind(prior_draws, cumulative_draws) %>%
+  cumulative_draws <- rbind(prior_draws, cumulative_draws) |>
     mutate(year = factor(year, levels = c(
       "Hatzigeorgiadis et al., (2011)",
       "2011",
@@ -2227,10 +2477,10 @@ plot_cumulative_main_model <- function(data, prior_model, cumulative_draws) {
       "2023"
     )))
 
-  posterior_summary <- group_by(cumulative_draws, year) %>%
+  posterior_summary <- group_by(cumulative_draws, year) |>
     mean_qi(b_Intercept)
 
-  cumulative_draws %>%
+  cumulative_draws |>
     ggplot(aes(y = year, x = b_Intercept)) +
 
     # Add ref line at zero
@@ -2282,7 +2532,7 @@ plot_cumulative_main_model <- function(data, prior_model, cumulative_draws) {
 
 # Model checks
 make_rhat_plot <- function(model) {
-  mod_rhat <- enframe(brms::rhat(model)) %>%
+  mod_rhat <- enframe(brms::rhat(model)) |>
     filter(!str_detect(name, "^r_id"))
 
   rhat_main_params <- mod_rhat$value
