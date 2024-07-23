@@ -252,7 +252,7 @@ get_logBF_curve <- function(model) {
                       BF = bayesfactor_parameters(model, null = .x)))
   })
 
-  plan(sequential)
+
 
   return(BF_curve)
 }
@@ -279,7 +279,7 @@ set_main_prior <- function() {
 
 sample_prior_main_model <- function(data, prior) {
 
-  plan(multisession, workers = 4)
+
 
   prior_main_model <-
     brm(
@@ -287,7 +287,7 @@ sample_prior_main_model <- function(data, prior) {
       data = data,
       prior = prior,
       chains = 4,
-      # cores = 4,
+      cores = 4,
       future = TRUE,
       seed = 1988,
       warmup = 2000,
@@ -296,7 +296,7 @@ sample_prior_main_model <- function(data, prior) {
       sample_prior = "only",
     )
 
-  plan(sequential)
+
 
   prior_main_model
 }
@@ -674,7 +674,7 @@ sample_prior_study_design_model <- function(data, prior) {
 #     mutate(analysis = future_pmap(., sim)) %>% # not sure why base pipe doesn't work here
 #     unnest(analysis)
 #
-#   plan(sequential)
+#
 #
 #   sims
 # }
@@ -699,7 +699,7 @@ sample_prior_study_design_model <- function(data, prior) {
 # Models
 fit_main_model <- function(data, prior) {
 
-  plan(multisession, workers = 4)
+
 
   main_model <-
     brm(
@@ -707,7 +707,7 @@ fit_main_model <- function(data, prior) {
       data = data,
       prior = prior,
       chains = 4,
-      # cores = 4,
+      cores = 4,
       future = TRUE,
       seed = 1988,
       warmup = 4000,
@@ -715,7 +715,7 @@ fit_main_model <- function(data, prior) {
       control = list(adapt_delta = 0.99)
     )
 
-  plan(sequential)
+
 
   main_model
 }
