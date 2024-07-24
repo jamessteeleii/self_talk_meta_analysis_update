@@ -100,18 +100,18 @@ list(
   tar_target(pp_check_selftalk_content_model, make_pp_check(selftalk_content_model)),
   tar_target(selftalk_content_model_plot, plot_selftalk_content_model(data_effect_sizes, prior_selftalk_content_model, selftalk_content_model)),
   tar_target(selftalk_content_model_logBF_curve, get_logBF_curve(selftalk_content_model)),
-  tar_target(tidy_selftalk_content_model, get_tidy_model(selftalk_content_model))
+  tar_target(tidy_selftalk_content_model, get_tidy_model(selftalk_content_model)),
 
-  # # Fit, check, and plot matching hypothesis model
-  # tar_target(matching_prior, set_matching_prior()),
-  # tar_target(prior_matching_model, sample_prior_matching_model(data_effect_sizes, matching_prior)),
-  # tar_target(matching_model, fit_matching_model(data_effect_sizes, matching_prior)),
-  # tar_target(rhat_matching_model, make_rhat_plot(matching_model)),
-  # tar_target(trace_plot_matching_model, make_trace_plot(matching_model)),
-  # tar_target(pp_check_matching_model, make_pp_check(matching_model)),
-  # # tar_target(matching_model_plot, plot_matching_model(data_effect_sizes, prior_matching_model, matching_model)),
-  # # tar_target(matching_model_logBF_curve, get_logBF_curve(matching_model)),
-  # tar_target(tidy_matching_model, get_tidy_model(matching_model)),
+  # Fit, check, and plot matching hypothesis model
+  tar_target(matching_prior, set_matching_prior()),
+  tar_target(prior_matching_model, sample_prior_matching_model(data_effect_sizes, matching_prior)),
+  tar_target(matching_model, fit_matching_model(data_effect_sizes, matching_prior)),
+  tar_target(rhat_matching_model, make_rhat_plot(matching_model)),
+  tar_target(trace_plot_matching_model, make_trace_plot(matching_model)),
+  tar_target(pp_check_matching_model, make_pp_check(matching_model)),
+  tar_target(matching_model_plot, plot_matching_model(data_effect_sizes, prior_matching_model, matching_model)),
+  tar_target(matching_model_logBF_curve, get_logBF_curve(matching_model)),
+  tar_target(tidy_matching_model, get_tidy_model(matching_model))
   #
   # # Fit, check, and plot task_novelty model
   # tar_target(task_novelty_prior, set_task_novelty_prior()),
