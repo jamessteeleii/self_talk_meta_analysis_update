@@ -122,18 +122,18 @@ list(
   tar_target(pp_check_task_novelty_model, make_pp_check(task_novelty_model)),
   tar_target(task_novelty_model_plot, plot_task_novelty_model(data_effect_sizes, prior_task_novelty_model, task_novelty_model)),
   tar_target(task_novelty_model_logBF_curve, get_logBF_curve(task_novelty_model)),
-  tar_target(tidy_task_novelty_model, get_tidy_model(task_novelty_model))
-  #
-  # # Fit, check, and plot cue_selection model
-  # tar_target(cue_selection_prior, set_cue_selection_prior()),
-  # tar_target(prior_cue_selection_model, sample_prior_cue_selection_model(data_effect_sizes, cue_selection_prior)),
-  # tar_target(cue_selection_model, fit_cue_selection_model(data_effect_sizes, cue_selection_prior)),
-  # tar_target(rhat_cue_selection_model, make_rhat_plot(cue_selection_model)),
-  # tar_target(trace_plot_cue_selection_model, make_trace_plot(cue_selection_model)),
-  # tar_target(pp_check_cue_selection_model, make_pp_check(cue_selection_model)),
-  # # tar_target(cue_selection_model_plot, plot_cue_selection_model(data_effect_sizes, prior_cue_selection_model, cue_selection_model)),
-  # # tar_target(cue_selection_model_logBF_curve, get_logBF_curve(cue_selection_model)),
-  # tar_target(tidy_cue_selection_model, get_tidy_model(cue_selection_model)),
+  tar_target(tidy_task_novelty_model, get_tidy_model(task_novelty_model)),
+
+  # Fit, check, and plot cue_selection model
+  tar_target(cue_selection_prior, set_cue_selection_prior()),
+  tar_target(prior_cue_selection_model, sample_prior_cue_selection_model(data_effect_sizes, cue_selection_prior)),
+  tar_target(cue_selection_model, fit_cue_selection_model(data_effect_sizes, cue_selection_prior)),
+  tar_target(rhat_cue_selection_model, make_rhat_plot(cue_selection_model)),
+  tar_target(trace_plot_cue_selection_model, make_trace_plot(cue_selection_model)),
+  tar_target(pp_check_cue_selection_model, make_pp_check(cue_selection_model)),
+  tar_target(cue_selection_model_plot, plot_cue_selection_model(data_effect_sizes, prior_cue_selection_model, cue_selection_model)),
+  tar_target(cue_selection_model_logBF_curve, get_logBF_curve(cue_selection_model)),
+  tar_target(tidy_cue_selection_model, get_tidy_model(cue_selection_model))
   #
   # # Fit, check, and plot overtness_selection model
   # tar_target(overtness_selection_prior, set_overtness_selection_prior()),
