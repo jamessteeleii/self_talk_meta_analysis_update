@@ -144,18 +144,18 @@ list(
   tar_target(pp_check_overtness_selection_model, make_pp_check(overtness_selection_model)),
   tar_target(overtness_selection_model_plot, plot_overtness_selection_model(data_effect_sizes, prior_overtness_selection_model, overtness_selection_model)),
   tar_target(overtness_selection_model_logBF_curve, get_logBF_curve(overtness_selection_model)),
-  tar_target(tidy_overtness_selection_model, get_tidy_model(overtness_selection_model))
-  #
-  # # Fit, check, and plot training model
-  # tar_target(training_prior, set_training_prior()),
-  # tar_target(prior_training_model, sample_prior_training_model(data_effect_sizes, training_prior)),
-  # tar_target(training_model, fit_training_model(data_effect_sizes, training_prior)),
-  # tar_target(rhat_training_model, make_rhat_plot(training_model)),
-  # tar_target(trace_plot_training_model, make_trace_plot(training_model)),
-  # tar_target(pp_check_training_model, make_pp_check(training_model)),
-  # # tar_target(training_model_plot, plot_training_model(data_effect_sizes, prior_training_model, training_model)),
-  # # tar_target(training_model_logBF_curve, get_logBF_curve(training_model)),
-  # tar_target(tidy_training_model, get_tidy_model(training_model)),
+  tar_target(tidy_overtness_selection_model, get_tidy_model(overtness_selection_model)),
+
+  # Fit, check, and plot training model
+  tar_target(training_prior, set_training_prior()),
+  tar_target(prior_training_model, sample_prior_training_model(data_effect_sizes, training_prior)),
+  tar_target(training_model, fit_training_model(data_effect_sizes, training_prior)),
+  tar_target(rhat_training_model, make_rhat_plot(training_model)),
+  tar_target(trace_plot_training_model, make_trace_plot(training_model)),
+  tar_target(pp_check_training_model, make_pp_check(training_model)),
+  tar_target(training_model_plot, plot_training_model(data_effect_sizes, prior_training_model, training_model)),
+  tar_target(training_model_logBF_curve, get_logBF_curve(training_model)),
+  tar_target(tidy_training_model, get_tidy_model(training_model))
   #
   # # Fit, check, and plot study_design model
   # tar_target(study_design_prior, set_study_design_prior()),
