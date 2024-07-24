@@ -89,18 +89,18 @@ list(
   tar_target(pp_check_participant_group_model, make_pp_check(participant_group_model)),
   tar_target(participant_group_model_plot, plot_participant_group_model(data_effect_sizes, prior_participant_group_model, participant_group_model)),
   tar_target(participant_group_model_logBF_curve, get_logBF_curve(participant_group_model)),
-  tar_target(tidy_participant_group_model, get_tidy_model(participant_group_model))
+  tar_target(tidy_participant_group_model, get_tidy_model(participant_group_model)),
 
-  # # Fit, check, and plot self-talk content model
-  # tar_target(selftalk_content_prior, set_selftalk_content_prior()),
-  # tar_target(prior_selftalk_content_model, sample_prior_selftalk_content_model(data_effect_sizes, selftalk_content_prior)),
-  # tar_target(selftalk_content_model, fit_selftalk_content_model(data_effect_sizes, selftalk_content_prior)),
-  # tar_target(rhat_selftalk_content_model, make_rhat_plot(selftalk_content_model)),
-  # tar_target(trace_plot_selftalk_content_model, make_trace_plot(selftalk_content_model)),
-  # tar_target(pp_check_selftalk_content_model, make_pp_check(selftalk_content_model)),
-  # tar_target(selftalk_content_model_plot, plot_selftalk_content_model(data_effect_sizes, prior_selftalk_content_model, selftalk_content_model)),
-  # tar_target(selftalk_content_model_logBF_curve, get_logBF_curve(selftalk_content_model)),
-  # tar_target(tidy_selftalk_content_model, get_tidy_model(selftalk_content_model))
+  # Fit, check, and plot self-talk content model
+  tar_target(selftalk_content_prior, set_selftalk_content_prior()),
+  tar_target(prior_selftalk_content_model, sample_prior_selftalk_content_model(data_effect_sizes, selftalk_content_prior)),
+  tar_target(selftalk_content_model, fit_selftalk_content_model(data_effect_sizes, selftalk_content_prior)),
+  tar_target(rhat_selftalk_content_model, make_rhat_plot(selftalk_content_model)),
+  tar_target(trace_plot_selftalk_content_model, make_trace_plot(selftalk_content_model)),
+  tar_target(pp_check_selftalk_content_model, make_pp_check(selftalk_content_model)),
+  tar_target(selftalk_content_model_plot, plot_selftalk_content_model(data_effect_sizes, prior_selftalk_content_model, selftalk_content_model)),
+  tar_target(selftalk_content_model_logBF_curve, get_logBF_curve(selftalk_content_model)),
+  tar_target(tidy_selftalk_content_model, get_tidy_model(selftalk_content_model))
 
   # # Fit, check, and plot matching hypothesis model
   # tar_target(matching_prior, set_matching_prior()),
