@@ -111,18 +111,18 @@ list(
   tar_target(pp_check_matching_model, make_pp_check(matching_model)),
   tar_target(matching_model_plot, plot_matching_model(data_effect_sizes, prior_matching_model, matching_model)),
   tar_target(matching_model_logBF_curve, get_logBF_curve(matching_model)),
-  tar_target(tidy_matching_model, get_tidy_model(matching_model))
-  #
-  # # Fit, check, and plot task_novelty model
-  # tar_target(task_novelty_prior, set_task_novelty_prior()),
-  # tar_target(prior_task_novelty_model, sample_prior_task_novelty_model(data_effect_sizes, task_novelty_prior)),
-  # tar_target(task_novelty_model, fit_task_novelty_model(data_effect_sizes, task_novelty_prior)),
-  # tar_target(rhat_task_novelty_model, make_rhat_plot(task_novelty_model)),
-  # tar_target(trace_plot_task_novelty_model, make_trace_plot(task_novelty_model)),
-  # tar_target(pp_check_task_novelty_model, make_pp_check(task_novelty_model)),
-  # # tar_target(task_novelty_model_plot, plot_task_novelty_model(data_effect_sizes, prior_task_novelty_model, task_novelty_model)),
-  # # tar_target(task_novelty_model_logBF_curve, get_logBF_curve(task_novelty_model)),
-  # tar_target(tidy_task_novelty_model, get_tidy_model(task_novelty_model)),
+  tar_target(tidy_matching_model, get_tidy_model(matching_model)),
+
+  # Fit, check, and plot task_novelty model
+  tar_target(task_novelty_prior, set_task_novelty_prior()),
+  tar_target(prior_task_novelty_model, sample_prior_task_novelty_model(data_effect_sizes, task_novelty_prior)),
+  tar_target(task_novelty_model, fit_task_novelty_model(data_effect_sizes, task_novelty_prior)),
+  tar_target(rhat_task_novelty_model, make_rhat_plot(task_novelty_model)),
+  tar_target(trace_plot_task_novelty_model, make_trace_plot(task_novelty_model)),
+  tar_target(pp_check_task_novelty_model, make_pp_check(task_novelty_model)),
+  tar_target(task_novelty_model_plot, plot_task_novelty_model(data_effect_sizes, prior_task_novelty_model, task_novelty_model)),
+  tar_target(task_novelty_model_logBF_curve, get_logBF_curve(task_novelty_model)),
+  tar_target(tidy_task_novelty_model, get_tidy_model(task_novelty_model))
   #
   # # Fit, check, and plot cue_selection model
   # tar_target(cue_selection_prior, set_cue_selection_prior()),
