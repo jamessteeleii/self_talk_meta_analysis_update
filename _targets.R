@@ -133,18 +133,18 @@ list(
   tar_target(pp_check_cue_selection_model, make_pp_check(cue_selection_model)),
   tar_target(cue_selection_model_plot, plot_cue_selection_model(data_effect_sizes, prior_cue_selection_model, cue_selection_model)),
   tar_target(cue_selection_model_logBF_curve, get_logBF_curve(cue_selection_model)),
-  tar_target(tidy_cue_selection_model, get_tidy_model(cue_selection_model))
-  #
-  # # Fit, check, and plot overtness_selection model
-  # tar_target(overtness_selection_prior, set_overtness_selection_prior()),
-  # tar_target(prior_overtness_selection_model, sample_prior_overtness_selection_model(data_effect_sizes, overtness_selection_prior)),
-  # tar_target(overtness_selection_model, fit_overtness_selection_model(data_effect_sizes, overtness_selection_prior)),
-  # tar_target(rhat_overtness_selection_model, make_rhat_plot(overtness_selection_model)),
-  # tar_target(trace_plot_overtness_selection_model, make_trace_plot(overtness_selection_model)),
-  # tar_target(pp_check_overtness_selection_model, make_pp_check(overtness_selection_model)),
-  # # tar_target(overtness_selection_model_plot, plot_overtness_selection_model(data_effect_sizes, prior_overtness_selection_model, overtness_selection_model)),
-  # # tar_target(overtness_selection_model_logBF_curve, get_logBF_curve(overtness_selection_model)),
-  # tar_target(tidy_overtness_selection_model, get_tidy_model(overtness_selection_model)),
+  tar_target(tidy_cue_selection_model, get_tidy_model(cue_selection_model)),
+
+  # Fit, check, and plot overtness_selection model
+  tar_target(overtness_selection_prior, set_overtness_selection_prior()),
+  tar_target(prior_overtness_selection_model, sample_prior_overtness_selection_model(data_effect_sizes, overtness_selection_prior)),
+  tar_target(overtness_selection_model, fit_overtness_selection_model(data_effect_sizes, overtness_selection_prior)),
+  tar_target(rhat_overtness_selection_model, make_rhat_plot(overtness_selection_model)),
+  tar_target(trace_plot_overtness_selection_model, make_trace_plot(overtness_selection_model)),
+  tar_target(pp_check_overtness_selection_model, make_pp_check(overtness_selection_model)),
+  tar_target(overtness_selection_model_plot, plot_overtness_selection_model(data_effect_sizes, prior_overtness_selection_model, overtness_selection_model)),
+  tar_target(overtness_selection_model_logBF_curve, get_logBF_curve(overtness_selection_model)),
+  tar_target(tidy_overtness_selection_model, get_tidy_model(overtness_selection_model))
   #
   # # Fit, check, and plot training model
   # tar_target(training_prior, set_training_prior()),
