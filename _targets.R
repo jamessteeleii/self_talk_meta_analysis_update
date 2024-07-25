@@ -155,18 +155,18 @@ list(
   tar_target(pp_check_training_model, make_pp_check(training_model)),
   tar_target(training_model_plot, plot_training_model(data_effect_sizes, prior_training_model, training_model)),
   tar_target(training_model_logBF_curve, get_logBF_curve(training_model)),
-  tar_target(tidy_training_model, get_tidy_model(training_model))
-  #
-  # # Fit, check, and plot study_design model
-  # tar_target(study_design_prior, set_study_design_prior()),
-  # tar_target(prior_study_design_model, sample_prior_study_design_model(data_effect_sizes, study_design_prior)),
-  # tar_target(study_design_model, fit_study_design_model(data_effect_sizes, study_design_prior)),
-  # tar_target(rhat_study_design_model, make_rhat_plot(study_design_model)),
-  # tar_target(trace_plot_study_design_model, make_trace_plot(study_design_model)),
-  # tar_target(pp_check_study_design_model, make_pp_check(study_design_model)),
-  # # tar_target(study_design_model_plot, plot_study_design_model(data_effect_sizes, prior_study_design_model, study_design_model)),
-  # # tar_target(study_design_model_logBF_curve, get_logBF_curve(study_design_model)),
-  # tar_target(tidy_study_design_model, get_tidy_model(study_design_model))
+  tar_target(tidy_training_model, get_tidy_model(training_model)),
+
+  # Fit, check, and plot study_design model
+  tar_target(study_design_prior, set_study_design_prior()),
+  tar_target(prior_study_design_model, sample_prior_study_design_model(data_effect_sizes, study_design_prior)),
+  tar_target(study_design_model, fit_study_design_model(data_effect_sizes, study_design_prior)),
+  tar_target(rhat_study_design_model, make_rhat_plot(study_design_model)),
+  tar_target(trace_plot_study_design_model, make_trace_plot(study_design_model)),
+  tar_target(pp_check_study_design_model, make_pp_check(study_design_model)),
+  tar_target(study_design_model_plot, plot_study_design_model(data_effect_sizes, prior_study_design_model, study_design_model)),
+  tar_target(study_design_model_logBF_curve, get_logBF_curve(study_design_model)),
+  tar_target(tidy_study_design_model, get_tidy_model(study_design_model))
 
   # # Make panel plot of moderators
   # tar_target(moderators_panel_plot, plot_panel_moderators(
