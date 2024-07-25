@@ -67,7 +67,7 @@ list(
   tar_target(tidy_rma.mv_model, tidy(rma.mv_model, conf.int = .95)),
   tar_target(main_model_contour_funnel_plot, plot_contour_funnel(data_effect_sizes, tidy_rma.mv_model, pet_model, tidy_pet_model)),
   tar_target(null_robma_model, fit_null_robma_model(data_effect_sizes)),
-  # tar_target(prior_robma_model, fit_prior_robma_model(data_effect_sizes)),
+  tar_target(prior_robma_model, fit_prior_robma_model(data_effect_sizes)),
 
   # # Fit, check, and plot motor demands model
   tar_target(motor_demands_prior, set_motor_demands_prior()),

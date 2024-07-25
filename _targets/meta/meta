@@ -1,5 +1,5 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-.Random.seed|object|f5d31c96b8fa6224|||||||||||||||
+.Random.seed|object|03dc3d145e1af2a1|||||||||||||||
 BF_curve_cue_selection_plot|stem|d86191cf9f036e09|117dd8672f862730|90cc6db19a3a1edc|1006727366||t19929.5360625953s|65eae6e16412695e|186811|qs|local|vector|||0.062||
 BF_curve_cue_selection_plot_tiff|stem|f6a0aa3ccf047e09|e84b267f530b7c55|d8672d5ecc417ab9|384259766||t19929.5360688814s|d22c29dc585b97b0|78|qs|local|vector|||0.25||
 BF_curve_main_model_plot|stem|7b81218b06303236|fcefa009d00f22c6|cc5efdc56993fccf|1515889785||t19927.6380239153s|2a17b3afb94aa7f8|166972|qs|local|vector|||0.063||
@@ -119,6 +119,7 @@ prior_matching_model|stem|1b8273d0f208dcf3|569e455b2199e48d|d45291e744c9c391|-16
 prior_motor_demands_model|stem|3276e87e030efa57|74fbd13e592ed326|564840917d0f550b|1381871542||t19927.6505495938s|492889aae3491daf|127410017|qs|local|vector|||99.985|Rows containing NAs were excluded from the model.|
 prior_overtness_selection_model|stem|7d11bb10a1eb2ee6|e4b7c77eb5bd1c26|e5227f4042844e89|-2047077170||t19928.6390588439s|aa59f0f59163ca23|76266458|qs|local|vector|||103.812|Rows containing NAs were excluded from the model.|
 prior_participant_group_model|stem|e2d2a8d090a617a6|dcc84dd47f3db51c|b18e47e925856fb1|833269566||t19927.7228491954s|96270435027119b2|123143743|qs|local|vector|||108.047|Rows containing NAs were excluded from the model.|
+prior_robma_model|stem|3d2544b10ed61925|3c4d15581e3d1b31|8be492e09024610d|504057134||t19929.6033110708s|ae58683647a0fa4f|28107536|qs|local|vector|||1549.5||
 prior_selftalk_content_model|stem|38cfab665f78d298|2593733a3063985f|7bd17fc66c919db0|-829736215||t19927.9514606723s|f88fb349fef9beb5|125430211|qs|local|vector|||99.672|Rows containing NAs were excluded from the model.|
 prior_study_design_model|stem|9ddc609184ba0a9d|07094913aaacbbc8|2e44e4582420d7e1|-419216519||t19928.8732632054s|49abe215aa074f4f|127865796|qs|local|vector|||105.656|Rows containing NAs were excluded from the model.|
 prior_task_novelty_model|stem|988f4463ec76508f|8a501793153f749f|9049f0d6cccfd91e|1727318987||t19928.2509358898s|6a4e26934f8131f2|127398984|qs|local|vector|||94.782|Rows containing NAs were excluded from the model.|
