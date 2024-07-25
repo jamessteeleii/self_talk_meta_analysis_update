@@ -186,10 +186,10 @@ list(
   tar_target(BF_curve_training_plot, plot_BF_curve_training(training_model_logBF_curve)),
   tar_target(BF_curve_study_design_plot, plot_BF_curve_study_design(study_design_model_logBF_curve)),
 
-  # # Make cumulative model and plot
-  # tar_target(cumulative_draws, fit_cumulative_main_model(data_effect_sizes)),
-  # tar_target(cumulative_main_model_plot, plot_cumulative_main_model(data_effect_sizes, prior_main_model, cumulative_draws)),
-  #
+  # Make cumulative model and plot
+  tar_target(cumulative_draws, fit_cumulative_main_model(data_effect_sizes)),
+  tar_target(cumulative_main_model_plot, plot_cumulative_main_model(data_effect_sizes, prior_main_model, cumulative_draws)),
+
   # Make plots tiffs
   # tar_target(additional_study_sims_plot_tiff, make_plot_tiff(additional_study_sims_plot, 7.5, 13.33, "plots/additional_study_sims_plot.tiff")),
   tar_target(main_model_plot_tiff, make_plot_tiff(main_model_plot, 7.5, 13.33, "plots/main_model_plot.tiff")),
@@ -203,7 +203,7 @@ list(
   tar_target(BF_curve_cue_selection_plot_tiff, make_plot_tiff(BF_curve_cue_selection_plot, 7.5, 5, "plots/BF_curve_cue_selection_plot.tiff")),
   tar_target(BF_curve_overtness_selection_plot_tiff, make_plot_tiff(BF_curve_overtness_selection_plot, 7.5, 5, "plots/BF_curve_overtness_selection_plot.tiff")),
   tar_target(BF_curve_training_plot_tiff, make_plot_tiff(BF_curve_training_plot, 7.5, 5, "plots/BF_curve_training_plot.tiff")),
-  tar_target(BF_curve_study_design_plot_tiff, make_plot_tiff(BF_curve_study_design_plot, 7.5, 5, "plots/BF_curve_study_design_plot.tiff"))
-  # tar_target(cumulative_main_model_plot_tiff, make_plot_tiff(cumulative_main_model_plot, 7.5, 5, "plots/cumulative_main_model_plot.tiff"))
+  tar_target(BF_curve_study_design_plot_tiff, make_plot_tiff(BF_curve_study_design_plot, 7.5, 5, "plots/BF_curve_study_design_plot.tiff")),
+  tar_target(cumulative_main_model_plot_tiff, make_plot_tiff(cumulative_main_model_plot, 7.5, 5, "plots/cumulative_main_model_plot.tiff"))
 
 )

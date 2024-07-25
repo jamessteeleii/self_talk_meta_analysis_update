@@ -878,7 +878,7 @@ fit_cumulative_main_model <- function(data) {
 
   # Create empty data frame for draws
   cumulative_draws <- data.frame(year = as.numeric(),
-                                  b_Intercept = as.numeric,
+                                  b_Intercept = as.numeric(),
                                  prior = as.character())
 
   # Initial posterior as prior
