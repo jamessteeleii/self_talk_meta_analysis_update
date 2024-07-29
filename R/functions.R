@@ -561,140 +561,215 @@ sample_prior_study_design_model <- function(data, prior) {
     )
 }
 
-# # Simulation of additional new study
-# additional_new_study_sim <- function() {
-#
-#   sim <- function(participant_n = as.double(),
-#                   b0 = as.double(), b_time = as.double(), b_cond = as.double(), b_cond_time = as.double(),         # fixed effects
-#                   u_participant = as.double(), # random intercepts
-#                   sigma = as.double(),       # measurement error
-#                   ... # helps the function work with pmap() below
-#   ) {
-#
-#     # Taken fromm Hatsigeorgiadis et al. (2011) overall estimate
-#     main_model_prior <-
-#       c(
-#         brms::prior("student_t(60, 0.48, 0.05)", class = "Intercept")
-#       )
-#
-#     # set up data structure
-#     dat <- add_random(participant = 100) |>
-#       add_between("participant", cond = c("control", "self_talk")) |>
-#       add_recode("cond", "cond_dummy", control = 0, self_talk = 1) |>
-#       add_within("participant", time = seq(0,1)) |>
-#       add_ranef("participant", u_participant = 1) |>
-#       add_ranef(sigma = 0.5) |>
-#       mutate(dv = (0 + u_participant) + (1 * time) + (0 * cond_dummy) + (0.5 * cond_dummy * time) + sigma)
-#
-#     ri_self_talk <- cor(filter(dat, cond == "self_talk" & time == 0)$dv,
-#                         filter(dat, cond == "self_talk" & time == 1)$dv)
-#
-#     ri_control <- cor(filter(dat, cond == "control" & time == 0)$dv,
-#                       filter(dat, cond == "control" & time == 1)$dv)
-#
-#     summary_dat <- dat |>
-#       group_by(time, cond) |>
-#       add_count() |>
-#       summarise(n = first(n),
-#                 mean = mean(dv),
-#                 sd = sd(dv)) |>
-#       pivot_wider(names_from = c(time,cond),
-#                   values_from = c(mean, sd, n)) |>
-#       mutate(pre_sd_pool = sqrt(((n_0_self_talk - 1) * sd_0_self_talk  ^ 2 +
-#                                    (n_0_control - 1) * sd_0_control ^ 2
-#       ) /
-#         (n_0_self_talk + n_0_control - 2)),
-#       ri_self_talk = ri_self_talk,
-#       ri_control = ri_control
-#       )
-#
-#     ppc_dat_st <- escalc(
-#       measure = "SMCR",
-#       m1i = mean_1_self_talk,
-#       m2i = mean_0_self_talk,
-#       sd1i = pre_sd_pool,
-#       ni = n_0_self_talk,
-#       ri = ri_self_talk,
-#       data = summary_dat
-#     )
-#     ppc_dat_con <- escalc(
-#       measure = "SMCR",
-#       m1i = mean_1_control,
-#       m2i = mean_0_control,
-#       sd1i = pre_sd_pool,
-#       ni = n_0_control,
-#       ri = ri_control,
-#       data = summary_dat
-#     )
-#
-#     summary_dat$yi <-
-#       (ppc_dat_st$yi - ppc_dat_con$yi)
-#     summary_dat$vi <-
-#       (ppc_dat_st$vi + ppc_dat_con$vi)
-#
-#     summary_dat$study_code <- 1
-#
-#
-#     main_model <-
-#       brm(
-#         yi | se(sqrt(vi)) ~ 1 + (1 | study_code),
-#         data = summary_dat,
-#         prior = main_model_prior,
-#         chains = 4,
-#         cores = 4,
-#         seed = 1988,
-#         warmup = 4000,
-#         iter = 6000,
-#         control = list(adapt_delta = 0.99)
-#       )
-#
-#     percentage_in_rope <- rope(main_model, ci = 1, range = c(0.38, 0.58))
-#
-#     remove(main_model)
-#
-#     gc()
-#
-#     return(percentage_in_rope)
-#
-#   }
-#
-#
-#   plan(multisession, workers = 2)
-#
-#   sims <- crossing(
-#     rep = 1:1000, # number of replicates
-#     participant_n = c(10,20,40,80,160,320,640,1282,2560,5120), # range of participant N
-#     b_cond_time = seq(0,1, by = 0.2) # estimand of interest
-#   ) |>
-#     mutate(
-#       b0 = 0, b_time = 1, b_cond = 0,         # fixed effects
-#       u_participant = 0.5,   # random intercept participant
-#       sigma = 0.5         # measurement error
-#     ) |>
-#     mutate(analysis = future_pmap(., sim)) %>% # not sure why base pipe doesn't work here
-#     unnest(analysis)
-#
-#
-#
-#   sims
-# }
-#
-# plot_additional_new_study_sims <- function(sims) {
-#   sims |>
-#     ggplot(aes(x=factor(participant_n), y = ROPE_Percentage)) +
-#     stat_slab() +
-#     labs(x = "Sample Size (n)",
-#          y = "Percentage (%)",
-#          title = "Percentage of Posterior Distribution within Prior 95% Quantile Interval",
-#          subtitle = "A percentage close to 95% indicates that the posterior distribution has a similar mass within the range of the 95% quantile interval of the prior estimate"
-#     ) +
-#
-#     ggh4x::facet_nested(. ~ effect_lab + b_cond_time) +
-#     coord_flip() +
-#     theme_classic() +
-#     theme(panel.border = element_rect(fill = NA),
-#           plot.subtitle = element_text(size = 6))
-# }
+# Simulation of additional new study
+additional_new_study_sim <- function(prior_model) {
+
+  sim <- function(participant_n = as.double(),
+                  effect_size = as.double(),
+                  ... # helps the function work with pmap() below
+  ) {
+
+    # Taken fromm Hatsigeorgiadis et al. (2011) overall estimate
+    main_model_prior <-
+      c(
+        brms::prior("student_t(60, 0.48, 0.05)", class = "Intercept")
+      )
+
+    # # set up data structure
+    # dat <- add_random(participant = participant_n) |>
+    #   add_between("participant", cond = c("control", "self_talk")) |>
+    #   add_recode("cond", "cond_dummy", control = 0, self_talk = 1) |>
+    #   add_within("participant", time = seq(0,1)) |>
+    #   add_ranef("participant", u_participant = u_participant) |>
+    #   add_ranef(e = sigma) |>
+    #   mutate(dv = (b0 + u_participant) + (b_time * time) + (b_cond * cond_dummy) + (b_cond_time * cond_dummy * time) + e)
+    #
+    # ri_self_talk <- cor(filter(dat, cond == "self_talk" & time == 0)$dv,
+    #                     filter(dat, cond == "self_talk" & time == 1)$dv)
+    #
+    # ri_control <- cor(filter(dat, cond == "control" & time == 0)$dv,
+    #                   filter(dat, cond == "control" & time == 1)$dv)
+    #
+    # summary_dat <- dat |>
+    #   group_by(time, cond) |>
+    #   add_count() |>
+    #   summarise(n = first(n),
+    #             mean = mean(dv),
+    #             sd = sd(dv)) |>
+    #   pivot_wider(names_from = c(time,cond),
+    #               values_from = c(mean, sd, n)) |>
+    #   mutate(pre_sd_pool = sqrt(((n_0_self_talk - 1) * sd_0_self_talk  ^ 2 +
+    #                                (n_0_control - 1) * sd_0_control ^ 2
+    #   ) /
+    #     (n_0_self_talk + n_0_control - 2)),
+    #   ri_self_talk = ri_self_talk,
+    #   ri_control = ri_control
+    #   )
+    #
+    # ppc_dat_st <- escalc(
+    #   measure = "SMCR",
+    #   m1i = mean_1_self_talk,
+    #   m2i = mean_0_self_talk,
+    #   sd1i = pre_sd_pool,
+    #   ni = n_0_self_talk,
+    #   ri = ri_self_talk,
+    #   data = summary_dat
+    # )
+    # ppc_dat_con <- escalc(
+    #   measure = "SMCR",
+    #   m1i = mean_1_control,
+    #   m2i = mean_0_control,
+    #   sd1i = pre_sd_pool,
+    #   ni = n_0_control,
+    #   ri = ri_control,
+    #   data = summary_dat
+    # )
+    #
+    # summary_dat$yi <-
+    #   (ppc_dat_st$yi - ppc_dat_con$yi)
+    # summary_dat$vi <-
+    #   (ppc_dat_st$vi + ppc_dat_con$vi)
+    #
+    # summary_dat$study_code <- 1
+
+    effect_size_dat <- escalc(
+      measure = "SMD1",
+      m1i = effect_size,
+      m2i = 0,
+      sd2i = 1,
+      n1i = participant_n/2,
+      n2i = participant_n/2
+    )
+
+    effect_size_dat$study_code <- 1
+
+    main_model <-
+      brm(
+        yi | se(sqrt(vi)) ~ 1 + (1 | study_code),
+        data = effect_size_dat,
+        prior = main_model_prior,
+        chains = 4,
+        cores = 4,
+        seed = 1988,
+        warmup = 2000,
+        iter = 6000,
+        control = list(adapt_delta = 0.99)
+      )
+
+    percentage_in_rope <- rope(main_model, ci = 1, range = c(0.38, 0.58))[1,5]
+
+    # Sample draws from the prior distribution
+    prior_draws <-
+      prior_model |>
+      spread_draws(b_Intercept) |>
+      mutate(study = "Prior (Hatzigeorgiadis et al., 2011)",
+             label = "Prior (Hatzigeorgiadis et al., 2011)")
+
+
+    # Sample draws from the posterior distribution
+    posterior_draws <- main_model |>
+      spread_draws(b_Intercept) |>
+      mutate(study = "Posterior Pooled Estimate",
+             label = "Posterior Pooled Estimate")
+
+    posterior_summary <- group_by(posterior_draws, label) |>
+      mean_qi(b_Intercept) |>
+      mutate(b_Intercept = b_Intercept,
+             .lower = .lower,
+             .upper = .upper)
+
+    # Combine prior dataframe with pooled draws
+    prior_posterior <- rbind(posterior_draws[, c(4, 6)], prior_draws[, c(4, 6)]) |>
+      mutate(label = factor(label, levels = c("Posterior Pooled Estimate",
+                                              "Prior (Hatzigeorgiadis et al., 2011)"
+      ))) |>
+      mutate(percentage_in_rope = percentage_in_rope,
+             yi = effect_size_dat$yi,
+             vi = effect_size_dat$vi)
+
+    remove(main_model)
+
+    gc()
+
+    return(prior_posterior)
+
+  }
+
+
+  plan(multisession, workers = 4)
+
+  set.seed(1988)
+
+  sims <- crossing(
+    # rep = 1:1000, # number of replicates
+    participant_n = c(10,20,40,80,160,320,640,1282,2560,5120), # range of participant N
+    effect_size = seq(0,1, by = 0.2) # true effect size
+  ) %>% # not sure why base pipe doesn't work here
+    mutate(analysis = future_pmap(., sim)) %>% # not sure why base pipe doesn't work here
+    unnest(analysis)
+
+  plan(sequential)
+
+  sims
+}
+
+plot_additional_new_study_sims <- function(sims) {
+  sims_summary <- sims |>
+    group_by(participant_n, effect_size) |>
+    slice(1) |>
+    mutate(effect_lab = "Effect Size")
+
+  # Plot showing updating of posterior estimate from a single new study
+  posterior_update_new_study <- sims |>
+    mutate(effect_lab = "Effect Size") |>
+    ggplot(aes(x = b_Intercept, y = factor(participant_n),
+               color = label, fill = label)) +
+
+    # Add reference line at zero
+    geom_vline(xintercept = 0, linetype = 2) +
+
+    # Add densities
+    stat_slab(alpha=0.6, linewidth=0) +
+
+    # Add text and labels
+    geom_text(
+      data = mutate_if(sims_summary,
+                       is.numeric, round, 3),
+      aes(
+        label = glue::glue("{scales::percent(percentage_in_rope)}"),
+        x = 1.1
+      ),
+      hjust = "inward",
+      size = 3,
+      color = "black",
+      position = position_nudge(y = 0.5)
+    ) +
+    ggh4x::facet_nested(. ~ effect_lab + effect_size) +
+
+    scale_y_discrete(expand = c(0, 0)) +
+    scale_color_manual(values = c("#009E73", "#E69F00")) +
+    scale_fill_manual(values = c("#009E73", "#E69F00")) +
+
+    labs(
+      x = "Standardised Mean Difference (Positive Values Favour Self-Talk)",
+      # summary measure
+      y = "Sample Size (n)",
+      fill = "",
+      title = "Examining the effects of a single new trial varying the true effect size and sample size",
+      subtitle = "Prior and posterior distributions for pooled estimates and percentage of posterior distribution within 95% quantile interval of prior distribution (text label)"
+    ) +
+    guides(color = "none") +
+    scale_x_continuous(limits = c(-0.05, 1.1),
+                       breaks = c(0, 0.5, 1)) +
+    theme_classic() +
+    theme(
+      legend.position = "bottom",
+      panel.border = element_rect(fill = NA),
+      plot.subtitle = element_text(size = 6)
+    )
+
+  posterior_update_new_study
+}
 
 # Models
 fit_main_model <- function(data, prior) {

@@ -1,5 +1,9 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-.Random.seed|object|03dc3d145e1af2a1|||||||||||||||
+.Random.seed|object|00f33996ffccf4a6|||||||||||||||
+additional_new_study_sim|function|d86c50c904893eab|||||||||||||||
+additional_study_sims|stem|5f08f257fb4535aa|b72774eca7ce6cd7|4dca752fe186d13e|1911381737||t19933.5175417533s|4924acc460273663|7193193|qs|local|vector|||1300.015|1m22mThere were 127 warnings in mutate.The first warning was1m22m36mℹ39m In argument analysis  future_pmap., sim.Caused by warning33m39m There were 9 divergent transitions after warmup. Seehttpsmcstan.orgmiscwarnings.htmldivergenttransitionsafterwarmupto find out why this is a problem and how to eliminate them.1m22m36mℹ39m Run dplyrlast_dplyr_warnings to see the 126 remaining warnings.|
+additional_study_sims_plot|stem|248499743004bfb7|e73cb39868ac22c8|180fc6fe92495100|1437089804||t19933.5318978691s|b8d586d4c66b582e|43564402|qs|local|vector|||0.406||
+additional_study_sims_plot_tiff|stem|876e26f1a1e74774|866fceac25da9722|7ee67591d91247eb|-150583175||t19933.533091769s|04fcf8b2530d31e5|77|qs|local|vector|||18.516||
 BF_curve_cue_selection_plot|stem|d86191cf9f036e09|117dd8672f862730|90cc6db19a3a1edc|1006727366||t19929.5360625953s|65eae6e16412695e|186811|qs|local|vector|||0.062||
 BF_curve_cue_selection_plot_tiff|stem|f6a0aa3ccf047e09|e84b267f530b7c55|d8672d5ecc417ab9|384259766||t19929.5360688814s|d22c29dc585b97b0|78|qs|local|vector|||0.25||
 BF_curve_main_model_plot|stem|7b81218b06303236|fcefa009d00f22c6|cc5efdc56993fccf|1515889785||t19927.6380239153s|2a17b3afb94aa7f8|166972|qs|local|vector|||0.063||
@@ -78,6 +82,7 @@ participant_group_model_logBF_curve|stem|f7141d6e50ac0aa6|9dd4d9fea4241e46|5ace9
 participant_group_model_plot|stem|5c48166c01924040|0d757228676f344f|40b40dd2c1e2b4d5|925369531||t19927.7389465656s|074dde16bb33c758|829103439|qs|local|vector|||43.844||
 participant_group_prior|stem|ca7332c3c6e1e80c|4e39a2700fe234cf|ea8c6a62b28437ae|170611052||t19927.7214581777s|ee4e85b92dca648d|259|qs|local|vector|||7.579||
 pet_model|stem|1c2a0a2e8cf52358|f93533c258ebdbc8|ff9b42e69e52fae9|-2128463180||t19929.5360833215s|8e7f7fbc445f4f5d|84065|qs|local|vector|||0.828|3 rows with NAs omitted from model fitting.|
+plot_additional_new_study_sims|function|dbb8630237ac34b0|||||||||||||||
 plot_BF_curve_cue_selection|function|6e042308a03ff9d3|||||||||||||||
 plot_BF_curve_main_model|function|74fab8d4b18b1d56|||||||||||||||
 plot_BF_curve_matching|function|7c1bc688a955ee6c|||||||||||||||

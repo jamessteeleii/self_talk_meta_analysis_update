@@ -42,9 +42,9 @@ list(
   # Setup rstan to run chains in parallel
   tar_target(rstan, rstan_setup()),
 
-  # # Simulation of additional new study
-  # tar_target(additional_study_sims, additional_new_study_sim()),
-  # tar_target(additional_study_sims_plot, plot_additional_new_study_sims(additional_study_sims)),
+  # Simulation of additional new study
+  tar_target(additional_study_sims, additional_new_study_sim(prior_main_model)),
+  tar_target(additional_study_sims_plot, plot_additional_new_study_sims(additional_study_sims)),
 
   # Fit, check, and plot main model
   tar_target(main_prior, set_main_prior()),
@@ -191,7 +191,7 @@ list(
   tar_target(cumulative_main_model_plot, plot_cumulative_main_model(data_effect_sizes, prior_main_model, cumulative_draws)),
 
   # Make plots tiffs
-  # tar_target(additional_study_sims_plot_tiff, make_plot_tiff(additional_study_sims_plot, 7.5, 13.33, "plots/additional_study_sims_plot.tiff")),
+  tar_target(additional_study_sims_plot_tiff, make_plot_tiff(additional_study_sims_plot, 13.33, 7.5, "plots/additional_study_sims_plot.tiff")),
   tar_target(main_model_plot_tiff, make_plot_tiff(main_model_plot, 7.5, 13.33, "plots/main_model_plot.tiff")),
   tar_target(main_model_contour_funnel_plot_tiff, make_plot_tiff(main_model_contour_funnel_plot, 5, 5, "plots/main_model_contour_funnel_plot.tiff")),
   # tar_target(moderators_panel_plot_tiff, make_plot_tiff(moderators_panel_plot, 21, 9, "plots/moderators_panel_plot.tiff")),
