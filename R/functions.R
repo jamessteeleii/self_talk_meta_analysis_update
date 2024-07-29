@@ -243,6 +243,18 @@ make_plot_tiff <- function(plot, width, height, path) {
 
 }
 
+ggplot_2_grob_nback <- function(plot) {
+  plot_grob <- ggplot2::ggplotGrob(plot)
+  plot_new <- ggpubr::as_ggplot(plot_grob)
+
+  remove(plot)
+  remove(plot_grob)
+
+  gc()
+
+  return(plot_new)
+}
+
 get_logBF_curve <- function(model) {
 
   plan(multisession, workers = 5)
@@ -1401,6 +1413,16 @@ plot_motor_demands_model <- function(data, prior_model, model) {
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
+
+  plot_grob <- ggplot2::ggplotGrob(posterior_update)
+  plot_new <- ggpubr::as_ggplot(plot_grob)
+
+  remove(posterior_update)
+  remove(plot_grob)
+
+  gc()
+
+  return(plot_new)
 }
 
 plot_participant_group_model <- function(data, prior_model, model) {
@@ -1490,6 +1512,17 @@ plot_participant_group_model <- function(data, prior_model, model) {
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
+
+
+  plot_grob <- ggplot2::ggplotGrob(posterior_update)
+  plot_new <- ggpubr::as_ggplot(plot_grob)
+
+  remove(posterior_update)
+  remove(plot_grob)
+
+  gc()
+
+  return(plot_new)
 }
 
 plot_selftalk_content_model <- function(data, prior_model, model) {
@@ -1580,6 +1613,17 @@ plot_selftalk_content_model <- function(data, prior_model, model) {
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
+
+
+  plot_grob <- ggplot2::ggplotGrob(posterior_update)
+  plot_new <- ggpubr::as_ggplot(plot_grob)
+
+  remove(posterior_update)
+  remove(plot_grob)
+
+  gc()
+
+  return(plot_new)
 }
 
 plot_matching_model <- function(data, prior_model, model) {
@@ -1670,6 +1714,17 @@ plot_matching_model <- function(data, prior_model, model) {
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
+
+
+  plot_grob <- ggplot2::ggplotGrob(posterior_update)
+  plot_new <- ggpubr::as_ggplot(plot_grob)
+
+  remove(posterior_update)
+  remove(plot_grob)
+
+  gc()
+
+  return(plot_new)
 }
 
 plot_task_novelty_model <- function(data, prior_model, model) {
@@ -1758,6 +1813,17 @@ plot_task_novelty_model <- function(data, prior_model, model) {
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
+
+
+  plot_grob <- ggplot2::ggplotGrob(posterior_update)
+  plot_new <- ggpubr::as_ggplot(plot_grob)
+
+  remove(posterior_update)
+  remove(plot_grob)
+
+  gc()
+
+  return(plot_new)
 }
 
 plot_cue_selection_model <- function(data, prior_model, model) {
@@ -1846,6 +1912,17 @@ plot_cue_selection_model <- function(data, prior_model, model) {
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
+
+
+  plot_grob <- ggplot2::ggplotGrob(posterior_update)
+  plot_new <- ggpubr::as_ggplot(plot_grob)
+
+  remove(posterior_update)
+  remove(plot_grob)
+
+  gc()
+
+  return(plot_new)
 }
 
 plot_overtness_selection_model <- function(data, prior_model, model) {
@@ -1934,6 +2011,17 @@ plot_overtness_selection_model <- function(data, prior_model, model) {
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
+
+
+  plot_grob <- ggplot2::ggplotGrob(posterior_update)
+  plot_new <- ggpubr::as_ggplot(plot_grob)
+
+  remove(posterior_update)
+  remove(plot_grob)
+
+  gc()
+
+  return(plot_new)
 }
 
 plot_training_model <- function(data, prior_model, model) {
@@ -2022,6 +2110,17 @@ plot_training_model <- function(data, prior_model, model) {
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
+
+
+  plot_grob <- ggplot2::ggplotGrob(posterior_update)
+  plot_new <- ggpubr::as_ggplot(plot_grob)
+
+  remove(posterior_update)
+  remove(plot_grob)
+
+  gc()
+
+  return(plot_new)
 }
 
 plot_study_design_model <- function(data, prior_model, model) {
@@ -2109,6 +2208,17 @@ plot_study_design_model <- function(data, prior_model, model) {
     theme(legend.position = "bottom",
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
+
+
+  plot_grob <- ggplot2::ggplotGrob(posterior_update)
+  plot_new <- ggpubr::as_ggplot(plot_grob)
+
+  remove(posterior_update)
+  remove(plot_grob)
+
+  gc()
+
+  return(plot_new)
 }
 
 plot_panel_moderators <- function(plot1, plot2, plot3,
@@ -2121,7 +2231,9 @@ plot_panel_moderators <- function(plot1, plot2, plot3,
     plot_annotation(tag_levels = "A",
                     title = "Updated Posterior Moderators Estimates",
                     subtitle = "Prior and posterior distributions for pooled estimates, individual effects (ticks), and mean and 95% quantile interval for posterior (text label)") +
-    plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+    plot_layout(guides = "collect",
+                axes = "collect",
+                axis_titles = "collect") + theme(legend.position = 'bottom')
 
 }
 

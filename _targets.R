@@ -168,12 +168,25 @@ list(
   tar_target(study_design_model_logBF_curve, get_logBF_curve(study_design_model)),
   tar_target(tidy_study_design_model, get_tidy_model(study_design_model)),
 
-  # # Make panel plot of moderators
-  # tar_target(moderators_panel_plot, plot_panel_moderators(
-  #   motor_demands_model_plot, participant_group_model_plot, selftalk_content_model_plot,
-  #     matching_model_plot, task_novelty_model_plot, cue_selection_model_plot,
-  #   overtness_selection_model_plot, training_model_plot, study_design_model_plot
-  # )),
+  # Make panel plot of moderators
+
+  # ## First convert plots to grob and back to reduce file sizes
+  # tar_target(motor_demands_model_plot_new, ggplot_2_grob_nback(motor_demands_model_plot)),
+  # tar_target(participant_group_model_plot_new, ggplot_2_grob_nback(participant_group_model_plot)),
+  # tar_target(selftalk_content_model_plot_new, ggplot_2_grob_nback(selftalk_content_model_plot)),
+  # tar_target(matching_model_plot_new, ggplot_2_grob_nback(matching_model_plot)),
+  # tar_target(task_novelty_model_plot_new, ggplot_2_grob_nback(task_novelty_model_plot)),
+  # tar_target(cue_selection_model_plot_new, ggplot_2_grob_nback(cue_selection_model_plot)),
+  # tar_target(overtness_selection_model_plot_new, ggplot_2_grob_nback(overtness_selection_model_plot)),
+  # tar_target(training_model_plot_new, ggplot_2_grob_nback(training_model_plot)),
+  # tar_target(study_design_model_plot_new, ggplot_2_grob_nback(study_design_model_plot)),
+
+  ## Patchwork of new plots
+  tar_target(moderators_panel_plot, plot_panel_moderators(
+    motor_demands_model_plot, participant_group_model_plot, selftalk_content_model_plot,
+      matching_model_plot, task_novelty_model_plot, cue_selection_model_plot,
+    overtness_selection_model_plot, training_model_plot, study_design_model_plot
+  )),
 
   # Make supplemental plots of evidence change for moderators
   tar_target(BF_curve_motor_demands_plot, plot_BF_curve_motor_demands(motor_demands_model_logBF_curve)),
@@ -194,7 +207,7 @@ list(
   tar_target(additional_study_sims_plot_tiff, make_plot_tiff(additional_study_sims_plot, 13.33, 7.5, "plots/additional_study_sims_plot.tiff")),
   tar_target(main_model_plot_tiff, make_plot_tiff(main_model_plot, 7.5, 13.33, "plots/main_model_plot.tiff")),
   tar_target(main_model_contour_funnel_plot_tiff, make_plot_tiff(main_model_contour_funnel_plot, 5, 5, "plots/main_model_contour_funnel_plot.tiff")),
-  # tar_target(moderators_panel_plot_tiff, make_plot_tiff(moderators_panel_plot, 21, 9, "plots/moderators_panel_plot.tiff")),
+  tar_target(moderators_panel_plot_tiff, make_plot_tiff(moderators_panel_plot, 21, 9, "plots/moderators_panel_plot.tiff")),
   tar_target(BF_curve_motor_demands_plot_tiff, make_plot_tiff(BF_curve_motor_demands_plot, 7.5, 5, "plots/BF_curve_motor_demands_plot.tiff")),
   tar_target(BF_curve_participant_group_plot_tiff, make_plot_tiff(BF_curve_participant_group_plot, 7.5, 5, "plots/BF_curve_participant_group_plot.tiff")),
   tar_target(BF_curve_selftalk_content_plot_tiff, make_plot_tiff(BF_curve_selftalk_content_plot, 7.5, 5, "plots/BF_curve_selftalk_content_plot.tiff")),
