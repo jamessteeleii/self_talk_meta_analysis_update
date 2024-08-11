@@ -587,63 +587,6 @@ additional_new_study_sim <- function(prior_model) {
         brms::prior("student_t(60, 0.48, 0.05)", class = "Intercept")
       )
 
-    # # set up data structure
-    # dat <- add_random(participant = participant_n) |>
-    #   add_between("participant", cond = c("control", "self_talk")) |>
-    #   add_recode("cond", "cond_dummy", control = 0, self_talk = 1) |>
-    #   add_within("participant", time = seq(0,1)) |>
-    #   add_ranef("participant", u_participant = u_participant) |>
-    #   add_ranef(e = sigma) |>
-    #   mutate(dv = (b0 + u_participant) + (b_time * time) + (b_cond * cond_dummy) + (b_cond_time * cond_dummy * time) + e)
-    #
-    # ri_self_talk <- cor(filter(dat, cond == "self_talk" & time == 0)$dv,
-    #                     filter(dat, cond == "self_talk" & time == 1)$dv)
-    #
-    # ri_control <- cor(filter(dat, cond == "control" & time == 0)$dv,
-    #                   filter(dat, cond == "control" & time == 1)$dv)
-    #
-    # summary_dat <- dat |>
-    #   group_by(time, cond) |>
-    #   add_count() |>
-    #   summarise(n = first(n),
-    #             mean = mean(dv),
-    #             sd = sd(dv)) |>
-    #   pivot_wider(names_from = c(time,cond),
-    #               values_from = c(mean, sd, n)) |>
-    #   mutate(pre_sd_pool = sqrt(((n_0_self_talk - 1) * sd_0_self_talk  ^ 2 +
-    #                                (n_0_control - 1) * sd_0_control ^ 2
-    #   ) /
-    #     (n_0_self_talk + n_0_control - 2)),
-    #   ri_self_talk = ri_self_talk,
-    #   ri_control = ri_control
-    #   )
-    #
-    # ppc_dat_st <- escalc(
-    #   measure = "SMCR",
-    #   m1i = mean_1_self_talk,
-    #   m2i = mean_0_self_talk,
-    #   sd1i = pre_sd_pool,
-    #   ni = n_0_self_talk,
-    #   ri = ri_self_talk,
-    #   data = summary_dat
-    # )
-    # ppc_dat_con <- escalc(
-    #   measure = "SMCR",
-    #   m1i = mean_1_control,
-    #   m2i = mean_0_control,
-    #   sd1i = pre_sd_pool,
-    #   ni = n_0_control,
-    #   ri = ri_control,
-    #   data = summary_dat
-    # )
-    #
-    # summary_dat$yi <-
-    #   (ppc_dat_st$yi - ppc_dat_con$yi)
-    # summary_dat$vi <-
-    #   (ppc_dat_st$vi + ppc_dat_con$vi)
-    #
-    # summary_dat$study_code <- 1
-
     effect_size_dat <- escalc(
       measure = "SMD1",
       m1i = effect_size,
@@ -776,8 +719,7 @@ plot_additional_new_study_sims <- function(sims) {
     theme_classic() +
     theme(
       legend.position = "bottom",
-      panel.border = element_rect(fill = NA),
-      plot.subtitle = element_text(size = 6)
+      panel.border = element_rect(fill = NA)
     )
 
   posterior_update_new_study
