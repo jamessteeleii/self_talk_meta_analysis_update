@@ -1000,6 +1000,26 @@ fit_prior_robma_model <- function(data) {
   )
 }
 
+# P-hacking effects
+fit_p_hack_model <- function(data) {
+  p_hack_model <- phma(yi, vi, filter(data, !is.na(yi)))
+}
+
+fit_classic_model <- function(data) {
+  classic_model <- cma(yi, vi, filter(data, !is.na(yi)))
+}
+
+fit_p_hack_model_prior <- function(data) {
+  p_hack_model_prior <- phma(yi, vi, filter(data, !is.na(yi)),
+                             prior = list(theta0_mean = 0.48, theta0_sd = 0.05))
+}
+
+fit_classic_model_prior <- function(data) {
+  classic_model_prior <- cma(yi, vi, filter(data, !is.na(yi)),
+                             prior = list(theta0_mean = 0.48, theta0_sd = 0.05))
+}
+
+
 # Plots
 plot_main_model_forest <- function(data, model) {
 
@@ -1155,6 +1175,164 @@ plot_contour_funnel <- function(data, tidy_model, pet_model, tidy_pet_model) {
     theme_classic() +
     theme(panel.border = element_rect(fill = NA),
           plot.subtitle = element_text(size = 6))
+
+}
+
+plot_p_hack_models <- function(p_hack_model, classic_model) {
+  samples_p_hack_model <- tibble(
+    draws = rstan::extract(p_hack_model)$theta0,
+    model = "p-hacking model"
+  )
+
+  posterior_summary_p_hack_model <- samples_p_hack_model |>
+    mean_qi(draws) |>
+    mutate(model = "p-hacking model")
+
+  samples_classic_model <- tibble(
+    draws = rstan::extract(classic_model)$theta0,
+    model = "Classic model"
+  )
+
+  posterior_summary_classic_model <- samples_classic_model |>
+    mean_qi(draws) |>
+    mutate(model = "Classic model")
+
+  samples_models <- rbind(
+    samples_classic_model, samples_p_hack_model
+  )
+
+  plot_p_hack_classic <- samples_models |>
+    ggplot(aes(x = draws,
+               color = model, fill = model)
+    ) +
+    # Add reference line at zero
+    geom_vline(xintercept = 0, linetype = 2) +
+
+    stat_slab(alpha = 0.6, linewidth = 0) +
+
+    # Add text and labels
+    geom_text(
+      data = mutate_if(posterior_summary_classic_model,
+                       is.numeric, round, 2),
+      aes(
+        label = glue::glue("Classic model without prior\n{draws} [{.lower}, {.upper}]"),
+        y = 0.1,
+        x = 1.5
+      ),
+      hjust = "inward",
+      size = 3,
+      color = "black",
+      position = position_nudge(y=0.1)
+    ) +
+
+    geom_text(
+      data = mutate_if(posterior_summary_p_hack_model,
+                       is.numeric, round, 2),
+      aes(
+        label = glue::glue("p-hacking model without prior\n{draws} [{.lower}, {.upper}]"),
+        y = 0.1,
+        x = -0.75
+      ),
+      hjust = "inward",
+      size = 3,
+      color = "black",
+      position = position_nudge(y=0.1)
+    ) +
+
+    scale_color_manual(values = c("#009E73", "#E69F00")) +
+    scale_fill_manual(values = c("#009E73", "#E69F00")) +
+
+    labs(x = "Standardised Mean Difference", # summary measure
+         y = element_blank(),
+         fill = "",
+         title = "Models without using prior (Hatzigeorgiadis et al., 2011)",
+    ) +
+    scale_x_continuous(limits = c(-1, 1.5), breaks = c(-1,-0.5, 0, 0.5, 1)) +
+    guides(color = "none",
+           shape = "none") +
+    theme_classic() +
+    theme(legend.position = "bottom",
+          panel.border = element_rect(fill = NA),
+          title = element_text(size=8))
+
+}
+
+plot_p_hack_models_prior <- function(p_hack_model_prior, classic_model_prior) {
+  samples_p_hack_model_prior <- tibble(
+    draws = rstan::extract(p_hack_model_prior)$theta0,
+    model = "p-hacking model"
+  )
+
+  posterior_summary_p_hack_model_prior <- samples_p_hack_model_prior |>
+    mean_qi(draws) |>
+    mutate(model = "p-hacking model")
+
+  samples_classic_model_prior <- tibble(
+    draws = rstan::extract(classic_model_prior)$theta0,
+    model = "Classic model"
+  )
+
+  posterior_summary_classic_model_prior <- samples_classic_model_prior |>
+    mean_qi(draws) |>
+    mutate(model = "Classic model")
+
+  samples_prior_models <- rbind(
+    samples_classic_model_prior, samples_p_hack_model_prior
+  )
+
+  plot_p_hack_classic_prior <- samples_prior_models |>
+    ggplot(aes(x = draws,
+               color = model, fill = model)
+    ) +
+    # Add reference line at zero
+    geom_vline(xintercept = 0, linetype = 2) +
+
+    stat_slab(alpha = 0.6, linewidth = 0) +
+
+    # Add text and labels
+    geom_text(
+      data = mutate_if(posterior_summary_classic_model_prior,
+                       is.numeric, round, 2),
+      aes(
+        label = glue::glue("Classic model with prior\n{draws} [{.lower}, {.upper}]"),
+        y = 0.1,
+        x = 1.5
+      ),
+      hjust = "inward",
+      size = 3,
+      color = "black",
+      position = position_nudge(y=0.1)
+    ) +
+
+    geom_text(
+      data = mutate_if(posterior_summary_p_hack_model_prior,
+                       is.numeric, round, 2),
+      aes(
+        label = glue::glue("p-hacking model with prior\n{draws} [{.lower}, {.upper}]"),
+        y = 0.1,
+        x = -0.75
+      ),
+      hjust = "inward",
+      size = 3,
+      color = "black",
+      position = position_nudge(y=0.1)
+    ) +
+
+    scale_color_manual(values = c("#009E73", "#E69F00")) +
+    scale_fill_manual(values = c("#009E73", "#E69F00")) +
+
+    labs(x = "Standardised Mean Difference", # summary measure
+         y = element_blank(),
+         fill = "",
+         title = "Models using prior (Hatzigeorgiadis et al., 2011)",
+    ) +
+    scale_x_continuous(limits = c(-1, 1.5), breaks = c(-1,-0.5, 0, 0.5, 1)) +
+    guides(color = "none",
+           shape = "none") +
+    theme_classic() +
+    theme(legend.position = "bottom",
+          panel.border = element_rect(fill = NA),
+          title = element_text(size=8))
 
 }
 
@@ -2040,6 +2218,14 @@ plot_panel_main_model <- function(plot1, plot2, plot3) {
   (plot1 / plot2 / plot3) +
     plot_layout(heights = c(2, 1,1)) +
     plot_annotation(tag_levels = "A")
+}
+
+plot_panel_p_hack <- function(plot1, plot2) {
+  (plot1 / plot2) +
+    plot_annotation(title = "Adjusted estimates assuming possible presence of p-hacking",
+                    subtitle = "Estimates from Bayesian random effects main model and mixture model for p-hacking both with, and without, using prior\nNote, models ignore multilevel structure",
+                    theme = theme(plot.subtitle = element_text(size = 8))) +
+    plot_layout(guides = "collect") & theme(legend.position = "bottom")
 }
 
 # Supplemental plots (moderator change in evidence and cummulative plot)

@@ -28,6 +28,7 @@ tar_option_set(
     "marginaleffects",
     "broom.mixed",
     # "RoBMA",
+    "publipha",
     "future",
     "faux"
   )
@@ -60,7 +61,7 @@ list(
   tar_target(main_model_plot, plot_panel_main_model(main_model_forest_plot,main_model_update_plot,BF_curve_main_model_plot)),
   tar_target(tidy_main_model, get_tidy_model(main_model)),
 
-  # # Small study/Publication bias for main model
+  # Small study/Publication bias for main model
   tar_target(pet_model, fit_pet_model(data_effect_sizes)),
   tar_target(tidy_pet_model, tidy(pet_model, conf.int = .95)),
   tar_target(rma.mv_model, fit_rma.mv_model(data_effect_sizes)),
@@ -69,7 +70,16 @@ list(
   tar_target(null_robma_model, fit_null_robma_model(data_effect_sizes)),
   tar_target(prior_robma_model, fit_prior_robma_model(data_effect_sizes)),
 
-  # # Fit, check, and plot motor demands model
+  # p-hacking models
+  tar_target(p_hack_model, fit_p_hack_model(data_effect_sizes)),
+  tar_target(classic_model, fit_classic_model(data_effect_sizes)),
+  tar_target(p_hack_models_plot, plot_p_hack_models(p_hack_model, classic_model)),
+  tar_target(p_hack_model_prior, fit_p_hack_model_prior(data_effect_sizes)),
+  tar_target(classic_model_prior, fit_classic_model_prior(data_effect_sizes)),
+  tar_target(p_hack_models_prior_plot, plot_p_hack_models_prior(p_hack_model_prior, classic_model_prior)),
+  tar_target(p_hack_models_plots, plot_panel_p_hack(p_hack_models_plot, p_hack_models_prior_plot)),
+
+  # Fit, check, and plot motor demands model
   tar_target(motor_demands_prior, set_motor_demands_prior()),
   tar_target(prior_motor_demands_model, sample_prior_motor_demands_model(data_effect_sizes, motor_demands_prior)),
   tar_target(motor_demands_model, fit_motor_demands_model(data_effect_sizes, motor_demands_prior)),
@@ -194,6 +204,7 @@ list(
   tar_target(additional_study_sims_plot_tiff, make_plot_tiff(additional_study_sims_plot, 13.33, 7.5, "plots/additional_study_sims_plot.tiff")),
   tar_target(main_model_plot_tiff, make_plot_tiff(main_model_plot, 7.5, 13.33, "plots/main_model_plot.tiff")),
   tar_target(main_model_contour_funnel_plot_tiff, make_plot_tiff(main_model_contour_funnel_plot, 5, 5, "plots/main_model_contour_funnel_plot.tiff")),
+  tar_target(p_hack_models_plots_tiff, make_plot_tiff(p_hack_models_plots, 7.5, 7.5, "plots/p_hack_models_plots.tiff")),
   tar_target(moderators_panel_plot_tiff, make_plot_tiff(moderators_panel_plot, 21, 9, "plots/moderators_panel_plot.tiff")),
   tar_target(BF_curve_motor_demands_plot_tiff, make_plot_tiff(BF_curve_motor_demands_plot, 7.5, 5, "plots/BF_curve_motor_demands_plot.tiff")),
   tar_target(BF_curve_participant_group_plot_tiff, make_plot_tiff(BF_curve_participant_group_plot, 7.5, 5, "plots/BF_curve_participant_group_plot.tiff")),
