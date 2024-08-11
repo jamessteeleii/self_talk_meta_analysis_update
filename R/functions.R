@@ -1330,33 +1330,26 @@ plot_BF_curve_main_model <- function(BF_curve) {
 
 plot_motor_demands_model <- function(data, prior_model, model) {
 
-  # Prior distribution samples
-  nd <- datagrid(model = model,
-                 motor_demands = c("Fine", "Gross"),
-                 vi = model$data$vi
-  )
+  prior_preds <- prior_model |>
+    gather_draws(b_motor_demandsFine, b_motor_demandsGross) |>
+    mutate(motor_demands = case_when(
+      .variable == "b_motor_demandsFine" ~ "Fine",
+      .variable == "b_motor_demandsGross" ~ "Gross"
 
-  # Prior distribution samples
-  prior_preds <- predictions(prior_model, type = "response",
-                             newdata = nd,
-                             re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
+    ),
+    label = "Prior (Hatzigeorgiadis et al., 2011)")
 
-  # Posterior distribution samples
-  posterior_preds <- predictions(model, type = "response",
-                                 newdata = nd,
-                                 re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Posterior Pooled Estimate")
+  posterior_preds <- model |>
+    gather_draws(b_motor_demandsFine, b_motor_demandsGross) |>
+    mutate(motor_demands = case_when(
+      .variable == "b_motor_demandsFine" ~ "Fine",
+      .variable == "b_motor_demandsGross" ~ "Gross"
+
+    ),
+    label = "Posterior Pooled Estimate")
 
   posterior_summary <- group_by(posterior_preds, motor_demands, label) |>
-    mean_qi(draw) |>
-    mutate(draw = draw,
-           .lower = .lower,
-           .upper = .upper)
+    mean_qi(.value)
 
   # Combine prior and posterior samples for plot
   prior_posterior <- rbind(prior_preds, posterior_preds) |>
@@ -1365,7 +1358,7 @@ plot_motor_demands_model <- function(data, prior_model, model) {
     )))
 
   posterior_update <- ggplot(data = prior_posterior,
-                             aes(x = draw, y = motor_demands,
+                             aes(x = .value, y = motor_demands,
                                  color = label, fill = label)
   ) +
     # Add reference line at zero
@@ -1388,7 +1381,7 @@ plot_motor_demands_model <- function(data, prior_model, model) {
       data = mutate_if(posterior_summary,
                        is.numeric, round, 2),
       aes(
-        label = glue::glue("{draw} [{.lower}, {.upper}]"),
+        label = glue::glue("{.value} [{.lower}, {.upper}]"),
         y = motor_demands,
         x = 1.5
       ),
@@ -1414,48 +1407,30 @@ plot_motor_demands_model <- function(data, prior_model, model) {
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
 
-  plot_grob <- ggplot2::ggplotGrob(posterior_update)
-  plot_new <- ggpubr::as_ggplot(plot_grob)
-
-  remove(posterior_update)
-  remove(plot_grob)
-
-  gc()
-
-  return(plot_new)
 }
 
 plot_participant_group_model <- function(data, prior_model, model) {
 
-  # Prior distribution samples
-  nd <- datagrid(model = model,
-                 participant_group = c("Non-athletes",
-                                       "Experienced athletes",
-                                       "Beginner athletes"),
-                 vi = model$data$vi
-  )
+  prior_preds <- prior_model |>
+    gather_draws(b_participant_groupBeginnerathletes, b_participant_groupExperiencedathletes, b_participant_groupNonMathletes) |>
+    mutate(participant_group = case_when(
+      .variable == "b_participant_groupBeginnerathletes" ~ "Beginner athletes",
+      .variable == "b_participant_groupExperiencedathletes" ~ "Experienced athletes",
+      .variable == "b_participant_groupNonMathletes" ~ "Non-athletes"
+    ),
+    label = "Prior (Hatzigeorgiadis et al., 2011)")
 
-  # Prior distribution samples
-  prior_preds <- predictions(prior_model, type = "response",
-                             newdata = nd,
-                             re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
-
-  # Posterior distribution samples
-  posterior_preds <- predictions(model, type = "response",
-                                 newdata = nd,
-                                 re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Posterior Pooled Estimate")
+  posterior_preds <- model |>
+    gather_draws(b_participant_groupBeginnerathletes, b_participant_groupExperiencedathletes, b_participant_groupNonMathletes) |>
+    mutate(participant_group = case_when(
+      .variable == "b_participant_groupBeginnerathletes" ~ "Beginner athletes",
+      .variable == "b_participant_groupExperiencedathletes" ~ "Experienced athletes",
+      .variable == "b_participant_groupNonMathletes" ~ "Non-athletes"
+    ),
+    label = "Posterior Pooled Estimate")
 
   posterior_summary <- group_by(posterior_preds, participant_group, label) |>
-    mean_qi(draw) |>
-    mutate(draw = draw,
-           .lower = .lower,
-           .upper = .upper)
+    mean_qi(.value)
 
   # Combine prior and posterior samples for plot
   prior_posterior <- rbind(prior_preds, posterior_preds) |>
@@ -1464,7 +1439,7 @@ plot_participant_group_model <- function(data, prior_model, model) {
     )))
 
   posterior_update <- ggplot(data = prior_posterior,
-                             aes(x = draw, y = participant_group,
+                             aes(x = .value, y = participant_group,
                                  color = label, fill = label)
   ) +
     # Add reference line at zero
@@ -1487,7 +1462,7 @@ plot_participant_group_model <- function(data, prior_model, model) {
       data = mutate_if(posterior_summary,
                        is.numeric, round, 2),
       aes(
-        label = glue::glue("{draw} [{.lower}, {.upper}]"),
+        label = glue::glue("{.value} [{.lower}, {.upper}]"),
         y = participant_group,
         x = 1.5
       ),
@@ -1513,50 +1488,38 @@ plot_participant_group_model <- function(data, prior_model, model) {
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
 
-
-  plot_grob <- ggplot2::ggplotGrob(posterior_update)
-  plot_new <- ggpubr::as_ggplot(plot_grob)
-
-  remove(posterior_update)
-  remove(plot_grob)
-
-  gc()
-
-  return(plot_new)
 }
 
 plot_selftalk_content_model <- function(data, prior_model, model) {
 
-  # Prior distribution samples
-  nd <- datagrid(model = model,
-                 selftalk_content = c("Instructional",
-                                      "Motivational",
-                                      "Combined Instructional/Motivational",
-                                      "Rational"),
-                 vi = model$data$vi
-  )
+  prior_preds <- prior_model |>
+    gather_draws(b_selftalk_contentCombinedInstructionalDMotivational,
+                 b_selftalk_contentInstructional,
+                 b_selftalk_contentMotivational,
+                 b_selftalk_contentRational) |>
+    mutate(selftalk_content = case_when(
+      .variable == "b_selftalk_contentCombinedInstructionalDMotivational" ~ "Combined Instructional/Motivational",
+      .variable == "b_selftalk_contentInstructional" ~ "Instructional",
+      .variable == "b_selftalk_contentMotivational" ~ "Motivational",
+      .variable == "b_selftalk_contentRational" ~ "Rational"
+    ),
+    label = "Prior (Hatzigeorgiadis et al., 2011)")
 
-  # Prior distribution samples
-  prior_preds <- predictions(prior_model, type = "response",
-                             newdata = nd,
-                             re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
-
-  # Posterior distribution samples
-  posterior_preds <- predictions(model, type = "response",
-                                 newdata = nd,
-                                 re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Posterior Pooled Estimate")
+  posterior_preds <- model |>
+    gather_draws(b_selftalk_contentCombinedInstructionalDMotivational,
+                 b_selftalk_contentInstructional,
+                 b_selftalk_contentMotivational,
+                 b_selftalk_contentRational) |>
+    mutate(selftalk_content = case_when(
+      .variable == "b_selftalk_contentCombinedInstructionalDMotivational" ~ "Combined Instructional/Motivational",
+      .variable == "b_selftalk_contentInstructional" ~ "Instructional",
+      .variable == "b_selftalk_contentMotivational" ~ "Motivational",
+      .variable == "b_selftalk_contentRational" ~ "Rational"
+    ),
+    label = "Posterior Pooled Estimate")
 
   posterior_summary <- group_by(posterior_preds, selftalk_content, label) |>
-    mean_qi(draw) |>
-    mutate(draw = draw,
-           .lower = .lower,
-           .upper = .upper)
+    mean_qi(.value)
 
   # Combine prior and posterior samples for plot
   prior_posterior <- rbind(prior_preds, posterior_preds) |>
@@ -1565,7 +1528,7 @@ plot_selftalk_content_model <- function(data, prior_model, model) {
     )))
 
   posterior_update <- ggplot(data = prior_posterior,
-                             aes(x = draw, y = selftalk_content,
+                             aes(x = .value, y = selftalk_content,
                                  color = label, fill = label)
   ) +
     # Add reference line at zero
@@ -1588,7 +1551,7 @@ plot_selftalk_content_model <- function(data, prior_model, model) {
       data = mutate_if(posterior_summary,
                        is.numeric, round, 2),
       aes(
-        label = glue::glue("{draw} [{.lower}, {.upper}]"),
+        label = glue::glue("{.value} [{.lower}, {.upper}]"),
         y = selftalk_content,
         x = 1.5
       ),
@@ -1614,50 +1577,38 @@ plot_selftalk_content_model <- function(data, prior_model, model) {
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
 
-
-  plot_grob <- ggplot2::ggplotGrob(posterior_update)
-  plot_new <- ggpubr::as_ggplot(plot_grob)
-
-  remove(posterior_update)
-  remove(plot_grob)
-
-  gc()
-
-  return(plot_new)
 }
 
 plot_matching_model <- function(data, prior_model, model) {
 
-  # Prior distribution samples
-  nd <- datagrid(model = model,
-                 matching = c("Instructional/Fine",
-                              "Instructional/Gross",
-                              "Motivational/Fine",
-                              "Motivational/Gross"),
-                 vi = model$data$vi
-  )
+  prior_preds <- prior_model |>
+    gather_draws(b_matchingInstructionalDFine,
+                 b_matchingInstructionalDGross,
+                 b_matchingMotivationalDFine,
+                 b_matchingMotivationalDGross) |>
+    mutate(matching = case_when(
+      .variable == "b_matchingInstructionalDFine" ~ "Instructional/Fine",
+      .variable == "b_matchingInstructionalDGross" ~ "Instructional/Gross",
+      .variable == "b_matchingMotivationalDFine" ~ "Motivational/Fine",
+      .variable == "b_matchingMotivationalDGross" ~ "Motivational/Gross"
+    ),
+    label = "Prior (Hatzigeorgiadis et al., 2011)")
 
-  # Prior distribution samples
-  prior_preds <- predictions(prior_model, type = "response",
-                             newdata = nd,
-                             re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
-
-  # Posterior distribution samples
-  posterior_preds <- predictions(model, type = "response",
-                                 newdata = nd,
-                                 re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Posterior Pooled Estimate")
+  posterior_preds <- model |>
+    gather_draws(b_matchingInstructionalDFine,
+                 b_matchingInstructionalDGross,
+                 b_matchingMotivationalDFine,
+                 b_matchingMotivationalDGross) |>
+    mutate(matching = case_when(
+      .variable == "b_matchingInstructionalDFine" ~ "Instructional/Fine",
+      .variable == "b_matchingInstructionalDGross" ~ "Instructional/Gross",
+      .variable == "b_matchingMotivationalDFine" ~ "Motivational/Fine",
+      .variable == "b_matchingMotivationalDGross" ~ "Motivational/Gross"
+    ),
+    label = "Posterior Pooled Estimate")
 
   posterior_summary <- group_by(posterior_preds, matching, label) |>
-    mean_qi(draw) |>
-    mutate(draw = draw,
-           .lower = .lower,
-           .upper = .upper)
+    mean_qi(.value)
 
   # Combine prior and posterior samples for plot
   prior_posterior <- rbind(prior_preds, posterior_preds) |>
@@ -1666,7 +1617,7 @@ plot_matching_model <- function(data, prior_model, model) {
     )))
 
   posterior_update <- ggplot(data = prior_posterior,
-                             aes(x = draw, y = matching,
+                             aes(x = .value, y = matching,
                                  color = label, fill = label)
   ) +
     # Add reference line at zero
@@ -1689,7 +1640,7 @@ plot_matching_model <- function(data, prior_model, model) {
       data = mutate_if(posterior_summary,
                        is.numeric, round, 2),
       aes(
-        label = glue::glue("{draw} [{.lower}, {.upper}]"),
+        label = glue::glue("{.value} [{.lower}, {.upper}]"),
         y = matching,
         x = 1.5
       ),
@@ -1715,48 +1666,30 @@ plot_matching_model <- function(data, prior_model, model) {
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
 
-
-  plot_grob <- ggplot2::ggplotGrob(posterior_update)
-  plot_new <- ggpubr::as_ggplot(plot_grob)
-
-  remove(posterior_update)
-  remove(plot_grob)
-
-  gc()
-
-  return(plot_new)
 }
 
 plot_task_novelty_model <- function(data, prior_model, model) {
 
-  # Prior distribution samples
-  nd <- datagrid(model = model,
-                 task_novelty = c("Learned",
-                                  "Novel"),
-                 vi = model$data$vi
-  )
+  prior_preds <- prior_model |>
+    gather_draws(b_task_noveltyLearned,
+                 b_task_noveltyNovel) |>
+    mutate(task_novelty = case_when(
+      .variable == "b_task_noveltyLearned" ~ "Learned",
+      .variable == "b_task_noveltyNovel" ~ "Novel"
+    ),
+    label = "Prior (Hatzigeorgiadis et al., 2011)")
 
-  # Prior distribution samples
-  prior_preds <- predictions(prior_model, type = "response",
-                             newdata = nd,
-                             re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
-
-  # Posterior distribution samples
-  posterior_preds <- predictions(model, type = "response",
-                                 newdata = nd,
-                                 re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Posterior Pooled Estimate")
+  posterior_preds <- model |>
+    gather_draws(b_task_noveltyLearned,
+                 b_task_noveltyNovel) |>
+    mutate(task_novelty = case_when(
+      .variable == "b_task_noveltyLearned" ~ "Learned",
+      .variable == "b_task_noveltyNovel" ~ "Novel"
+    ),
+    label = "Posterior Pooled Estimate")
 
   posterior_summary <- group_by(posterior_preds, task_novelty, label) |>
-    mean_qi(draw) |>
-    mutate(draw = draw,
-           .lower = .lower,
-           .upper = .upper)
+    mean_qi(.value)
 
   # Combine prior and posterior samples for plot
   prior_posterior <- rbind(prior_preds, posterior_preds) |>
@@ -1765,7 +1698,7 @@ plot_task_novelty_model <- function(data, prior_model, model) {
     )))
 
   posterior_update <- ggplot(data = prior_posterior,
-                             aes(x = draw, y = task_novelty,
+                             aes(x = .value, y = task_novelty,
                                  color = label, fill = label)
   ) +
     # Add reference line at zero
@@ -1788,7 +1721,7 @@ plot_task_novelty_model <- function(data, prior_model, model) {
       data = mutate_if(posterior_summary,
                        is.numeric, round, 2),
       aes(
-        label = glue::glue("{draw} [{.lower}, {.upper}]"),
+        label = glue::glue("{.value} [{.lower}, {.upper}]"),
         y = task_novelty,
         x = 1.5
       ),
@@ -1814,48 +1747,30 @@ plot_task_novelty_model <- function(data, prior_model, model) {
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
 
-
-  plot_grob <- ggplot2::ggplotGrob(posterior_update)
-  plot_new <- ggpubr::as_ggplot(plot_grob)
-
-  remove(posterior_update)
-  remove(plot_grob)
-
-  gc()
-
-  return(plot_new)
 }
 
 plot_cue_selection_model <- function(data, prior_model, model) {
 
-  # Prior distribution samples
-  nd <- datagrid(model = model,
-                 cue_selection = c("Assigned",
-                                   "Self-selected"),
-                 vi = model$data$vi
-  )
+  prior_preds <- prior_model |>
+    gather_draws(b_cue_selectionAssigned,
+                 b_cue_selectionSelfMselected) |>
+    mutate(cue_selection = case_when(
+      .variable == "b_cue_selectionAssigned" ~ "Assigned",
+      .variable == "b_cue_selectionSelfMselected" ~ "Self-selected"
+    ),
+    label = "Prior (Hatzigeorgiadis et al., 2011)")
 
-  # Prior distribution samples
-  prior_preds <- predictions(prior_model, type = "response",
-                             newdata = nd,
-                             re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
-
-  # Posterior distribution samples
-  posterior_preds <- predictions(model, type = "response",
-                                 newdata = nd,
-                                 re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Posterior Pooled Estimate")
+  posterior_preds <- model |>
+    gather_draws(b_cue_selectionAssigned,
+                 b_cue_selectionSelfMselected) |>
+    mutate(cue_selection = case_when(
+      .variable == "b_cue_selectionAssigned" ~ "Assigned",
+      .variable == "b_cue_selectionSelfMselected" ~ "Self-selected"
+    ),
+    label = "Posterior Pooled Estimate")
 
   posterior_summary <- group_by(posterior_preds, cue_selection, label) |>
-    mean_qi(draw) |>
-    mutate(draw = draw,
-           .lower = .lower,
-           .upper = .upper)
+    mean_qi(.value)
 
   # Combine prior and posterior samples for plot
   prior_posterior <- rbind(prior_preds, posterior_preds) |>
@@ -1864,7 +1779,7 @@ plot_cue_selection_model <- function(data, prior_model, model) {
     )))
 
   posterior_update <- ggplot(data = prior_posterior,
-                             aes(x = draw, y = cue_selection,
+                             aes(x = .value, y = cue_selection,
                                  color = label, fill = label)
   ) +
     # Add reference line at zero
@@ -1887,7 +1802,7 @@ plot_cue_selection_model <- function(data, prior_model, model) {
       data = mutate_if(posterior_summary,
                        is.numeric, round, 2),
       aes(
-        label = glue::glue("{draw} [{.lower}, {.upper}]"),
+        label = glue::glue("{.value} [{.lower}, {.upper}]"),
         y = cue_selection,
         x = 1.5
       ),
@@ -1913,48 +1828,30 @@ plot_cue_selection_model <- function(data, prior_model, model) {
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
 
-
-  plot_grob <- ggplot2::ggplotGrob(posterior_update)
-  plot_new <- ggpubr::as_ggplot(plot_grob)
-
-  remove(posterior_update)
-  remove(plot_grob)
-
-  gc()
-
-  return(plot_new)
 }
 
 plot_overtness_selection_model <- function(data, prior_model, model) {
 
-  # Prior distribution samples
-  nd <- datagrid(model = model,
-                 overtness_selection = c("Assigned",
-                                   "Self-selected"),
-                 vi = model$data$vi
-  )
+  prior_preds <- prior_model |>
+    gather_draws(b_overtness_selectionAssigned,
+                 b_overtness_selectionSelfMselected) |>
+    mutate(overtness_selection = case_when(
+      .variable == "b_overtness_selectionAssigned" ~ "Assigned",
+      .variable == "b_overtness_selectionSelfMselected" ~ "Self-selected"
+    ),
+    label = "Prior (Hatzigeorgiadis et al., 2011)")
 
-  # Prior distribution samples
-  prior_preds <- predictions(prior_model, type = "response",
-                             newdata = nd,
-                             re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
-
-  # Posterior distribution samples
-  posterior_preds <- predictions(model, type = "response",
-                                 newdata = nd,
-                                 re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Posterior Pooled Estimate")
+  posterior_preds <- model |>
+    gather_draws(b_overtness_selectionAssigned,
+                 b_overtness_selectionSelfMselected) |>
+    mutate(overtness_selection = case_when(
+      .variable == "b_overtness_selectionAssigned" ~ "Assigned",
+      .variable == "b_overtness_selectionSelfMselected" ~ "Self-selected"
+    ),
+    label = "Posterior Pooled Estimate")
 
   posterior_summary <- group_by(posterior_preds, overtness_selection, label) |>
-    mean_qi(draw) |>
-    mutate(draw = draw,
-           .lower = .lower,
-           .upper = .upper)
+    mean_qi(.value)
 
   # Combine prior and posterior samples for plot
   prior_posterior <- rbind(prior_preds, posterior_preds) |>
@@ -1963,7 +1860,7 @@ plot_overtness_selection_model <- function(data, prior_model, model) {
     )))
 
   posterior_update <- ggplot(data = prior_posterior,
-                             aes(x = draw, y = overtness_selection,
+                             aes(x = .value, y = overtness_selection,
                                  color = label, fill = label)
   ) +
     # Add reference line at zero
@@ -1986,7 +1883,7 @@ plot_overtness_selection_model <- function(data, prior_model, model) {
       data = mutate_if(posterior_summary,
                        is.numeric, round, 2),
       aes(
-        label = glue::glue("{draw} [{.lower}, {.upper}]"),
+        label = glue::glue("{.value} [{.lower}, {.upper}]"),
         y = overtness_selection,
         x = 1.5
       ),
@@ -2012,48 +1909,30 @@ plot_overtness_selection_model <- function(data, prior_model, model) {
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
 
-
-  plot_grob <- ggplot2::ggplotGrob(posterior_update)
-  plot_new <- ggpubr::as_ggplot(plot_grob)
-
-  remove(posterior_update)
-  remove(plot_grob)
-
-  gc()
-
-  return(plot_new)
 }
 
 plot_training_model <- function(data, prior_model, model) {
 
-  # Prior distribution samples
-  nd <- datagrid(model = model,
-                 training = c("Training",
-                              "No training"),
-                 vi = model$data$vi
-  )
+  prior_preds <- prior_model |>
+    gather_draws(b_trainingNotraining,
+                 b_trainingTraining) |>
+    mutate(training = case_when(
+      .variable == "b_trainingNotraining" ~ "No training",
+      .variable == "b_trainingTraining" ~ "Training"
+    ),
+    label = "Prior (Hatzigeorgiadis et al., 2011)")
 
-  # Prior distribution samples
-  prior_preds <- predictions(prior_model, type = "response",
-                             newdata = nd,
-                             re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
-
-  # Posterior distribution samples
-  posterior_preds <- predictions(model, type = "response",
-                                 newdata = nd,
-                                 re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Posterior Pooled Estimate")
+  posterior_preds <- model |>
+    gather_draws(b_trainingNotraining,
+                 b_trainingTraining) |>
+    mutate(training = case_when(
+      .variable == "b_trainingNotraining" ~ "No training",
+      .variable == "b_trainingTraining" ~ "Training"
+    ),
+    label = "Posterior Pooled Estimate")
 
   posterior_summary <- group_by(posterior_preds, training, label) |>
-    mean_qi(draw) |>
-    mutate(draw = draw,
-           .lower = .lower,
-           .upper = .upper)
+    mean_qi(.value)
 
   # Combine prior and posterior samples for plot
   prior_posterior <- rbind(prior_preds, posterior_preds) |>
@@ -2062,7 +1941,7 @@ plot_training_model <- function(data, prior_model, model) {
     )))
 
   posterior_update <- ggplot(data = prior_posterior,
-                             aes(x = draw, y = training,
+                             aes(x = .value, y = training,
                                  color = label, fill = label)
   ) +
     # Add reference line at zero
@@ -2085,7 +1964,7 @@ plot_training_model <- function(data, prior_model, model) {
       data = mutate_if(posterior_summary,
                        is.numeric, round, 2),
       aes(
-        label = glue::glue("{draw} [{.lower}, {.upper}]"),
+        label = glue::glue("{.value} [{.lower}, {.upper}]"),
         y = training,
         x = 1.5
       ),
@@ -2111,47 +1990,34 @@ plot_training_model <- function(data, prior_model, model) {
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
 
-
-  plot_grob <- ggplot2::ggplotGrob(posterior_update)
-  plot_new <- ggpubr::as_ggplot(plot_grob)
-
-  remove(posterior_update)
-  remove(plot_grob)
-
-  gc()
-
-  return(plot_new)
 }
 
 plot_study_design_model <- function(data, prior_model, model) {
 
-  # Prior distribution samples
-  nd <- datagrid(model = model,
-                 study_design = c("Pre/post - experimental/control", "Post - experimental/control", "Pre/post - experimental"),
-                 vi = model$data$vi
-  )
+  prior_preds <- prior_model |>
+    gather_draws(b_study_designPostMexperimentalDcontrol,
+                 b_study_designPreDpostMexperimental,
+                 b_study_designPreDpostMexperimentalDcontrol) |>
+    mutate(study_design = case_when(
+      .variable == "b_study_designPostMexperimentalDcontrol" ~ "Post - experimental/control",
+      .variable == "b_study_designPreDpostMexperimental" ~ "Pre/post - experimental",
+      .variable == "b_study_designPreDpostMexperimentalDcontrol" ~ "Pre/post - experimental/control"
+    ),
+    label = "Prior (Hatzigeorgiadis et al., 2011)")
 
-  # Prior distribution samples
-  prior_preds <- predictions(prior_model, type = "response",
-                             newdata = nd,
-                             re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Prior (Hatzigeorgiadis et al., 2011)")
-
-  # Posterior distribution samples
-  posterior_preds <- predictions(model, type = "response",
-                                 newdata = nd,
-                                 re_formula = NA) |>
-    posterior_draws() |>
-    transform(type = "Response") |>
-    mutate(label = "Posterior Pooled Estimate")
+  posterior_preds <- model |>
+    gather_draws(b_study_designPostMexperimentalDcontrol,
+                 b_study_designPreDpostMexperimental,
+                 b_study_designPreDpostMexperimentalDcontrol) |>
+    mutate(study_design = case_when(
+      .variable == "b_study_designPostMexperimentalDcontrol" ~ "Post - experimental/control",
+      .variable == "b_study_designPreDpostMexperimental" ~ "Pre/post - experimental",
+      .variable == "b_study_designPreDpostMexperimentalDcontrol" ~ "Pre/post - experimental/control"
+    ),
+    label = "Posterior Pooled Estimate")
 
   posterior_summary <- group_by(posterior_preds, study_design, label) |>
-    mean_qi(draw) |>
-    mutate(draw = draw,
-           .lower = .lower,
-           .upper = .upper)
+    mean_qi(.value)
 
   # Combine prior and posterior samples for plot
   prior_posterior <- rbind(prior_preds, posterior_preds) |>
@@ -2160,7 +2026,7 @@ plot_study_design_model <- function(data, prior_model, model) {
     )))
 
   posterior_update <- ggplot(data = prior_posterior,
-                             aes(x = draw, y = study_design,
+                             aes(x = .value, y = study_design,
                                  color = label, fill = label)
   ) +
     # Add reference line at zero
@@ -2183,7 +2049,7 @@ plot_study_design_model <- function(data, prior_model, model) {
       data = mutate_if(posterior_summary,
                        is.numeric, round, 2),
       aes(
-        label = glue::glue("{draw} [{.lower}, {.upper}]"),
+        label = glue::glue("{.value} [{.lower}, {.upper}]"),
         y = study_design,
         x = 1.5
       ),
@@ -2209,16 +2075,6 @@ plot_study_design_model <- function(data, prior_model, model) {
           panel.border = element_rect(fill = NA),
           title = element_text(size=8))
 
-
-  plot_grob <- ggplot2::ggplotGrob(posterior_update)
-  plot_new <- ggpubr::as_ggplot(plot_grob)
-
-  remove(posterior_update)
-  remove(plot_grob)
-
-  gc()
-
-  return(plot_new)
 }
 
 plot_panel_moderators <- function(plot1, plot2, plot3,
@@ -2233,7 +2089,7 @@ plot_panel_moderators <- function(plot1, plot2, plot3,
                     subtitle = "Prior and posterior distributions for pooled estimates, individual effects (ticks), and mean and 95% quantile interval for posterior (text label)") +
     plot_layout(guides = "collect",
                 axes = "collect",
-                axis_titles = "collect") + theme(legend.position = 'bottom')
+                axis_titles = "collect") & theme(legend.position = 'bottom')
 
 }
 

@@ -169,19 +169,6 @@ list(
   tar_target(tidy_study_design_model, get_tidy_model(study_design_model)),
 
   # Make panel plot of moderators
-
-  # ## First convert plots to grob and back to reduce file sizes
-  # tar_target(motor_demands_model_plot_new, ggplot_2_grob_nback(motor_demands_model_plot)),
-  # tar_target(participant_group_model_plot_new, ggplot_2_grob_nback(participant_group_model_plot)),
-  # tar_target(selftalk_content_model_plot_new, ggplot_2_grob_nback(selftalk_content_model_plot)),
-  # tar_target(matching_model_plot_new, ggplot_2_grob_nback(matching_model_plot)),
-  # tar_target(task_novelty_model_plot_new, ggplot_2_grob_nback(task_novelty_model_plot)),
-  # tar_target(cue_selection_model_plot_new, ggplot_2_grob_nback(cue_selection_model_plot)),
-  # tar_target(overtness_selection_model_plot_new, ggplot_2_grob_nback(overtness_selection_model_plot)),
-  # tar_target(training_model_plot_new, ggplot_2_grob_nback(training_model_plot)),
-  # tar_target(study_design_model_plot_new, ggplot_2_grob_nback(study_design_model_plot)),
-
-  ## Patchwork of new plots
   tar_target(moderators_panel_plot, plot_panel_moderators(
     motor_demands_model_plot, participant_group_model_plot, selftalk_content_model_plot,
       matching_model_plot, task_novelty_model_plot, cue_selection_model_plot,
