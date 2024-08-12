@@ -72,10 +72,14 @@ list(
 
   # p-hacking models
   tar_target(p_hack_model, fit_p_hack_model(data_effect_sizes)),
+  tar_target(tidy_p_hack_model, tidy(p_hack_model, conf.int = .95)),
   tar_target(classic_model, fit_classic_model(data_effect_sizes)),
+  tar_target(tidy_classic_model, tidy(classic_model, conf.int = .95)),
   tar_target(p_hack_models_plot, plot_p_hack_models(p_hack_model, classic_model)),
   tar_target(p_hack_model_prior, fit_p_hack_model_prior(data_effect_sizes)),
+  tar_target(tidy_p_hack_model_prior, tidy(p_hack_model_prior, conf.int = .95)),
   tar_target(classic_model_prior, fit_classic_model_prior(data_effect_sizes)),
+  tar_target(tidy_classic_model_prior, tidy(classic_model_prior, conf.int = .95)),
   tar_target(p_hack_models_prior_plot, plot_p_hack_models_prior(p_hack_model_prior, classic_model_prior)),
   tar_target(p_hack_models_plots, plot_panel_p_hack(p_hack_models_plot, p_hack_models_prior_plot)),
 
