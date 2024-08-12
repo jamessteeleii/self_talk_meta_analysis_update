@@ -1239,8 +1239,8 @@ plot_p_hack_models <- function(p_hack_model, classic_model) {
       position = position_nudge(y=0.1)
     ) +
 
-    scale_color_manual(values = c("#009E73", "#E69F00")) +
-    scale_fill_manual(values = c("#009E73", "#E69F00")) +
+    scale_color_manual(values = c("#0072B2", "#D55E00")) +
+    scale_fill_manual(values = c("#0072B2", "#D55E00")) +
 
     labs(x = "Standardised Mean Difference", # summary measure
          y = element_blank(),
@@ -1318,8 +1318,8 @@ plot_p_hack_models_prior <- function(p_hack_model_prior, classic_model_prior) {
       position = position_nudge(y=0.1)
     ) +
 
-    scale_color_manual(values = c("#009E73", "#E69F00")) +
-    scale_fill_manual(values = c("#009E73", "#E69F00")) +
+    scale_color_manual(values = c("#0072B2", "#D55E00")) +
+    scale_fill_manual(values = c("#0072B2", "#D55E00")) +
 
     labs(x = "Standardised Mean Difference", # summary measure
          y = element_blank(),

@@ -2229,6 +2229,26 @@
       ],
       "Hash": "dd2b9319ee0656c8acf45c7f40c59de7"
     },
+    "publipha": {
+      "Package": "publipha",
+      "Version": "0.1.2",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "BH",
+        "R",
+        "Rcpp",
+        "RcppEigen",
+        "RcppParallel",
+        "StanHeaders",
+        "loo",
+        "methods",
+        "rstan",
+        "rstantools",
+        "truncnorm"
+      ],
+      "Hash": "41c15fa493e049a7bc3503b3096e173e"
+    },
     "purrr": {
       "Package": "purrr",
       "Version": "1.0.2",
