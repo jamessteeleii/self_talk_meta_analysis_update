@@ -30,7 +30,9 @@ tar_option_set(
     # "RoBMA",
     "publipha",
     "future",
-    "faux"
+    "faux",
+    "quarto",
+    "grateful"
   )
 )
 
@@ -219,6 +221,12 @@ list(
   tar_target(BF_curve_overtness_selection_plot_tiff, make_plot_tiff(BF_curve_overtness_selection_plot, 7.5, 5, "plots/BF_curve_overtness_selection_plot.tiff")),
   tar_target(BF_curve_training_plot_tiff, make_plot_tiff(BF_curve_training_plot, 7.5, 5, "plots/BF_curve_training_plot.tiff")),
   tar_target(BF_curve_study_design_plot_tiff, make_plot_tiff(BF_curve_study_design_plot, 7.5, 5, "plots/BF_curve_study_design_plot.tiff")),
-  tar_target(cumulative_main_model_plot_tiff, make_plot_tiff(cumulative_main_model_plot, 7.5, 5, "plots/cumulative_main_model_plot.tiff"))
+  tar_target(cumulative_main_model_plot_tiff, make_plot_tiff(cumulative_main_model_plot, 7.5, 5, "plots/cumulative_main_model_plot.tiff")),
+
+  # Manuscript
+  tar_target(grateful_report, cite_packages(out.dir = "pre_print", cite.tidyverse = TRUE, out.format = "pdf")),
+  tar_quarto(diagnostic_plots, path = "plots/diagnostic_plots.qmd"),
+  tar_quarto(response_to_reviewers.qmd, path = "pre_print/response_to_reviewers.qmd"),
+  tar_quarto(pre_print, path = "pre_print/pre_print_v2.qmd")
 
 )

@@ -1,0 +1,77 @@
+$-- Implements the frontmatter, title page, and abstract.
+$--
+$-- %%%% TODO %%%%%
+$-- Customize is needed, otherwise remove this partials to use Quarto default one
+$-- %%%%%%%%%%%%%%%%
+
+% set short author name
+\newcounter{nauthor}
+$for(by-author)$\stepcounter{nauthor}$endfor$
+\ifnum\thenauthor>2
+\renewcommand{\shortauthor}{$author/first$ et al. }
+\else 
+\renewcommand{\shortauthor}{${ for(by-author) }${ by-author.name.family }${ sep } \& ${ endfor } }
+\fi
+
+\pagestyle{fancy}
+\fancyhead[L]{$if(shorttitle)$$shorttitle$$else$\shortauthor$ if(year)$($year$)$else$(\the\year)$endif$$endif$}
+\fancyhead[R]{}
+\fancypagestyle{firstpage}{
+  \fancyhf{}% clear default for head and foot
+  \lhead{\href{https://sportrxiv.org}{\includegraphics[width = 40mm]{logo.png}}}
+  \chead{$printnote$}
+  \rhead{\$license-type$\vspace{0.2mm}}
+  \lfoot{\color{gray}All authors have read and approved  this version  of the manuscript. \linebreak The manuscript was last updated on \today}
+}
+\begin{flushleft}
+\begin{spacing}{2.5}
+\thispagestyle{firstpage}
+\vspace*{0.1cm}
+{\huge{\textbf{$articletitle$}}}
+\end{spacing}
+\vspace*{0.1cm}
+$by-author:_authors.tex()[, ]$
+\\
+\bigskip
+$by-affiliation:_affiliations.tex()[\\ ]$
+\\
+\bigskip
+*Correspondence: 
+$for(by-author)$
+$if(by-author.attributes.corresponding)$
+\href{mailto:$by-author.email$}{\color{black}$by-author.email$}
+$endif$
+$endfor$
+\\
+\bigskip
+\begin{spacing}{1}
+Cite as: \shortauthor$if(year)$($year$)$else$(\the\year)$endif$. $articletitle$. \emph{SportRxiv.} \\
+\end{spacing}
+$if(suppl-link)$
+  \vspace{1mm} Supplementary Materials: \href{$suppl-link$}{$suppl-link$} \\
+$endif$
+\vspace*{1cm}
+\end{flushleft}
+
+
+\newenvironment{abstractbox}
+  {}
+
+\surroundwithmdframed[
+  backgroundcolor=SRXIVgreen,
+  innertopmargin=10pt,
+  innerbottommargin=10pt,
+  linewidth=2pt,
+  linecolor=gray!30,
+  leftmargin=20pt,
+  rightmargin=20pt,
+  frametitle={\large{Abstract}},
+]{abstractbox}
+
+\begin{abstractbox}
+  $abstract$ 
+  $if(keywords)$
+  \\ \\
+  Keywords: \emph{${for(keywords)}${keywords}${sep}; ${endfor}}
+  $endif$ 
+\end{abstractbox}

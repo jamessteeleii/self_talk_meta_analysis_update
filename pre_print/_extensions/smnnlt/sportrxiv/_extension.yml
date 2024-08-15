@@ -1,0 +1,41 @@
+title: SportRxiv Template
+author: Simon Nolte
+version: 0.0.1
+contributes:
+  formats:
+    common:
+      # define below YAML configuration common to all formats
+      filters:
+        # You can include here Lua filters from your extension format 
+      shortcodes:
+        # You can include here Lua filters defining shortcodes from your extension
+      knitr:
+        opts_chunk:
+          echo: false
+      # Use a CSL file to style (https://www.zotero.org/styles/)
+      csl: apa.csl
+      link-citations: yes
+    pdf:
+      # define default configuration for the pdf version of your format
+      colorlinks: true
+      urlcolor: blue
+      fig-width: 6.5
+      fig-height: 4.5
+      mainfont: Verdana
+      # Content to add in header that your format is using
+      include-in-header: 
+        - include-in-header.tex
+      template-partials:
+        # Add here the partials your format is using
+        - "partials/before-body.tex"
+        - "partials/_authors.tex"
+        - "partials/_affiliations.tex"
+      format-resources:
+        # Add here the resources required for the PDF rendering
+        - logo.png
+    html:
+      # define default configuration for the html version of your format
+      number-sections: true
+      toc: true
+      theme: custom.scss
+
