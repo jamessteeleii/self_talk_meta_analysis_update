@@ -243,18 +243,6 @@ make_plot_tiff <- function(plot, width, height, path) {
 
 }
 
-ggplot_2_grob_nback <- function(plot) {
-  plot_grob <- ggplot2::ggplotGrob(plot)
-  plot_new <- ggpubr::as_ggplot(plot_grob)
-
-  remove(plot)
-  remove(plot_grob)
-
-  gc()
-
-  return(plot_new)
-}
-
 get_logBF_curve <- function(model) {
 
   plan(multisession, workers = 5)

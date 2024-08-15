@@ -4,26 +4,44 @@ This is a project where the earlier meta-analysis by [Hatzigeorgiadis et al., (2
 
 ## Abstract
 
-Self-talk has been researched as an aspect of mental preparation for performance in sports and other motor tasks since the late 1980s. In 2011 Hatzigeorgiadis and colleagues systematically reviewed and meta-analysed three decades of self-talk intervention research including 32 studies. Yet, despite the general proliferation of meta-analyses, this topic has not been meta-analysed in the decade since their review which, at least for the main effect, provided a reasonably precise standardised mean difference estimate (0.48 [95% confidence interval: 0.38, 0.58]). Several further studies on self-talk interventions have been conducted in that time and it is of interest to explore what additional evidence they offer regarding the effects of self-talk interventions on sport/motor performance. Bayesian approaches are well positioned to explore how additional evidence changes our understanding of an effect; to see whether it has changed in sign, magnitude, or precision, or whether further research has largely been a ‘waste’. Therefore, our aim was to conduct an updated systematic review and Bayesian meta-analysis replicating the search, inclusion, and models of Hatzigeorgiadis et al. Informative priors were taken directly from Hatzigeorgiadis et al. A total of 34 studies providing 128 effects nested in 64 groups across experiments 42 were included in the final updated meta-analysis representing data from 18761 participants. The overall posterior pooled estimate for the standardised mean difference was almost exactly the same as the prior: 0.47 [95% quantile interval: 0.39, 0.56]. Bayes factors were calculated for a range of effect sizes and indicated that the included studies largely reflected ‘Weak’ evidence against effects ranging from 0.30 to 0.59, and only provided ‘Decisive’ evidence or greater against more extreme effects: either very small (i.e., <0.02) or large (i.e., >0.81). Results were largely similar for all moderator analyses which were updated too; either providing relatively weak evidence against effects found in the previous meta-analysis or evidence suggesting smaller effects for certain moderators. The findings of our updated Bayesian meta-analyses reiterate the positive effect of self-talk interventions on sport/motor performance. However, they also suggest that cumulatively the past decade and more of research has done little to further our understanding of these effects. Considering the limited resources and time for conducting research, it may be worth moving onto to other more pertinent questions regarding psychological constructs impact upon sport/motor performance.
+  In the present paper we demonstrate the application of methods for cumulative evidence synthesis including Bayesian meta-analysis, and exploration of questionable research practices such as publication bias or *p*-hacking, in the sport and exercise sciences for the evaluation of experimental interventions. The use of such methods can aid in study planning and avoid "research waste". In demonstrating and discussing these methods we use the example of self-talk interventions and their effects upon sport/motor performance given a quantitative evidence synthesis has not been conducted on this topic, to the best of our knowledge, since 2011 when [Hatzigeorgiadis et al., (2011)](https://journals.sagepub.com/doi/abs/10.1177/1745691611413136) conducted their systematic review and meta-analysis. As such, this topic is ripe to use in demonstrating cumulative methods such as Bayesian updating. Therefore, our aim was to conduct an updated systematic review and Bayesian meta-analysis replicating the search, inclusion, and models of Hatzigeorgiadis et al. (2011) and demonstrate the application of cumulative evidence synthesis methods including; consideration of the initial probability that a new study of the effects of self-talk interventions would shift our prior belief in their effectiveness, the application of priors taken from the previous meta-analysis to be updated by new studies identified to a new posterior estimate of effect, and consideration of other possible sources of research waste from questionable research practices such as publication bias and *p*-hacking. Such methods as those demonstrated here, when used prospectively, can aid researchers in determining whether further research of a particular experimental intervention is in fact warranted. Considering the limited resources and time for conducting research we hope that highlighting the application of these methods might help researchers in the field to avoid research waste and more productively direct their research efforts.
+
 
 ## Reproducibility
+This repository contains the necessary files and code to reproduce the analyses, figures, and the manuscript. 
 
-This project uses
-[`renv`](https://rstudio.github.io/renv/articles/renv.html#reproducibility):
+## Usage
+To reproduce the analyses, you will need to have R (https://cran.r-project.org/) and RStudio (https://www.rstudio.com/products/rstudio/download/#download) installed on your computer.
 
-- `renv::snapshot()` save state
-- `renv::restore()` load state
+To help with reproducibility, this project uses the `renv` R package (see https://rstudio.github.io/renv/articles/renv.html). With `renv`, the state of this R project can be easily loaded as `renv` keeps track of the required R packages (including version), and (if known) the external source from which packages were retrieved (e.g., CRAN, Github). With `renv`, packages are installed to a project specific library rather than your user or system library. The `renv` package must be installed on your machine before being able to benefit from its features. The package can be installed using the following command:
 
-where state refers to package versions used by the project.
+``` r
+install.packages("renv")
+```
+
+Once you have `renv` installed, you can get a copy of this repository on your machine by clicking the green Code button then choose Download zip. Save to your machine and extract. After extraction, double click the `self_talk_meta_analysis_update.Rproj` file in the root directory. This will automatically open RStudio. This will ensure all paths work on your system as the working directory will be set to the location of the `.Rproj` file. Upon opening, RStudio will recognize the `renv` files and you will be informed that the project library is out of sync with the lockfile. At shown in the console pane of RStudio, running `renv::restore()` will install the packages recorded in the lockfile. This could take some time depending on your machine and internet connection.
 
 ## Targets analysis pipeline
 
 This project also uses a function based analysis pipeline using
-[`targets`](https://books.ropensci.org/targets/)
+[`targets`](https://books.ropensci.org/targets/). Instead of script based pipelines the `targets` package makes use of functions applied to targets specified within the pipeline. The targets can be viewed in the `_targets.R` file, and any user defined functions are available in `R/functions.r`.
+
+
 
 Useful console functions:
 
-- `tar_edit()` opens a the make file
+- `tar_edit()` opens the make file
 - `tar_make()` to run targets
 - `tar_visnetwork()` to view pipeline
+
+Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
+
+This work is licensed under a
+[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa].
+
+[![CC BY-NC-SA 4.0][cc-by-nc-sa-image]][cc-by-nc-sa]
+
+[cc-by-nc-sa]: http://creativecommons.org/licenses/by-nc-sa/4.0/
+  [cc-by-nc-sa-image]: https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png
+[cc-by-nc-sa-shield]: https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg
 

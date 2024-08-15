@@ -980,22 +980,6 @@
       "Repository": "RSPM",
       "Hash": "f7736a18de97dea803bde0a2daaafb27"
     },
-    "faux": {
-      "Package": "faux",
-      "Version": "1.2.1",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Requirements": [
-        "R",
-        "dplyr",
-        "ggplot2",
-        "jsonlite",
-        "lme4",
-        "rlang",
-        "truncnorm"
-      ],
-      "Hash": "273d0eafdca86e59a70a7c2f2bfe192d"
-    },
     "fontawesome": {
       "Package": "fontawesome",
       "Version": "0.5.2",
@@ -1753,25 +1737,6 @@
         "R"
       ],
       "Hash": "7ce2733a9826b3aeb1775d56fd305472"
-    },
-    "marginaleffects": {
-      "Package": "marginaleffects",
-      "Version": "0.19.0",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Requirements": [
-        "R",
-        "Rcpp",
-        "RcppEigen",
-        "checkmate",
-        "data.table",
-        "generics",
-        "insight",
-        "methods",
-        "rlang",
-        "utils"
-      ],
-      "Hash": "65f5dc8f18f67de93d61887c2bb1ed17"
     },
     "mathjaxr": {
       "Package": "mathjaxr",
