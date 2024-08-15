@@ -26,7 +26,7 @@ Once you have `renv` installed, you can get a copy of this repository on your ma
 This project also uses a function based analysis pipeline using
 [`targets`](https://books.ropensci.org/targets/). Instead of script based pipelines the `targets` package makes use of functions applied to targets specified within the pipeline. The targets can be viewed in the `_targets.R` file, and any user defined functions are available in `R/functions.r`.
 
-
+You can view the existing targets pipeline by downloading the `targets_pipeline.html` file and opening it in your browser.
 
 Useful console functions:
 
