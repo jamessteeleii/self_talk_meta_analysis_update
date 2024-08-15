@@ -25,12 +25,10 @@ tar_option_set(
     "base",
     "furrr",
     "patchwork",
-    "marginaleffects",
     "broom.mixed",
     # "RoBMA",
     "publipha",
     "future",
-    "faux",
     "quarto",
     "grateful"
   )
