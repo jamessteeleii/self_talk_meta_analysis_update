@@ -31,6 +31,12 @@ Useful console functions:
 - `tar_make()` to run targets
 - `tar_visnetwork()` to view pipeline
 
+## Software and packages used
+
+The [`grateful`](https://pakillo.github.io/grateful/index.html) package was used to create citations to all software and packages used in the analysis. The `grateful` report can be viewed by downloading the `pre_print/grateful-report.pdf` file.
+
+## License
+
 Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 
 This work is licensed under a
