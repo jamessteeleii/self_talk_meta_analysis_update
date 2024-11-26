@@ -51,6 +51,7 @@ library(kableExtra)
 
 targets::tar_config_set(store = here::here('_targets'))
 ```
+
 # Introduction
 ## Cumulative evidence synthesis 
 Two questions that should be asked (though arguably are not asked often enough particularly in sport and and exercise science) by researchers when planning a study of an experimental intervention is *"what is the likelihood that the experimental intervention is superior to the control intervention given the evidence accumulated so far?"*, and *"what is the likelihood that a new trial, given some design parameters and previous evidence, will demonstrate the superiority of the experimental intervention?"*. The key here is to consider the *cumulative* nature of evidence provided by research and its synthesis. Indeed, to not do this could lead to redundancy or so called "research waste". Evidence synthesis methods are essential to determining whether or not there is justification for further research on a given topic, and the Cochrane-Collaboration and REWARD (Reduce Research Waste and Reward Diligence) Alliance have even established an award for efforts in the area of reducing "research waste" [@glasziouResearchWasteStill2018a]. However, across many domains there remains a high prevalence of redundancy and a low prevalence of attempts to minimise or reduce it [@lundMetaresearchEvaluatingRedundancy2022].
@@ -153,6 +154,7 @@ In addition to this we also examined both the random effects mixture model for *
 [^9]: Note that for the mixture model of *p*-hacking the `publipha` package used does not allow for specification of a prior based upon the $t$ distribution for that function. As such, instead of the $t(60, 0.48, 0.05)$ prior taken from Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] for these models we used a normal prior with the same location and scale parameters. Given the the $t$ distribution approaches the normal distribution with high degrees of freedom, and the prior for other models had a high number of degrees of freedom (i.e., $k=60$), the choice of a normal distribution here very closely approximates the $t$ distribution based prior anyway and if anything is conservative in examining an adjusted estimate for *p*-hacking.
 
 # Results
+
 ```{r}
 targets::tar_load(data)
 sample_sizes_st <- data %>%
@@ -178,7 +180,9 @@ sample_sizes <- bind_rows(sample_sizes_st, sample_sizes_con)
 
 ```
 
+
 Since Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] meta-analysis the number of studies conducted examining the effects of self-talk interventions on sport/motor performance has roughly doubled. We identified `r length(unique(data$study_code))` new studies published from November 2011 up to November 2023 [@abdoliCloserLookHow2018; @hatzigeorgiadisSelftalkCompetitiveSport2014; @panteliAcquisitionLongJump2013; @hongEmpiricalTestSelfTalk2020; @hatzigeorgiadisBeatHeatEffects2018; @laneBriefOnlineTraining2016; @latinjakCombiningSelfTalk2011; @gregersenCounteringConsequencesEgo2017; @mccormickEffectsMotivationalSelfTalk2018; @galanisEffectsStrategicSelftalk2022; @benekaEffectsInstructionalMotivational2013; @wallaceEffectsMotivationalSelfTalk2017; @walterEffectsSelfTalkTraining2019; @galanisLabFieldEffects2018; @youngHowMuchDoes2023; @raalteWillUseDeclarative2018; @liuInteractiveEffectsMotor2022; @dematosMotivationalSelftalkImproves2021; @barwoodImprovement10kmTimetrial2015; @cabralMotivationalSelftalkMitigates2023; @changSelftalkSoftballPerformance2014; @raalteSelfTalkSCUBADiving2018; @galanisStrategicSelfTalkAssists2022; @blanchfieldTalkingYourselfOut2014; @turnerTeeingSuccessEffects2018; @naderiradEffectInstructionalMotivational2023; @zetouEffectSelftalkTaekwondo2014; @zourbanosEffectsSelftalkIntervention2013; @osmanEffectsInstructionalMotivational2022; @kolovelonisEffectsInstructionalMotivational2011; @sarigEffectsInstructionalSelfTalk2023; @marshallEffectsSelfTalkCues2016; @zourbanosEffectsSelfTalkDominant2013; @galanisEffectsStrategicSelftalk2023; @weinbergInfluenceSelftalkIntervention2012]. These included `r length(unique(data$effect_code))` effects nested in `r length(unique(data$group_code))` groups nested in `r length(unique(data$experiment_code))` experiments. The included studies contained a total of `r sample_sizes[1,2] + sample_sizes[5,2]` participants (see @tbl-sample-sizes). We included all but one study [@marshallEffectsSelfTalkCues2016], due to the sample size for groups in this study being too small to calculate SMDs (i.e., n = 2 to 3), in our analyses.
+
 
 ```{r}
 #| label: tbl-sample-sizes 
@@ -195,9 +199,11 @@ knitr::kable(
   kable_classic(full_width = FALSE) 
 ```
 
+
 ## Examining the effects of a new trial upon belief in the effects of self-talk interventions
 
 Given the precision of the prior distribution taken from Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] it is highly unlikely that any further study would have shifted belief in the effect estimate. As can be seen in @fig-additional-study, irrespective of the sample size or magnitude of effect and the extent to which it disagreed with the prior estimate, no single new study could shift the posterior distribution to an extent that it didn't still have ~95% of its mass within the 95% quantile interval of the prior distribution. As such, if we were to take the prior estimate from Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] at face value in the process of deciding whether to conduct a new study of self-talk interventions, at least with respect to their main effects on sport/motor performance, we should likely conclude that it would be a waste of resources given the precision of this existing estimate of the intervention effect. Of course, this only considers the addition of a single study and as noted since 2011 the number of studies examining self-talk interventions has roughly doubled. As such, it is worth considering the extent to which this volume of additional evidence might have updated belief in the estimate of their effects. 
+
 ```{r}
 #| label: fig-additional-study 
 #| fig-width: 13.33
@@ -208,16 +214,20 @@ targets::tar_load(additional_study_sims_plot)
 additional_study_sims_plot
 ```
 
+
 ## Updating the prior estimate from Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] with newer studies
 
 ### Main model
+
 ```{r}
 targets::tar_load(main_model)
 targets::tar_load(tidy_main_model)
 targets::tar_load(main_model_logBF_curve)
 ```
 
+
 The overall mean and interval estimate for the SMD for self-talk interventions was `r round(tidy_main_model$estimate[1],2)` [95% quantile interval: `r round(tidy_main_model$conf.low[1],2)`, `r round(tidy_main_model$conf.high[1],2)`]. This was very similar to the estimate of overall effect in Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] of 0.48 [95% confidence interval: 0.38, 0.58]. Heterogeneity ($\tau$) at the study level was also similar to that reported by Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011], though as noted it is not clear what level theirs pertained to exactly. At the study level $\tau$ = `r round(tidy_main_model$estimate[2],2)` [95% quantile interval: `r round(tidy_main_model$conf.low[2],2)`, `r round(tidy_main_model$conf.high[2],2)`], at the experiment level $\tau$ = `r round(tidy_main_model$estimate[3],2)` [95% quantile interval: `r round(tidy_main_model$conf.low[3],2)`, `r round(tidy_main_model$conf.high[3],2)`], at the group level $\tau$ = `r round(tidy_main_model$estimate[4],2)` [95% quantile interval: `r round(tidy_main_model$conf.low[4],2)`, `r round(tidy_main_model$conf.high[4],2)`], and at the effect level $\tau$ = `r round(tidy_main_model$estimate[5],2)` [95% quantile interval: `r round(tidy_main_model$conf.low[5],2)`, `r round(tidy_main_model$conf.high[5],2)`]. An ordered forest plot of study level estimates is shown in @fig-main-model panel (A), and the posterior pooled estimate for the overall SMD effect compared with the prior is shown in panel (B).
+
 
 ```{r}
 #| label: fig-main-model 
@@ -260,9 +270,11 @@ Jeffreys_scales <- main_model_logBF_curve %>%
             max_effect = max(effect)) 
 ```
 
+
 Considering the log10(BF) values calculated against the range of SMD effect sizes from 0 to 1 compared to Jeffreys scale (see @fig-main-model panel [C]), the newly added evidence suggested that there was only "decisive" evidence updating the prior against effect sizes ranging from 0 to `r round(Jeffreys_scales$max_effect[1],2)` and from `r round(Jeffreys_scales$min_effect[2],2)` to `r round(Jeffreys_scales$max_effect[2],2)`. "Very strong" evidence was indicated against effect sizes ranging from `r round(Jeffreys_scales$min_effect[7],2)` to `r round(Jeffreys_scales$max_effect[7],2)` and from `r round(Jeffreys_scales$min_effect[8],2)` to `r round(Jeffreys_scales$max_effect[8],2)`. "Strong" evidence was indicated against effect sizes ranging from `r round(Jeffreys_scales$min_effect[3],2)` to `r round(Jeffreys_scales$max_effect[3],2)` and from `r round(Jeffreys_scales$min_effect[4],2)` to `r round(Jeffreys_scales$max_effect[4],2)`. "Substantial" evidence was indicated against effect sizes ranging from `r round(Jeffreys_scales$min_effect[5],2)` to `r round(Jeffreys_scales$max_effect[5],2)` and from `r round(Jeffreys_scales$min_effect[6],2)` to `r round(Jeffreys_scales$max_effect[6],2)`. "Weak" or "negative" evidence was indicated against effect sizes ranging from `r round(Jeffreys_scales$min_effect[9],2)` to `r round(Jeffreys_scales$max_effect[10],2)`. This suggested that the newly acquired evidence generally decreased our belief only in effect sizes that would likely already have been ruled out by the analysis of Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011]. The supplementary cumulative models further supported this. They showed little change in either point or interval estimates for the SMD from year to year as a result of new studies during the period of November 2011 to November 2023 (see [https://osf.io/9qrh5](cumulative model plot)).
 
 ### Moderators
+
 ```{r}
 targets::tar_load(tidy_motor_demands_model)
 targets::tar_load(tidy_selftalk_content_model)
@@ -271,11 +283,13 @@ targets::tar_load(tidy_task_novelty_model)
 targets::tar_load(tidy_training_model)
 ```
 
+
 For most of the moderators explored there was similarly little impact upon posterior estimates for the SMD from the introduction of new evidence accumulated since the analysis of Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011]. @fig-moderators-models shows each of the prior and posterior distributions for the moderators estimates and the log10(BF) results for each are available in the supplementary materials (see 'plots' folder [https://osf.io/dqwh5/](https://osf.io/dqwh5/)). Where there were more substantial changes from prior to posterior these typically revealed a shift in the magnitude of SMD estimate towards the overall pooled estimate from the main model e.g., for fine tasks in the motor demands model (Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] = 0.67 [95% confidence interval: 0.53, 0.82]; posterior pooled estimate = `r round(tidy_motor_demands_model$estimate[1],2)` [95% quantile interval: `r round(tidy_motor_demands_model$conf.low[1],2)`, `r round(tidy_motor_demands_model$conf.high[1],2)`]), instructional in the self-talk content model (Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] = 0.55 [95% confidence interval: 0.40, 0.70]; posterior pooled estimate = `r round(tidy_selftalk_content_model$estimate[2],2)` [95% quantile interval: `r round(tidy_selftalk_content_model$conf.low[2],2)`, `r round(tidy_selftalk_content_model$conf.high[2],2)`]), instructional/fine in the matching hypothesis model (Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] = 0.83 [95% confidence interval: 0.64, 1.02]; posterior pooled estimate = `r round(tidy_matching_model$estimate[1],2)` [95% quantile interval: `r round(tidy_matching_model$conf.low[1],2)`, `r round(tidy_matching_model$conf.high[1],2)`]), for novel tasks in the task novelty model (Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] = 0.73 [95% confidence interval: 0.47, 1.00]; posterior pooled estimate = `r round(tidy_task_novelty_model$estimate[2],2)` [95% quantile interval: `r round(tidy_task_novelty_model$conf.low[2],2)`, `r round(tidy_task_novelty_model$conf.high[2],2)`]), and for training interventions in the training model (Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] = 0.80 [95% confidence interval: 0.57, 1.03]; posterior pooled estimate = `r round(tidy_training_model$estimate[2],2)` [95% quantile interval: `r round(tidy_training_model$conf.low[2],2)`, `r round(tidy_training_model$conf.high[2],2)`]).
 
 \newpage
 
 \blandscape
+
 
 ```{r}
 #| label: fig-moderators-models 
@@ -301,9 +315,11 @@ targets::tar_load(study_design_model_plot)
     plot_layout(guides = "collect") & theme(legend.position = 'bottom')
 
 ```
+
 \elandscape
 
 ## Examining the quality of the evidence and potential questionable research practices
+
 ```{r}
 targets::tar_load(tidy_pet_model)
 targets::tar_load(tidy_rma.mv_model)
@@ -315,7 +331,9 @@ targets::tar_load(tidy_p_hack_model_prior)
 targets::tar_load(tidy_classic_model_prior)
 ```
 
+
 When considering only the new studies published since Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] the frequentist multilevel model estimate (`r round(tidy_rma.mv_model$estimate[1],2)` [95% confidence interval: `r round(tidy_rma.mv_model$conf.low[1],2)`, `r round(tidy_rma.mv_model$conf.high[1],2)`]) was very similar to both their prior estimate, and also the posterior Bayesian estimate from our updated model (see section above). For the conditional PET-PEESE estimator however the PET estimate was not statistically significant at the $\alpha=0.10$ level and this adjusted estimate was compatible with a range of estimates from negative effects of similar magnitude to the previously reported positive effect in Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011], through to null and trivially positive effects (`r round(tidy_pet_model$estimate[1],2)` [95% confidence interval: `r round(tidy_pet_model$conf.low[1],2)`, `r round(tidy_pet_model$conf.high[1],2)`]) suggesting that publication bias/small study effects may be present in this post-2011 literature. These estimates can be seen in the contour enhanced funnel plot in @fig-contour-plot.
+
 
 ```{r}
 #| label: fig-contour-plot 
@@ -328,7 +346,9 @@ main_model_contour_funnel_plot
 
 ```
 
+
 The Bayesian mixture models assuming the presence of *p*-hacking (note, recall these models ignore the multilevel structure of the effects) also provided reduced adjusted effect estimates, though not to the same magnitude as seen in the PET estimate, with this reduction more prominent when only considering the post-2011 studies and not incorporating the prior from Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011]. Without the prior the estimate from a classic random effects model was `r round(tidy_classic_model$estimate[1],2)` [95% quantile interval: `r round(tidy_classic_model$conf.low[1],2)`, `r round(tidy_classic_model$conf.high[1],2)`] and was reduced to `r round(tidy_p_hack_model$estimate[1],2)` [95% quantile interval: `r round(tidy_p_hack_model$conf.low[1],2)`, `r round(tidy_p_hack_model$conf.high[1],2)`] assuming the presence of *p*-hacking. When incorporating the prior from Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] the estimate from a classic random effects model was `r round(tidy_classic_model_prior$estimate[1],2)` [95% quantile interval: `r round(tidy_classic_model_prior$conf.low[1],2)`, `r round(tidy_classic_model_prior$conf.high[1],2)`] and was reduced to `r round(tidy_p_hack_model_prior$estimate[1],2)` [95% quantile interval: `r round(tidy_p_hack_model_prior$conf.low[1],2)`, `r round(tidy_p_hack_model_prior$conf.high[1],2)`] assuming the presence of *p*-hacking. These estimates and the posterior distributions can be seen in @fig-phack-plot.
+
 
 ```{r}
 #| label: fig-phack-plot 
@@ -356,6 +376,7 @@ sum_prior_robma_model <-  summary(prior_robma_model)
 ```
 
 
+
 When considering only the post-2011 studies and utilising default prior distributions, RoBMA found "strong" evidence against the effect, $BF_{10}$ = `r round(sum_null_robma_model$components$inclusion_BF[1],3)` with mean model-averaged estimate of `r round(sum_null_robma_model$estimates$Mean[1],2)` [95% quantile interval: `r round(sum_null_robma_model$estimates[1,3],2)`, `r round(sum_null_robma_model$estimates[1,4],2)`], "strong" evidence in favor of the heterogeneity, $BF_{rf}$ = `r round(sum_null_robma_model$components$inclusion_BF[2],3)` with mean model-averaged estimate $\tau$ = `r round(sum_null_robma_model$estimates$Mean[2],2)` [95% quantile interval: `r round(sum_null_robma_model$estimates[2,3],2)`, `r round(sum_null_robma_model$estimates[2,4],2)`]. RoBMA without an informative prior also found "strong" evidence in favor of the publication bias, $BF_{pb}$ = `r round(sum_null_robma_model$components$inclusion_BF[3],3)`. When including the prior from Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] results were similar with RoBMA finding "strong" evidence against the effect, $BF_{10}$ = `r round(sum_prior_robma_model$components$inclusion_BF[1],3)` with mean model-averaged estimate of `r round(sum_prior_robma_model$estimates$Mean[1],2)` [95% quantile interval: `r round(sum_prior_robma_model$estimates[1,3],2)`, `r round(sum_prior_robma_model$estimates[1,4],2)`], "strong" evidence in favor of the heterogeneity, $BF_{rf}$ = `r round(sum_prior_robma_model$components$inclusion_BF[2],3)` with mean model-averaged estimate $\tau$ = `r round(sum_prior_robma_model$estimates$Mean[2],2)` [95% quantile interval: `r round(sum_prior_robma_model$estimates[2,3],2)`, `r round(sum_prior_robma_model$estimates[2,4],2)`]. RoBMA with an informative prior also found "strong" evidence in favor of the publication bias, $BF_{pb}$ = `r round(sum_prior_robma_model$components$inclusion_BF[3],3)`.
 
 # Discussion
@@ -373,10 +394,10 @@ Although *a priori* the use of simulation is valuable to see whether a new study
 
 So, we also updated using Bayesian methods the results of Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] with studies published since 2011. Since that time a further `r length(unique(data$study_code))` new studies had been published which were identified in our searches and we could include all but one in our analysis. Our findings suggested that the cumulative impact of this research over the last decade and more has done little to further our understanding of the effects of self-talk interventions. The results showed that the overall pooled estimate from the meta-analysis was a SMD of `r round(tidy_main_model$estimate[1],2)` [95% quantile interval: `r round(tidy_main_model$conf.low[1],2)`, `r round(tidy_main_model$conf.high[1],2)`]. This was very similar to the previous estimate of overall effect in Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] of 0.48 [95% confidence interval: 0.38, 0.58]. The log10(BF) calculated indicated that the included studies largely reflected “weak”, or even very mildly "negative", evidence against effects ranging from `r round(Jeffreys_scales$min_effect[9],2)` to `r round(Jeffreys_scales$max_effect[10],2)`, and only provided "decisive" evidence updating the prior against *a priori* implausible effect sizes ranging from 0 to `r round(Jeffreys_scales$max_effect[1],2)` and from `r round(Jeffreys_scales$min_effect[2],2)` to `r round(Jeffreys_scales$max_effect[2],2)`.
 
+
 ```{r}
 lochbaum <- c(0.57,1.35,0.65,0.32,0.24,0.51,0.51,0.48,0.72,1,0.22,0.49,0.48,0.47,0.68,0.28,0.2,0.44,0.32,0.34,0.84,0.38,0.38,0.38,0.74,0.72,0.82,0.72,0.15,0.47,0.31,0.49,0.49,0.65)
 ```
-
 
 ```{r}
 nd <- data.frame(study = "new", vi = 0)
@@ -391,6 +412,7 @@ pred_int_data <- brms::posterior_predict(
 
 pred_int_summary <- tidybayes::qi(pred_int_data)
 ```
+
 
 In one sense, the findings of the updated Bayesian meta-analyses do reiterate the positive effect of self-talk interventions on sport/motor performance on average reported by Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011]. Indeed, the estimate reflects the typical effect of other psychological interventions (0.51 \[95% confidence interval: 0.42, 0.58\]) as identified by Lochbaum et al.  [-@lochbaumSportPsychologyPerformance2022] in their umbrella review; though notably they also reported a wide range of overall effect estimates between positively directed interventions/strategies (`r min(lochbaum)` to `r max(lochbaum)`). Reflecting this, Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] reported $\tau$ = 0.27 (though as noted in footnote$^7$ it is not clear which level this pertains to) for the self-talk intervention studies they explored, and our study level estimate was not dissimilar to this ($\tau$ = `r round(tidy_main_model$estimate[2],2)` [95% quantile interval: `r round(tidy_main_model$conf.low[2],2)`, `r round(tidy_main_model$conf.high[2],2)`]). Indeed, our prediction interval ranged from `r round(pred_int_summary[1],2)` to `r round(pred_int_summary[2],2)`. Considering this heterogeneity in effects, Hatzigeorgiadis et al. [-@hatzigeorgiadisSelfTalkSportsPerformance2011] previously examined varied theoretically plausible moderators of the effectiveness of self-talk interventions which we were also able to update with new evidence. It may be the case that since 2011 the majority of research has focused on understanding exactly how best to employ self-talk interventions.
 
@@ -432,3 +454,4 @@ No funding was received for this project.
 # Data and Supplementary Material Accessibility
 
 All extracted data and code utilised for data preparation and analyses are available in either the Open Science Framework page for this project [https://osf.io/dqwh5/](https://osf.io/dqwh5/) or the corresponding GitHub repository [https://github.com/jamessteeleii/self_talk_meta_analysis_update](https://github.com/jamessteeleii/self_talk_meta_analysis_update). Other supplementary analyses and plots are also available there.
+

@@ -19,9 +19,9 @@ $for(by-author)$\stepcounter{nauthor}$endfor$
 \fancypagestyle{firstpage}{
   \fancyhf{}% clear default for head and foot
   \lhead{\href{https://sportrxiv.org}{\includegraphics[width = 40mm]{logo.png}}}
-  \chead{$printnote$}
+  \chead{\scriptsize{Reviewed and recommended through \href{https://healthmovsci.peercommunityin.org/articles/rec?id=44}{Peer Community in Health and Movement Sciences}}}
   \rhead{\$license-type$\vspace{0.2mm}}
-  \lfoot{\color{gray}All authors have read and approved  this version  of the manuscript. \linebreak The manuscript was last updated on \today}
+  \lfoot{\color{gray}\footnotesize{All authors have read and approved this version  of the manuscript. \linebreak The manuscript was last updated on \today}}
 }
 \begin{flushleft}
 \begin{spacing}{2.5}
@@ -69,9 +69,8 @@ $endif$
 ]{abstractbox}
 
 \begin{abstractbox}
-  $abstract$
+  \footnotesize{$abstract$}
   $if(keywords)$
-  \\ \\
   Keywords: \emph{${for(keywords)}${keywords}${sep}; ${endfor}}
   $endif$
 \end{abstractbox}
